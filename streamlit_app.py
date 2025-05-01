@@ -4,7 +4,6 @@ from PIL import Image
 import os
 import numpy as np
 
-# Page configuration
 st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
 
 # File paths
@@ -24,44 +23,46 @@ plot_files = {
     'R2 Score': 'r2_comparison.png'
 }
 
-# Title & Introduction
 st.title("Water Quality Analysis Dashboard")
+
 st.markdown("""
-This dashboard displays water quality analysis results, including model performance metrics, site-specific forecasts, and comparisons over time horizons (Next Week, Month, Year).
+This dashboard displays model performance metrics, data summaries, site-specific statistics, and model comparisons across different time horizons.
 """)
 
-# Load core data
+# Combined Results
+st.header("Model Performance Metrics")
 try:
     combined_results = pd.read_parquet(os.path.join(output_dir, parquet_files['Combined Results']))
+    st.dataframe(combined_results, use_container_width=True)
 except Exception as e:
-    st.error(f"Failed to load combined results: {e}")
-    st.stop()
-
-# Model Metrics Table
-st.header("Model Performance Metrics")
-st.dataframe(combined_results, use_container_width=True)
+    st.error(f"Failed to load Combined Results: {e}")
 
 # Data Summaries
 st.header("Data Summaries")
 col1, col2, col3 = st.columns(3)
 
-for col, key, label in zip([col1, col2, col3], 
-                           ['Weather Conditions', 'Wind Directions', 'Sites'], 
-                           ['Unique Weather Conditions', 'Unique Wind Directions', 'Unique Sites']):
-    with col:
+def load_table(parquet_key, label):
+    try:
+        df = pd.read_parquet(os.path.join(output_dir, parquet_files[parquet_key]))
         st.subheader(label)
-        try:
-            df = pd.read_parquet(os.path.join(output_dir, parquet_files[key]))
-            st.table(df)
-        except Exception as e:
-            st.error(f"Failed to load {key}: {e}")
+        st.table(df)
+    except Exception as e:
+        st.error(f"Failed to load {label}: {e}")
 
-# Model Performance Visuals
+with col1:
+    load_table('Weather Conditions', "Weather Conditions")
+with col2:
+    load_table('Wind Directions', "Wind Directions")
+with col3:
+    load_table('Sites', "Sites")
+
+# Model Performance Visualizations
 st.header("Model Performance Visualizations")
 for metric, plot_file in plot_files.items():
     try:
         image = Image.open(os.path.join(output_dir, plot_file))
-        st.image(image, caption=f"{metric} Comparison", use_column_width=True)
+        st.subheader(f"{metric} Comparison")
+        st.image(image, caption=f"{metric} Across Models", use_column_width=True)
     except Exception as e:
         st.error(f"Failed to load {metric} plot: {e}")
 
@@ -70,72 +71,70 @@ st.header("Site-Specific Predictions")
 try:
     site_predictions = pd.read_parquet(os.path.join(output_dir, parquet_files['Site Predictions']))
     sites = pd.read_parquet(os.path.join(output_dir, parquet_files['Sites']))
-    
     site_list = sorted(sites['site'].dropna().unique())
     selected_site = st.selectbox("Select Site", site_list)
 
-    model_list = sorted(combined_results['Model'].dropna().unique())
+    model_list = combined_results['Model'].unique()
     selected_model = st.selectbox("Select Model", model_list)
 
     horizons = ["Next Week", "Next Month", "Next Year"]
-    selected_horizon = st.selectbox("Select Prediction Horizon", horizons, key="horizon_pred")
+    selected_horizon = st.selectbox("Select Prediction Horizon", horizons)
 
-    # Filter data
-    site_data = site_predictions[
+    # Filter
+    filtered = site_predictions[
         (site_predictions['site'] == selected_site) &
         (site_predictions['model'] == selected_model) &
         (site_predictions['horizon'] == selected_horizon)
     ]
 
-    if not site_data.empty:
-        st.subheader(f"{selected_site} - {selected_model} ({selected_horizon})")
-
-        pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
-        site_data_limited = site_data.head(10)
-
-        # Summary stats
-        summary = site_data_limited[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose()
-        summary.reset_index(inplace=True)
-        summary['Metric'] = summary['index'].str.replace('pred_', '')
-        summary = summary[['Metric', 'mean', 'min', 'max', 'std']]
-        summary = summary.round(3).fillna("nan")
-
-        st.dataframe(summary, use_container_width=True, height=400)
-
-        if len(site_data) == 1:
-            st.warning("Only one prediction found; standard deviation is undefined.")
+    if filtered.empty:
+        st.warning(f"No predictions found for {selected_site}, {selected_model}, {selected_horizon}.")
     else:
-        st.warning("No data available for selected site/model/horizon.")
-except Exception as e:
-    st.error(f"Site-specific predictions failed: {e}")
+        st.subheader(f"{selected_site} - {selected_model} - {selected_horizon}")
+        metric_cols = [
+            'pred_surface_temperature', 'pred_middle_temperature', 'pred_bottom_temperature',
+            'pred_pH', 'pred_ammonia', 'pred_nitrate', 'pred_phosphate', 'pred_dissolved_oxygen',
+            'pred_sulfide', 'pred_carbon_dioxide', 'pred_weather_condition',
+            'pred_wind_direction', 'pred_air_temperature'
+        ]
+        summary = filtered[metric_cols].agg(['mean', 'min', 'max', 'std']).T.reset_index()
+        summary['Metric'] = summary['index'].str.replace('pred_', '').str.replace('_', ' ').str.title()
+        summary = summary[['Metric', 'mean', 'min', 'max', 'std']]
 
-# Model Comparison by Time Horizon
+        for col in ['mean', 'min', 'max', 'std']:
+            summary[col] = pd.to_numeric(summary[col], errors='coerce').round(3)
+
+        st.dataframe(summary, use_container_width=True)
+except Exception as e:
+    st.error(f"Error processing site-specific predictions: {e}")
+
+# Model Performance Comparison
 st.header("Model Performance Comparison")
 try:
     selected_horizon = st.selectbox("Select Time Horizon", horizons, key="horizon_compare")
-    metrics = ['Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score']
-    horizon_cols = [f"{m} - {selected_horizon}" for m in metrics]
+    columns = [f"{m} - {selected_horizon}" for m in ['Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score']]
+    comparison_df = combined_results[['Model'] + columns].copy()
 
-    comparison_df = combined_results[['Model'] + horizon_cols].copy()
-    comparison_df[horizon_cols] = comparison_df[horizon_cols].applymap(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
+    for col in columns:
+        comparison_df[col] = pd.to_numeric(comparison_df[col], errors='coerce').round(3)
 
     def highlight_model(row):
-        return ['background-color: #d3d3d3' if row['Model'] == selected_model else '' for _ in row]
+        return ['background-color: #cce5ff' if row['Model'] == selected_model else '' for _ in row]
 
     st.subheader(f"{selected_horizon} Comparison")
     st.dataframe(comparison_df.style.apply(highlight_model, axis=1), use_container_width=True)
 
-    selected_metrics = comparison_df[comparison_df['Model'] == selected_model]
-    st.markdown(f"**Metrics for {selected_model} ({selected_horizon}):**")
-    for metric, val in selected_metrics[horizon_cols].iloc[0].items():
-        st.markdown(f"- {metric}: {val}")
+    selected_row = comparison_df[comparison_df['Model'] == selected_model]
+    if not selected_row.empty:
+        st.markdown(f"**Metrics for {selected_model}**")
+        for col in columns:
+            st.markdown(f"- {col}: {selected_row.iloc[0][col]}")
 except Exception as e:
-    st.error(f"Comparison failed: {e}")
+    st.error(f"Error displaying model comparison: {e}")
 
 # Footer
 st.markdown("""
 ---
-**Note**: Ensure all required files (Parquet and PNGs) are available in the working directory.  
-Run with: `streamlit run streamlit_app.py`  
-Dependencies: `pip install streamlit pandas pillow pyarrow numpy`
+**Note**: Make sure all required `.parquet` and `.png` files exist in the working directory.
+To run: `pip install streamlit pandas pillow pyarrow numpy` and then `streamlit run streamlit_app.py`.
 """)
