@@ -6,8 +6,8 @@ import os
 # Set page configuration
 st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
 
-# Define file paths
-output_dir = '/content'  # Adjust for local or other environments as needed
+# Define file paths (relative to the script in the GitHub repository)
+output_dir = "."  # Files are in the same directory as the script
 parquet_files = {
     'Combined Results': 'combined_results.parquet',
     'Weather Conditions': 'weather_conditions.parquet',
@@ -27,7 +27,7 @@ st.title("Water Quality Analysis Dashboard")
 
 # Introduction
 st.markdown("""
-This dashboard displays the results of a water quality analysis, including model performance mot performance metrics, data summaries, and site-specific statistics.
+This dashboard displays the results of a water quality analysis, including model performance metrics, data summaries, and site-specific statistics.
 The metrics compare different models for predicting water quality parameters over various time horizons (Next Week, Next Month, Next Year).
 """)
 
@@ -37,7 +37,7 @@ try:
     combined_results = pd.read_parquet(os.path.join(output_dir, parquet_files['Combined Results']))
     st.dataframe(combined_results, use_container_width=True)
 except FileNotFoundError:
-    st.error(f"Error: '{parquet_files['Combined Results']}' not found in {output_dir}. Please ensure the file is generated and saved correctly.")
+    st.error(f"Error: '{parquet_files['Combined Results']}' not found in {output_dir}. Ensure the file is included in the GitHub repository.")
 except Exception as e:
     st.error(f"Error loading combined results: {str(e)}")
 
@@ -81,9 +81,9 @@ for metric, plot_file in plot_files.items():
     st.subheader(f"{metric} Comparison")
     try:
         image = Image.open(os.path.join(output_dir, plot_file))
-        st.image(image, caption=f"{metric} Comparison Across Models", use_container_width=True)
+        st.image(image, caption=f"{metric} Comparison Across Models", use_column_width=True)
     except FileNotFoundError:
-        st.error(f"Error: '{plot_file}' not found in {output_dir}. Please ensure the plot is generated and saved correctly.")
+        st.error(f"Error: '{plot_file}' not found in {output_dir}. Ensure the plot is included in the GitHub repository.")
     except Exception as e:
         st.error(f"Error loading {metric} plot: {str(e)}")
 
@@ -113,7 +113,7 @@ except Exception as e:
 # Footer
 st.markdown("""
 ---
-**Note**: Ensure all required files (Parquet and PNGs) are in the specified directory (`{}`).
-To run this app in Google Colab, install Streamlit (`pip install streamlit pyngrok pyarrow`), set up ngrok, and execute `streamlit run streamlit_app.py`.
-To run locally or on Streamlit Cloud, place all files in the same directory as this script and run `streamlit run streamlit_app.py`.
-""".format(output_dir))
+**Note**: Ensure all required files (Parquet and PNGs) are included in the GitHub repository in the same directory as this script.
+To deploy this app on Streamlit Cloud, link your GitHub repository and specify this script as the entry point.
+To run locally, install dependencies (`pip install streamlit pandas pillow pyarrow`) and execute `streamlit run streamlit_app.py`.
+""")
