@@ -27,7 +27,7 @@ st.title("Water Quality Analysis Dashboard")
 
 # Introduction
 st.markdown("""
-This dashboard displays the results of a water quality analysis, including model performance metrics, data summaries, and site-specific statistics.
+This dashboard displays the results of a water quality analysis, including model performance metrics, data summaries, site-specific statistics, and model comparisons.
 The metrics compare different models for predicting water quality parameters over various time horizons (Next Week, Next Month, Next Year).
 """)
 
@@ -87,16 +87,20 @@ for metric, plot_file in plot_files.items():
     except Exception as e:
         st.error(f"Error loading {metric} plot: {str(e)}")
 
-# Site-specific summary with dropdown
+# Site-specific summary with dual-criteria dropdown
 st.header("Site-Specific Summary")
 try:
     # Load site summary and sites data
     site_summary = pd.read_parquet(os.path.join(output_dir, parquet_files['Site Summary']))
     sites = pd.read_parquet(os.path.join(output_dir, parquet_files['Sites']))
     
-    # Create dropdown with unique, non-null sites
+    # Create dropdown for site selection
     site_list = sites['site'].dropna().unique().tolist()
     selected_site = st.selectbox("Select a Site", options=site_list, key="site_select")
+    
+    # Create dropdown for model selection
+    model_list = combined_results['Model'].unique().tolist()
+    selected_model = st.selectbox("Select a Model", options=model_list, key="model_select")
     
     # Filter summary for selected site
     site_data = site_summary[site_summary['site'] == selected_site]
@@ -108,13 +112,45 @@ try:
         # Format numerical values to 3 decimal places
         site_data_transposed['Value'] = site_data_transposed['Value'].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
         # Display the transposed table
-        st.dataframe(site_data_transposed, use_container_width=True, height=600)  # Increased height to utilize y-space
+        st.dataframe(site_data_transposed, use_container_width=True, height=600)
     else:
         st.warning(f"No summary data available for {selected_site}.")
 except FileNotFoundError as e:
     st.error(f"Error: Unable to load site summary or sites file. Ensure '{parquet_files['Site Summary']}' and '{parquet_files['Sites']}' are in {output_dir}.")
 except Exception as e:
     st.error(f"Error displaying site summary: {str(e)}")
+
+# Model performance comparison section
+st.header("Model Performance Comparison")
+try:
+    # Dropdown for time horizon selection
+    time_horizons = ["Next Week", "Next Month", "Next Year"]
+    selected_horizon = st.selectbox("Select Time Horizon for Comparison", options=time_horizons, key="horizon_select")
+    
+    # Extract metrics for the selected time horizon
+    metrics = ['Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score']
+    horizon_columns = [f"{metric} - {selected_horizon}" for metric in metrics]
+    
+    # Prepare comparison DataFrame
+    comparison_df = combined_results[['Model'] + horizon_columns].copy()
+    # Format numerical values to 3 decimal places
+    for col in horizon_columns:
+        comparison_df[col] = comparison_df[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
+    
+    # Highlight the selected model's row
+    def highlight_selected_model(row):
+        return ['background-color: #d3d3d3' if row['Model'] == selected_model else '' for _ in row]
+    
+    st.subheader(f"Model Comparison for {selected_horizon} Prediction")
+    st.dataframe(comparison_df.style.apply(highlight_selected_model, axis=1), use_container_width=True)
+    
+    # Display the selected model's metrics explicitly
+    selected_model_metrics = comparison_df[comparison_df['Model'] == selected_model]
+    st.markdown(f"**Selected Model ({selected_model}) Metrics for {selected_horizon}:**")
+    for metric, value in selected_model_metrics[horizon_columns].iloc[0].items():
+        st.markdown(f"- {metric}: {value}")
+except Exception as e:
+    st.error(f"Error displaying model comparison: {str(e)}")
 
 # Footer
 st.markdown("""
