@@ -6,14 +6,15 @@ import os
 # Set page configuration
 st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
 
-# Define file paths (relative to the script in the GitHub repository)
+# Define file paths
 output_dir = "."  # Files are in the same directory as the script
 parquet_files = {
     'Combined Results': 'combined_results.parquet',
     'Weather Conditions': 'weather_conditions.parquet',
     'Wind Directions': 'wind_directions.parquet',
     'Sites': 'sites.parquet',
-    'Site Summary': 'site_summary.parquet'
+    'Site Summary': 'site_summary.parquet',
+    'Site Predictions': 'site_predictions.parquet'  # New file
 }
 plot_files = {
     'MAE': 'mae_comparison.png',
@@ -88,10 +89,10 @@ for metric, plot_file in plot_files.items():
         st.error(f"Error loading {metric} plot: {str(e)}")
 
 # Site-specific summary with dual-criteria dropdown
-st.header("Site-Specific Summary")
+st.header("Site-Specific Predictions")
 try:
-    # Load site summary and sites data
-    site_summary = pd.read_parquet(os.path.join(output_dir, parquet_files['Site Summary']))
+    # Load site predictions and sites data
+    site_predictions = pd.read_parquet(os.path.join(output_dir, parquet_files['Site Predictions']))
     sites = pd.read_parquet(os.path.join(output_dir, parquet_files['Sites']))
     
     # Create dropdown for site selection
@@ -102,23 +103,35 @@ try:
     model_list = combined_results['Model'].unique().tolist()
     selected_model = st.selectbox("Select a Model", options=model_list, key="model_select")
     
-    # Filter summary for selected site
-    site_data = site_summary[site_summary['site'] == selected_site]
+    # Create dropdown for horizon selection
+    horizon_list = ["Next Week", "Next Month", "Next Year"]
+    selected_horizon = st.selectbox("Select Prediction Horizon", options=horizon_list, key="horizon_select_predictions")
+    
+    # Filter predictions for selected site, model, and horizon
+    site_data = site_predictions[
+        (site_predictions['site'] == selected_site) &
+        (site_predictions['model'] == selected_model) &
+        (site_predictions['horizon'] == selected_horizon)
+    ]
     
     if not site_data.empty:
-        st.subheader(f"Summary Statistics for {selected_site}")
-        # Transpose the data to make columns into rows
-        site_data_transposed = site_data.drop(columns=['site']).melt(var_name='Metric', value_name='Value')
+        st.subheader(f"Predicted Water Quality for {selected_site} ({selected_model}, {selected_horizon})")
+        # Compute summary statistics on predictions
+        pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
+        summary_data = site_data[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
+        summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
+        summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
         # Format numerical values to 3 decimal places
-        site_data_transposed['Value'] = site_data_transposed['Value'].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
-        # Display the transposed table
-        st.dataframe(site_data_transposed, use_container_width=True, height=600)
+        for col in ['mean', 'min', 'max', 'std']:
+            summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
+        # Display the summary table
+        st.dataframe(summary_data, use_container_width=True, height=600)
     else:
-        st.warning(f"No summary data available for {selected_site}.")
+        st.warning(f"No prediction data available for {selected_site}, {selected_model}, {selected_horizon}.")
 except FileNotFoundError as e:
-    st.error(f"Error: Unable to load site summary or sites file. Ensure '{parquet_files['Site Summary']}' and '{parquet_files['Sites']}' are in {output_dir}.")
+    st.error(f"Error: Unable to load site predictions or sites file. Ensure '{parquet_files['Site Predictions']}' and '{parquet_files['Sites']}' are in {output_dir}.")
 except Exception as e:
-    st.error(f"Error displaying site summary: {str(e)}")
+    st.error(f"Error displaying site predictions: {str(e)}")
 
 # Model performance comparison section
 st.header("Model Performance Comparison")
