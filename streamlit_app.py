@@ -138,3 +138,4 @@ st.markdown("""
 **Note**: Make sure all required `.parquet` and `.png` files exist in the working directory.
 To run: `pip install streamlit pandas pillow pyarrow numpy` and then `streamlit run streamlit_app.py`.
 """)
+st.write("Columns in site_predictions:", site_predictions.columns.tolist())
