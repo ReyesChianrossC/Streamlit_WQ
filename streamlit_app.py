@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 import os
+import numpy as np
 
 # Set page configuration
 st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
@@ -38,7 +39,7 @@ try:
     combined_results = pd.read_parquet(os.path.join(output_dir, parquet_files['Combined Results']))
     st.dataframe(combined_results, use_container_width=True)
 except FileNotFoundError:
-    st.error(f"Error: '{parquet_files['Combined Results']}' not found in {output_dir}.")
+    st.error(f"Error: '{parquet_files['Combined Results']}' not found snarled {output_dir}.")
 except Exception as e:
     st.error(f"Error loading combined results: {str(e)}")
 
@@ -121,28 +122,32 @@ try:
         st.subheader(f"Predicted Water Quality for {selected_site} ({selected_model}, {selected_horizon})")
         # Compute summary statistics on predictions
         pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
-        if len(site_data) > 1:
-            # Limit to 10 rows for summary statistics
-            if len(site_data) > 10:
-                st.write("More than 10 predictions available. Displaying summary statistics based on the first 10 predictions.")
-                site_data_limited = site_data.head(10)
-            else:
-                site_data_limited = site_data
-            summary_data = site_data_limited[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
-            summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
-            summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
-            # Format numerical values to 3 decimal places
-            for col in ['mean', 'min', 'max', 'std']:
-                summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else "nan")
-            # Display the summary table
-            st.dataframe(summary_data, use_container_width=True, height=600)
+        
+        # Limit to the first 5 metrics (to ensure only 5 rows)
+        pred_cols_limited = pred_cols[:5]  # Select only the first 5 metrics
+        
+        # Limit to 10 rows for summary statistics if more than 10 predictions
+        if len(site_data) > 10:
+            st.write("More than 10 predictions available. Displaying summary statistics based on the first 10 predictions.")
+            site_data_limited = site_data.head(10)
         else:
-            st.warning("Only one prediction available. Summary statistics require at least two data points to compute meaningful metrics like standard deviation.")
-            # Display the single prediction
-            single_pred = site_data[pred_cols].melt(var_name='Metric', value_name='Value')
-            single_pred['Metric'] = single_pred['Metric'].str.replace('pred_', '')
-            single_pred['Value'] = single_pred['Value'].apply(lambda x: f"{x:.3f}")
-            st.dataframe(single_pred, use_container_width=True, height=600)
+            site_data_limited = site_data
+        
+        # Compute summary statistics (mean, min, max, std) for the limited metrics
+        summary_data = site_data_limited[pred_cols_limited].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
+        summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
+        summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
+        
+        # Format numerical values to 3 decimal places
+        for col in ['mean', 'min', 'max', 'std']:
+            summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) and not np.isnan(x) else "nan")
+        
+        # Display the summary table
+        st.dataframe(summary_data, use_container_width=True, height=300)  # Adjusted height for 5 rows
+        
+        # Add a note if there’s only one prediction
+        if len(site_data) == 1:
+            st.warning("Only one prediction available. Standard deviation is undefined for a single data point.")
     else:
         st.warning(f"No prediction data available for {selected_site}, {selected_model}, {selected_horizon}.")
 except FileNotFoundError as e:
@@ -158,7 +163,7 @@ try:
     selected_horizon = st.selectbox("Select Time Horizon for Comparison", options=time_horizons, key="horizon_select")
     
     # Extract metrics for the selected time horizon
-    metrics = ['Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score']
+    metrics = ['Final MAE', "Final MSE", 'Final RMSE', 'R2 Score']
     horizon_columns = [f"{metric} - {selected_horizon}" for metric in metrics]
     
     # Prepare comparison DataFrame
@@ -186,5 +191,5 @@ except Exception as e:
 st.markdown("""
 ---
 **Note**: Ensure all required files (Parquet and PNGs) are included in the directory.
-To run locally, install dependencies (`pip install streamlit pandas pillow pyarrow`) and execute `streamlit run streamlit_app.py`.
+To run locally, install dependencies (`pip install streamlit pandas pillow pyarrow numpy`) and execute `streamlit run streamlit_app.py`.
 """)
