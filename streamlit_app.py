@@ -104,13 +104,46 @@ try:
         summary = limited[metric_cols].agg(['mean', 'min', 'max', 'std']).T.reset_index()
         summary.columns = ['Metric', 'Mean', 'Min', 'Max', 'Std']
         summary['Metric'] = summary['Metric'].str.replace('pred_', '')
+
+        # Convert columns to numeric and round to 3 decimals
         for col in ['Mean', 'Min', 'Max', 'Std']:
             summary[col] = pd.to_numeric(summary[col], errors='coerce').round(3).astype(str)
+        
+        # Display the summary dataframe
         st.dataframe(summary, use_container_width=True, height=600)
+        
+        # Display a warning if only one prediction is available
         if len(filtered) == 1:
             st.warning("Only one prediction available. Standard deviation is undefined.")
     else:
         st.warning("No data available for the selected site, model, and horizon.")
+
+    # Additional numeric metrics summary
+    st.subheader("Numeric Metrics Summary")
+    try:
+        # Define the 10 numeric metrics to include
+        numeric_metrics_list = [
+            'surface_temperature', 'middle_temperature', 'bottom_temperature',
+            'ph', 'ammonia', 'nitrate', 'phosphate',
+            'dissolved_oxygen', 'sulfide', 'carbon_dioxide'
+        ]
+
+        # Filter only the required columns from the DataFrame
+        numeric_df = filtered[numeric_metrics_list]
+
+        # Create summary statistics table
+        summary_df = numeric_df.describe().transpose().reset_index()
+        summary_df.rename(columns={'index': 'Metric', 'mean': 'Mean', 'min': 'Min', 'max': 'Max', 'std': 'Std'}, inplace=True)
+
+        # Display only the first 10 rows (optional safeguard)
+        summary_df = summary_df.head(10)
+
+        # Display in Streamlit
+        st.dataframe(summary_df, use_container_width=True)
+
+    except Exception as e:
+        st.error(f"Error displaying numeric metrics summary: {e}")
+
 except Exception as e:
     st.error(f"Error processing site-specific predictions: {e}")
 
