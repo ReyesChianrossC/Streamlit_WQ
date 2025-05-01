@@ -90,6 +90,6 @@ Members: <br>
 Agana <br>
 Casa <br>
 Gregorio <br>
-Jeremillos <br>
+Jeremillos <br> <br>
 Reyes
 """, unsafe_allow_html=True)
