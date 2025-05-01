@@ -7,14 +7,14 @@ import os
 st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
 
 # Define file paths
-output_dir = "."  # Files are in the same directory as the script
+output_dir = "."  # Update to your directory if running locally
 parquet_files = {
     'Combined Results': 'combined_results.parquet',
     'Weather Conditions': 'weather_conditions.parquet',
     'Wind Directions': 'wind_directions.parquet',
     'Sites': 'sites.parquet',
     'Site Summary': 'site_summary.parquet',
-    'Site Predictions': 'site_predictions.parquet'  # New file
+    'Site Predictions': 'site_predictions.parquet'
 }
 plot_files = {
     'MAE': 'mae_comparison.png',
@@ -38,7 +38,7 @@ try:
     combined_results = pd.read_parquet(os.path.join(output_dir, parquet_files['Combined Results']))
     st.dataframe(combined_results, use_container_width=True)
 except FileNotFoundError:
-    st.error(f"Error: '{parquet_files['Combined Results']}' not found in {output_dir}. Ensure the file is included in the GitHub repository.")
+    st.error(f"Error: '{parquet_files['Combined Results']}' not found in {output_dir}.")
 except Exception as e:
     st.error(f"Error loading combined results: {str(e)}")
 
@@ -84,7 +84,7 @@ for metric, plot_file in plot_files.items():
         image = Image.open(os.path.join(output_dir, plot_file))
         st.image(image, caption=f"{metric} Comparison Across Models", use_column_width=True)
     except FileNotFoundError:
-        st.error(f"Error: '{plot_file}' not found in {output_dir}. Ensure the plot is included in the GitHub repository.")
+        st.error(f"Error: '{plot_file}' not found in {output_dir}.")
     except Exception as e:
         st.error(f"Error loading {metric} plot: {str(e)}")
 
@@ -114,18 +114,29 @@ try:
         (site_predictions['horizon'] == selected_horizon)
     ]
     
+    # Debug number of rows
+    st.write(f"Number of predictions for {selected_site}, {selected_model}, {selected_horizon}: {len(site_data)}")
+    
     if not site_data.empty:
         st.subheader(f"Predicted Water Quality for {selected_site} ({selected_model}, {selected_horizon})")
         # Compute summary statistics on predictions
         pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
-        summary_data = site_data[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
-        summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
-        summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
-        # Format numerical values to 3 decimal places
-        for col in ['mean', 'min', 'max', 'std']:
-            summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
-        # Display the summary table
-        st.dataframe(summary_data, use_container_width=True, height=600)
+        if len(site_data) > 1:
+            summary_data = site_data[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
+            summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
+            summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
+            # Format numerical values to 3 decimal places
+            for col in ['mean', 'min', 'max', 'std']:
+                summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else "nan")
+            # Display the summary table
+            st.dataframe(summary_data, use_container_width=True, height=600)
+        else:
+            st.warning("Only one prediction available. Summary statistics require at least two data points to compute meaningful metrics like standard deviation.")
+            # Display the single prediction
+            single_pred = site_data[pred_cols].melt(var_name='Metric', value_name='Value')
+            single_pred['Metric'] = single_pred['Metric'].str.replace('pred_', '')
+            single_pred['Value'] = single_pred['Value'].apply(lambda x: f"{x:.3f}")
+            st.dataframe(single_pred, use_container_width=True, height=600)
     else:
         st.warning(f"No prediction data available for {selected_site}, {selected_model}, {selected_horizon}.")
 except FileNotFoundError as e:
@@ -168,7 +179,6 @@ except Exception as e:
 # Footer
 st.markdown("""
 ---
-**Note**: Ensure all required files (Parquet and PNGs) are included in the GitHub repository in the same directory as this script.
-To deploy this app on Streamlit Cloud, link your GitHub repository and specify this script as the entry point.
+**Note**: Ensure all required files (Parquet and PNGs) are included in the directory.
 To run locally, install dependencies (`pip install streamlit pandas pillow pyarrow`) and execute `streamlit run streamlit_app.py`.
 """)
