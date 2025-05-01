@@ -138,11 +138,3 @@ try:
             st.markdown(f"- {m}: {v}")
 except Exception as e:
     st.error(f"Error displaying model comparison: {e}")
-
-# Footer
-st.markdown("""---  
-**Note**: Ensure all required files (Parquet and PNGs) are in the directory.  
-To run locally:  
-```bash  
-pip install streamlit pandas pillow pyarrow numpy  
-streamlit run streamlit_app.py  
