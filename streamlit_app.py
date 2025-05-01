@@ -98,11 +98,17 @@ try:
     site_list = sites['site'].dropna().unique().tolist()
     selected_site = st.selectbox("Select a Site", options=site_list, key="site_select")
     
-    # Filter and display summary for selected site
+    # Filter summary for selected site
     site_data = site_summary[site_summary['site'] == selected_site]
+    
     if not site_data.empty:
         st.subheader(f"Summary Statistics for {selected_site}")
-        st.dataframe(site_data, use_container_width=True)
+        # Transpose the data to make columns into rows
+        site_data_transposed = site_data.drop(columns=['site']).melt(var_name='Metric', value_name='Value')
+        # Format numerical values to 3 decimal places
+        site_data_transposed['Value'] = site_data_transposed['Value'].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
+        # Display the transposed table
+        st.dataframe(site_data_transposed, use_container_width=True, height=600)  # Increased height to utilize y-space
     else:
         st.warning(f"No summary data available for {selected_site}.")
 except FileNotFoundError as e:
