@@ -85,7 +85,7 @@ except FileNotFoundError:
 # Footer
 st.markdown("""
 ---
-**CPEN 106 - GROUP 1** <br> 
+**CPEN 106 - GROUP 1** <br> <br>
 Members: <br> <br>
 Agana <br>
 Casa <br>
