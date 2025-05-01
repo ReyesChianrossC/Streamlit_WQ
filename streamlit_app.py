@@ -1,7 +1,7 @@
 import streamlit as st
- import pandas as pd
- from PIL import Image
- import os
+import pandas as pd
+from PIL import Image
+import os
  
  # Set page configuration
  st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
