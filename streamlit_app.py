@@ -86,10 +86,10 @@ except FileNotFoundError:
 st.markdown("""
 ---
 **CPEN 106 - GROUP 1**  
-Members: <br>
+Members: <br> <br>
 Agana <br>
 Casa <br>
 Gregorio <br>
-Jeremillos <br> <br>
+Jeremillos <br>
 Reyes
 """, unsafe_allow_html=True)
