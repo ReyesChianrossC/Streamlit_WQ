@@ -39,7 +39,7 @@ try:
     combined_results = pd.read_parquet(os.path.join(output_dir, parquet_files['Combined Results']))
     st.dataframe(combined_results, use_container_width=True)
 except FileNotFoundError:
-    st.error(f"Error: '{parquet_files['Combined Results']}' not found snarled {output_dir}.")
+    st.error(f"Error: '{parquet_files['Combined Results']}' not found in {output_dir}.")
 except Exception as e:
     st.error(f"Error loading combined results: {str(e)}")
 
@@ -123,9 +123,6 @@ try:
         # Compute summary statistics on predictions
         pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
         
-        # Limit to the first 5 metrics (to ensure only 5 rows)
-        pred_cols_limited = pred_cols[:5]  # Select only the first 5 metrics
-        
         # Limit to 10 rows for summary statistics if more than 10 predictions
         if len(site_data) > 10:
             st.write("More than 10 predictions available. Displaying summary statistics based on the first 10 predictions.")
@@ -133,8 +130,8 @@ try:
         else:
             site_data_limited = site_data
         
-        # Compute summary statistics (mean, min, max, std) for the limited metrics
-        summary_data = site_data_limited[pred_cols_limited].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
+        # Compute summary statistics (mean, min, max, std) regardless of the number of predictions
+        summary_data = site_data_limited[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
         summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
         summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
         
@@ -143,7 +140,7 @@ try:
             summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) and not np.isnan(x) else "nan")
         
         # Display the summary table
-        st.dataframe(summary_data, use_container_width=True, height=300)  # Adjusted height for 5 rows
+        st.dataframe(summary_data, use_container_width=True, height=600)
         
         # Add a note if there’s only one prediction
         if len(site_data) == 1:
@@ -163,7 +160,7 @@ try:
     selected_horizon = st.selectbox("Select Time Horizon for Comparison", options=time_horizons, key="horizon_select")
     
     # Extract metrics for the selected time horizon
-    metrics = ['Final MAE', "Final MSE", 'Final RMSE', 'R2 Score']
+    metrics = ['Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score']
     horizon_columns = [f"{metric} - {selected_horizon}" for metric in metrics]
     
     # Prepare comparison DataFrame
