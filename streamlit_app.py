@@ -85,7 +85,11 @@ except FileNotFoundError:
 # Footer
 st.markdown("""
 ---
-**Note**: Ensure all required files (`combined_results.csv`, `weather_conditions.csv`, `wind_directions.csv`, `sites.csv`, 
-and the PNG plot files) are in the same directory as this script. To run the app, install Streamlit (`pip install streamlit`) 
-and execute `streamlit run streamlit_app.py` in your terminal.
+**CPEN 106 - GROUP 1**
+Members:
+Agana
+Casa
+Gregorio
+Jeremillos
+Reyes
 """)
