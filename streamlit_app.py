@@ -1,130 +1,190 @@
-def run_prediction_model(prediction_gap_weeks, title_suffix=""):
-    water_cols = [
-        'surface_temperature', 'middle_temperature', 'bottom_temperature',
-        'ph', 'ammonia', 'nitrate', 'phosphate',
-        'dissolved_oxygen', 'sulfide', 'carbon_dioxide'
+import streamlit as st
+import pandas as pd
+from PIL import Image
+import os
+
+# Set page configuration
+st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
+
+# Define file paths
+output_dir = "."  # Update to your directory if running locally
+parquet_files = {
+    'Combined Results': 'combined_results.parquet',
+    'Weather Conditions': 'weather_conditions.parquet',
+    'Wind Directions': 'wind_directions.parquet',
+    'Sites': 'sites.parquet',
+    'Site Summary': 'site_summary.parquet',
+    'Site Predictions': 'site_predictions.parquet'
+}
+plot_files = {
+    'MAE': 'mae_comparison.png',
+    'MSE': 'mse_comparison.png',
+    'RMSE': 'rmse_comparison.png',
+    'R2 Score': 'r2_comparison.png'
+}
+
+# Title
+st.title("Water Quality Analysis Dashboard")
+
+# Introduction
+st.markdown("""
+This dashboard displays the results of a water quality analysis, including model performance metrics, data summaries, site-specific statistics, and model comparisons.
+The metrics compare different models for predicting water quality parameters over various time horizons (Next Week, Next Month, Next Year).
+""")
+
+# Load and display combined results
+st.header("Model Performance Metrics")
+try:
+    combined_results = pd.read_parquet(os.path.join(output_dir, parquet_files['Combined Results']))
+    st.dataframe(combined_results, use_container_width=True)
+except FileNotFoundError:
+    st.error(f"Error: '{parquet_files['Combined Results']}' not found in {output_dir}.")
+except Exception as e:
+    st.error(f"Error loading combined results: {str(e)}")
+
+# Load and display unique weather conditions, wind directions, and sites
+st.header("Data Summaries")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.subheader("Unique Weather Conditions")
+    try:
+        weather_conditions = pd.read_parquet(os.path.join(output_dir, parquet_files['Weather Conditions']))
+        st.table(weather_conditions)
+    except FileNotFoundError:
+        st.error(f"Error: '{parquet_files['Weather Conditions']}' not found in {output_dir}.")
+    except Exception as e:
+        st.error(f"Error loading weather conditions: {str(e)}")
+
+with col2:
+    st.subheader("Unique Wind Directions")
+    try:
+        wind_directions = pd.read_parquet(os.path.join(output_dir, parquet_files['Wind Directions']))
+        st.table(wind_directions)
+    except FileNotFoundError:
+        st.error(f"Error: '{parquet_files['Wind Directions']}' not found in {output_dir}.")
+    except Exception as e:
+        st.error(f"Error loading wind directions: {str(e)}")
+
+with col3:
+    st.subheader("Unique Sites")
+    try:
+        sites = pd.read_parquet(os.path.join(output_dir, parquet_files['Sites']))
+        st.table(sites)
+    except FileNotFoundError:
+        st.error(f"Error: '{parquet_files['Sites']}' not found in {output_dir}.")
+    except Exception as e:
+        st.error(f"Error loading sites: {str(e)}")
+
+# Display comparison plots
+st.header("Model Performance Visualizations")
+for metric, plot_file in plot_files.items():
+    st.subheader(f"{metric} Comparison")
+    try:
+        image = Image.open(os.path.join(output_dir, plot_file))
+        st.image(image, caption=f"{metric} Comparison Across Models", use_column_width=True)
+    except FileNotFoundError:
+        st.error(f"Error: '{plot_file}' not found in {output_dir}.")
+    except Exception as e:
+        st.error(f"Error loading {metric} plot: {str(e)}")
+
+# Site-specific summary with dual-criteria dropdown
+st.header("Site-Specific Predictions")
+try:
+    # Load site predictions and sites data
+    site_predictions = pd.read_parquet(os.path.join(output_dir, parquet_files['Site Predictions']))
+    sites = pd.read_parquet(os.path.join(output_dir, parquet_files['Sites']))
+    
+    # Create dropdown for site selection
+    site_list = sites['site'].dropna().unique().tolist()
+    selected_site = st.selectbox("Select a Site", options=site_list, key="site_select")
+    
+    # Create dropdown for model selection
+    model_list = combined_results['Model'].unique().tolist()
+    selected_model = st.selectbox("Select a Model", options=model_list, key="model_select")
+    
+    # Create dropdown for horizon selection
+    horizon_list = ["Next Week", "Next Month", "Next Year"]
+    selected_horizon = st.selectbox("Select Prediction Horizon", options=horizon_list, key="horizon_select_predictions")
+    
+    # Filter predictions for selected site, model, and horizon
+    site_data = site_predictions[
+        (site_predictions['site'] == selected_site) &
+        (site_predictions['model'] == selected_model) &
+        (site_predictions['horizon'] == selected_horizon)
     ]
-    water_external_cols = water_cols + ['site', 'weather_condition', 'wind_direction', 'air_temperature']
     
-    # Prepare DataFrames
-    pd_waterparam_only = df_act2.select(*water_cols + ['site']).toPandas()
-    pd_waterparam_external = df_act2.select(*water_external_cols).toPandas()
+    # Debug number of rows
+    st.write(f"Number of predictions for {selected_site}, {selected_model}, {selected_horizon}: {len(site_data)}")
     
-    # Encode categorical variables
-    for col in ['site', 'weather_condition', 'wind_direction']:
-        if col in pd_waterparam_external.columns:
-            le = LabelEncoder()
-            pd_waterparam_external[col] = le.fit_transform(pd_waterparam_external[col].astype(str))
+    if not site_data.empty:
+        st.subheader(f"Predicted Water Quality for {selected_site} ({selected_model}, {selected_horizon})")
+        # Compute summary statistics on predictions
+        pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
+        if len(site_data) > 1:
+            # Limit to 10 rows for summary statistics
+            if len(site_data) > 10:
+                st.write("More than 10 predictions available. Displaying summary statistics based on the first 10 predictions.")
+                site_data_limited = site_data.head(10)
+            else:
+                site_data_limited = site_data
+            summary_data = site_data_limited[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
+            summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
+            summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
+            # Format numerical values to 3 decimal places
+            for col in ['mean', 'min', 'max', 'std']:
+                summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else "nan")
+            # Display the summary table
+            st.dataframe(summary_data, use_container_width=True, height=600)
+        else:
+            st.warning("Only one prediction available. Summary statistics require at least two data points to compute meaningful metrics like standard deviation.")
+            # Display the single prediction
+            single_pred = site_data[pred_cols].melt(var_name='Metric', value_name='Value')
+            single_pred['Metric'] = single_pred['Metric'].str.replace('pred_', '')
+            single_pred['Value'] = single_pred['Value'].apply(lambda x: f"{x:.3f}")
+            st.dataframe(single_pred, use_container_width=True, height=600)
+    else:
+        st.warning(f"No prediction data available for {selected_site}, {selected_model}, {selected_horizon}.")
+except FileNotFoundError as e:
+    st.error(f"Error: Unable to load site predictions or sites file. Ensure '{parquet_files['Site Predictions']}' and '{parquet_files['Sites']}' are in {output_dir}.")
+except Exception as e:
+    st.error(f"Error displaying site predictions: {str(e)}")
+
+# Model performance comparison section
+st.header("Model Performance Comparison")
+try:
+    # Dropdown for time horizon selection
+    time_horizons = ["Next Week", "Next Month", "Next Year"]
+    selected_horizon = st.selectbox("Select Time Horizon for Comparison", options=time_horizons, key="horizon_select")
     
-    # Handle missing values
-    pd_waterparam_only[water_cols] = pd_waterparam_only[water_cols].astype(float).fillna(pd_waterparam_only[water_cols].mean())
-    pd_waterparam_external[water_cols + ['air_temperature']] = \
-        pd_waterparam_external[water_cols + ['air_temperature']].astype(float).fillna(
-            pd_waterparam_external[water_cols + ['air_temperature']].mean())
+    # Extract metrics for the selected time horizon
+    metrics = ['Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score']
+    horizon_columns = [f"{metric} - {selected_horizon}" for metric in metrics]
     
-    # Normalize data
-    scaler_only = MinMaxScaler()
-    np_waterparam_only_scaled = scaler_only.fit_transform(pd_waterparam_only[water_cols])
+    # Prepare comparison DataFrame
+    comparison_df = combined_results[['Model'] + horizon_columns].copy()
+    # Format numerical values to 3 decimal places
+    for col in horizon_columns:
+        comparison_df[col] = comparison_df[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
     
-    scaler_external = MinMaxScaler()
-    np_waterparam_external_scaled = scaler_external.fit_transform(pd_waterparam_external[water_cols + ['air_temperature', 'site', 'weather_condition', 'wind_direction']])
+    # Highlight the selected model's row with a more visible color
+    def highlight_selected_model(row):
+        return ['background-color: #a9a9a9' if row['Model'] == selected_model else '' for _ in row]
     
-    # Create sliding window predictions
-    window_size = 1  # Predict for each time step
-    step_size = 1    # Step size for sliding window
-    X_list_only, Y_list_only, sites_list = [], [], []
-    X_list_ext, Y_list_ext = [], []
+    st.subheader(f"Model Comparison for {selected_horizon} Prediction")
+    st.dataframe(comparison_df.style.apply(highlight_selected_model, axis=1), use_container_width=True)
     
-    for start in range(0, len(np_waterparam_only_scaled) - prediction_gap_weeks - window_size + 1, step_size):
-        end = start + window_size
-        X_window_only = np_waterparam_only_scaled[start:end]
-        Y_window_only = np_waterparam_only_scaled[end + prediction_gap_weeks - 1:end + prediction_gap_weeks]
-        site_window = pd_waterparam_only['site'].values[start:end]
-        
-        X_window_ext = np_waterparam_external_scaled[start:end]
-        Y_window_ext = np_waterparam_only_scaled[end + prediction_gap_weeks - 1:end + prediction_gap_weeks]
-        
-        if X_window_only.shape[0] == window_size and Y_window_only.shape[0] == 1:
-            X_list_only.append(X_window_only)
-            Y_list_only.append(Y_window_only)
-            sites_list.append(site_window[0])  # Take the site at the start of the window
-            X_list_ext.append(X_window_ext)
-            Y_list_ext.append(Y_window_ext)
-    
-    X_waterparam_only = np.array(X_list_only)
-    Y_waterparam_only = np.array(Y_list_only).squeeze(1)
-    sites = np.array(sites_list)
-    X_waterparam_external = np.array(X_list_ext)
-    Y_waterparam_external = np.array(Y_list_ext).squeeze(1)
-    
-    # Debug shapes
-    print(f"Prediction gap: {prediction_gap_weeks}")
-    print(f"X_waterparam_only shape: {X_waterparam_only.shape}")
-    print(f"Y_waterparam_only shape: {Y_waterparam_only.shape}")
-    print(f"X_waterparam_external shape: {X_waterparam_external.shape}")
-    print(f"Y_waterparam_external shape: {Y_waterparam_external.shape}")
-    print(f"Sites length: {len(sites)}")
-    
-    # Reshape for models
-    X_cnn_only = X_waterparam_only.reshape(X_waterparam_only.shape[0], X_waterparam_only.shape[1], 1)
-    X_lstm_only = X_waterparam_only.reshape(X_waterparam_only.shape[0], 1, X_waterparam_only.shape[1])
-    X_cnnlstm_only = X_waterparam_only.reshape(X_waterparam_only.shape[0], 1, X_waterparam_only.shape[1], 1)
-    
-    X_cnn_ext = X_waterparam_external.reshape(X_waterparam_external.shape[0], X_waterparam_external.shape[1], 1)
-    X_lstm_ext = X_waterparam_external.reshape(X_waterparam_external.shape[0], 1, X_waterparam_external.shape[1])
-    X_cnnlstm_ext = X_waterparam_external.reshape(X_waterparam_external.shape[0], 1, X_waterparam_external.shape[1], 1)
-    
-    # Train models and collect predictions
-    models = {}
-    site_predictions = []
-    for name, train_func, X_train, Y_train in [
-        ('CNN - Water Only', train_cnn, X_cnn_only, Y_waterparam_only),
-        ('LSTM - Water Only', train_lstm, X_lstm_only, Y_waterparam_only),
-        ('CNN-LSTM - Water Only', train_cnn_lstm, X_cnnlstm_only, Y_waterparam_only),
-        ('CNN - Water + External', train_cnn, X_cnn_ext, Y_waterparam_only),
-        ('LSTM - Water + External', train_lstm, X_lstm_ext, Y_waterparam_only),
-        ('CNN-LSTM - Water + External', train_cnn_lstm, X_cnnlstm_ext, Y_waterparam_only),
-    ]:
-        print(f"Training {name}...")
-        print(f"X_train shape: {X_train.shape}")
-        print(f"Y_train shape: {Y_train.shape}")
-        
-        model, _ = train_func(X_train, Y_train)
-        y_pred = model.predict(X_train, verbose=0)
-        print(f"y_pred shape for {name}: {y_pred.shape}")
-        
-        # Check prediction variance
-        pred_std = np.std(y_pred, axis=0)
-        print(f"Prediction std for {name}: {pred_std}")
-        if np.all(pred_std < 1e-5):
-            print(f"Warning: Predictions for {name} have very low variance. Model may not be learning effectively.")
-        
-        if y_pred.shape[1] != len(water_cols):
-            raise ValueError(f"Prediction output for {name} has {y_pred.shape[1]} columns, expected {len(water_cols)}")
-        
-        if y_pred.shape[0] != len(sites):
-            raise ValueError(f"Prediction output for {name} has {y_pred.shape[0]} rows, expected {len(sites)}")
-        
-        models[name] = (Y_train, y_pred)
-        
-        # Store site-specific predictions
-        pred_df = pd.DataFrame(y_pred, columns=[f"pred_{col}" for col in water_cols])
-        pred_df['site'] = sites
-        pred_df['model'] = name
-        pred_df['horizon'] = title_suffix
-        site_predictions.append(pred_df)
-    
-    # Compute metrics
-    summary = []
-    for model_name, (y_true, y_pred) in models.items():
-        mae = np.mean(np.abs(y_true - y_pred))
-        mse = mean_squared_error(y_true, y_pred)
-        rmse = np.sqrt(mse)
-        r2 = r2_score(y_true, y_pred)
-        summary.append([model_name, mae, mse, rmse, r2])
-    
-    metrics_df = pd.DataFrame(summary, columns=['Model', 'Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score'])
-    
-    # Combine site-specific predictions
-    site_predictions_df = pd.concat(site_predictions, ignore_index=True)
-    return metrics_df, site_predictions_df
+    # Display the selected model's metrics explicitly
+    selected_model_metrics = comparison_df[comparison_df['Model'] == selected_model]
+    st.markdown(f"**Selected Model ({selected_model}) Metrics for {selected_horizon}:**")
+    for metric, value in selected_model_metrics[horizon_columns].iloc[0].items():
+        st.markdown(f"- {metric}: {value}")
+except Exception as e:
+    st.error(f"Error displaying model comparison: {str(e)}")
+
+# Footer
+st.markdown("""
+---
+**Note**: Ensure all required files (Parquet and PNGs) are included in the directory.
+To run locally, install dependencies (`pip install streamlit pandas pillow pyarrow`) and execute `streamlit run streamlit_app.py`.
+""")
