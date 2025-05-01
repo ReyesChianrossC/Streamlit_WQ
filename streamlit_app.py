@@ -85,11 +85,11 @@ except FileNotFoundError:
 # Footer
 st.markdown("""
 ---
-**CPEN 106 - GROUP 1**
+**CPEN 106 - GROUP 1**  
 Members: <br>
-Agana
+Agana <br>
 Casa <br>
 Gregorio <br>
 Jeremillos <br>
-Reyes 
-""")
+Reyes
+""", unsafe_allow_html=True)
