@@ -155,7 +155,7 @@ try:
             if not site_data.empty:
                 st.subheader(f"Raw Predictions for {selected_site} ({selected_model}, {selected_horizon})")
                 pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
-                display_cols = ['site', 'model', 'horizon'] + pred_cols
+                display_cols = ['index', 'site', 'model', 'horizon'] + pred_cols
                 display_data = site_data[display_cols].reset_index(drop=True).round(3).astype(str)
                 st.dataframe(display_data, use_container_width=True, height=600)
                 st.write(f"Number of predictions: {len(site_data)}")
@@ -172,7 +172,7 @@ try:
                     model_data = model_data.head(5)
                     model_data = model_data[display_cols].reset_index(drop=True)
                     model_data['Row'] = model_data.index  # Add row identifier
-                    model_data = model_data[['Row', 'model'] + pred_cols]
+                    model_data = model_data[['Row', 'index', 'model'] + pred_cols]
                     comparison_data.append(model_data)
             if comparison_data:
                 comparison_df = pd.concat(comparison_data, ignore_index=True).round(3).astype(str)
