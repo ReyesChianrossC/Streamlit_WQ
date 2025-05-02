@@ -1,4 +1,17 @@
-# Streamlit Dashboard
+import streamlit as st
+import pandas as pd
+import os
+from PIL import Image
+import google.colab.files as files
+
+# Cache data loading for performance
+@st.cache_data
+def load_parquet(file_path):
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File {file_path} not found")
+    return pd.read_parquet(file_path)
+
+# Initialize Streamlit page
 st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
 st.title("Water Quality Analysis Dashboard")
 st.markdown("""
@@ -6,17 +19,23 @@ This dashboard displays the results of a water quality analysis, including model
 The metrics compare different models for predicting water quality parameters over various time horizons (Next Week, Next Month, Next Year).
 """)
 
+# Define local output directory
+local_output_dir = '/content'
+
 # Model Performance Metrics
 st.header("Model Performance Metrics")
 try:
-    # Format numerical columns to 3 decimal places
-    formatted_results = combined_results.copy()
-    for col in combined_results.columns:
-        if col != 'Model':
-            formatted_results[col] = formatted_results[col].apply(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
-    st.dataframe(formatted_results, use_container_width=True)
+    with st.spinner("Loading model performance metrics..."):
+        combined_results = load_parquet(os.path.join(local_output_dir, 'combined_results.parquet'))
+    if combined_results.empty:
+        st.warning("No model performance metrics available.")
+    else:
+        # Format numerical columns
+        formatted_results = combined_results.round(3).astype(str)
+        formatted_results['Model'] = combined_results['Model']  # Preserve Model column as string
+        st.dataframe(formatted_results, use_container_width=True)
 except Exception as e:
-    st.error(f"Error loading model performance metrics: {str(e)}")
+    st.error(f"Failed to load model performance metrics: {str(e)}")
 
 # Data Summaries
 st.header("Data Summaries")
@@ -25,23 +44,38 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.subheader("Unique Weather Conditions")
     try:
-        st.table(weather_conditions)
-    except:
-        st.error("Error loading weather conditions.")
+        with st.spinner("Loading weather conditions..."):
+            weather_conditions = load_parquet(os.path.join(local_output_dir, 'weather_conditions.parquet'))
+        if weather_conditions.empty:
+            st.warning("No weather conditions data available.")
+        else:
+            st.table(weather_conditions)
+    except Exception as e:
+        st.error(f"Failed to load weather conditions: {str(e)}")
 
 with col2:
     st.subheader("Unique Wind Directions")
     try:
-        st.table(wind_directions)
-    except:
-        st.error("Error loading wind directions.")
+        with st.spinner("Loading wind directions..."):
+            wind_directions = load_parquet(os.path.join(local_output_dir, 'wind_directions.parquet'))
+        if wind_directions.empty:
+            st.warning("No wind directions data available.")
+        else:
+            st.table(wind_directions)
+    except Exception as e:
+        st.error(f"Failed to load wind directions: {str(e)}")
 
 with col3:
     st.subheader("Unique Sites")
     try:
-        st.table(sites)
-    except:
-        st.error("Error loading sites.")
+        with st.spinner("Loading sites..."):
+            sites = load_parquet(os.path.join(local_output_dir, 'sites.parquet'))
+        if sites.empty:
+            st.warning("No sites data available.")
+        else:
+            st.table(sites)
+    except Exception as e:
+        st.error(f"Failed to load sites: {str(e)}")
 
 # Model Performance Visualizations
 st.header("Model Performance Visualizations")
@@ -53,87 +87,110 @@ for metric, caption in [
 ]:
     st.subheader(caption)
     try:
-        image = Image.open(os.path.join(local_output_dir, metric))
-        st.image(image, caption=caption, use_column_width=True)
-    except:
-        st.error(f"Error loading {metric}.")
+        file_path = os.path.join(local_output_dir, metric)
+        if not os.path.exists(file_path):
+            st.warning(f"Visualization {metric} not found.")
+        else:
+            with st.spinner(f"Loading {caption}..."):
+                image = Image.open(file_path)
+            st.image(image, caption=caption, use_column_width=True)
+    except Exception as e:
+        st.error(f"Failed to load {metric}: {str(e)}")
 
 # Site-Specific Predictions
 st.header("Site-Specific Predictions")
 try:
-    # Load site predictions and sites data
-    site_predictions = pd.read_parquet(os.path.join(local_output_dir, 'site_predictions.parquet'))
-    sites = pd.read_parquet(os.path.join(local_output_dir, 'sites.parquet'))
+    with st.spinner("Loading site predictions and sites data..."):
+        site_predictions = load_parquet(os.path.join(local_output_dir, 'site_predictions.parquet'))
+        sites = load_parquet(os.path.join(local_output_dir, 'sites.parquet'))
 
-    # Dropdown for site selection
-    site_list = sorted(sites['site'].dropna().unique().tolist())
-    selected_site = st.selectbox("Select a Site", options=site_list, key="site_select")
-
-    # Dropdown for model selection (including all specified models)
-    model_list = [
-        'CNN - Water Only', 'LSTM - Water Only', 'CNN-LSTM - Water Only',
-        'CNN - Water + External', 'LSTM - Water + External', 'CNN-LSTM - Water + External'
-    ]
-    selected_model = st.selectbox("Select a Model", options=model_list, key="model_select")
-
-    # Dropdown for horizon selection
-    horizon_list = ["Next Week", "Next Month", "Next Year"]
-    selected_horizon = st.selectbox("Select Prediction Horizon", options=horizon_list, key="horizon_select_predictions")
-
-    st.markdown(f"**Selected: {selected_site} - {selected_model} - {selected_horizon}**")
-
-    # Filter predictions for selected site, model, and horizon
-    site_data = site_predictions[
-        (site_predictions['site'] == selected_site) &
-        (site_predictions['model'] == selected_model) &
-        (site_predictions['horizon'] == selected_horizon)
-    ]
-
-    if not site_data.empty:
-        st.subheader(f"Predicted Water Quality for {selected_site} ({selected_model}, {selected_horizon})")
-        pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
-
-        # Compute summary statistics
-        summary_data = site_data[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
-        summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
-        summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
-
-        # Format numerical values to 3 decimal places
-        for col in ['mean', 'min', 'max', 'std']:
-            summary_data[col] = summary_data[col].apply(lambda x: f"{x:.3f}" if pd.notnull(x) else "N/A")
-
-        # Display the summary table
-        st.dataframe(summary_data, use_container_width=True, height=600)
-
-        # Display number of predictions
-        st.write(f"Number of predictions: {len(site_data)}")
-
-        # Warning for single prediction
-        if len(site_data) == 1:
-            st.warning("Only one prediction available. Standard deviation is undefined for a single data point.")
+    if site_predictions.empty or sites.empty:
+        st.warning("No site predictions or sites data available.")
     else:
-        st.warning(f"No prediction data available for {selected_site}, {selected_model}, {selected_horizon}.")
+        # Cache site list
+        @st.cache_data
+        def get_site_list():
+            return sorted(sites['site'].dropna().unique().tolist())
+
+        # Dropdowns
+        site_list = get_site_list()
+        selected_site = st.selectbox("Select a Site", options=site_list, key="site_select")
+        model_list = [
+            'CNN - Water Only', 'LSTM - Water Only', 'CNN-LSTM - Water Only',
+            'CNN - Water + External', 'LSTM - Water + External', 'CNN-LSTM - Water + External'
+        ]
+        selected_model = st.selectbox("Select a Model", options=model_list, key="model_select")
+        horizon_list = ["Next Week", "Next Month", "Next Year"]
+        selected_horizon = st.selectbox("Select Prediction Horizon", options=horizon_list, key="horizon_select_predictions")
+
+        st.markdown(f"**Selected: {selected_site} - {selected_model} - {selected_horizon}**")
+
+        # Filter predictions
+        site_data = site_predictions[
+            (site_predictions['site'] == selected_site) &
+            (site_predictions['model'] == selected_model) &
+            (site_predictions['horizon'] == selected_horizon)
+        ]
+
+        if not site_data.empty:
+            st.subheader(f"Predicted Water Quality for {selected_site} ({selected_model}, {selected_horizon})")
+            pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
+            summary_data = site_data[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
+            summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
+            summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
+            summary_data[['mean', 'min', 'max', 'std']] = summary_data[['mean', 'min', 'max', 'std']].round(3).astype(str).replace('nan', 'N/A')
+            st.dataframe(summary_data, use_container_width=True, height=600)
+            st.write(f"Number of predictions: {len(site_data)}")
+            if len(site_data) == 1:
+                st.warning("Only one prediction available. Standard deviation is undefined.")
+        else:
+            st.warning(f"No predictions available for {selected_site}, {selected_model}, {selected_horizon}.")
 except Exception as e:
-    st.error(f"Error processing site-specific predictions: {str(e)}")
+    st.error(f"Failed to load site-specific predictions: {str(e)}")
+
+# Model Performance Comparison
+st.header("Model Performance Comparison")
+try:
+    if combined_results.empty:
+        st.warning("No model performance data available for comparison.")
+    else:
+        time_horizons = ["Next Week", "Next Month", "Next Year"]
+        selected_horizon = st.selectbox("Select Time Horizon for Comparison", options=time_horizons, key="horizon_select_comparison")
+        metrics = ['Final MAE', 'Final MSE', 'Final RMSE', 'R2 Score']
+        horizon_columns = [f"{metric} - {selected_horizon}" for metric in metrics]
+        comparison_df = combined_results[['Model'] + horizon_columns].round(3).astype(str)
+        def highlight_selected_model(row):
+            return ['background-color: #d3d3d3' if row['Model'] == selected_model else '' for _ in row]
+        st.subheader(f"Model Comparison for {selected_horizon} Prediction")
+        st.dataframe(comparison_df.style.apply(highlight_selected_model, axis=1), use_container_width=True)
+        selected_model_metrics = comparison_df[comparison_df['Model'] == selected_model]
+        st.markdown(f"**Selected Model ({selected_model}) Metrics for {selected_horizon}:**")
+        for metric, value in selected_model_metrics[horizon_columns].iloc[0].items():
+            st.markdown(f"- {metric}: {value}")
+except Exception as e:
+    st.error(f"Failed to display model comparison: {str(e)}")
+
+# Dynamic File Download
+st.header("Download Results")
+try:
+    available_files = [f for f in os.listdir(local_output_dir) if f.endswith(('.parquet', '.png'))]
+    if not available_files:
+        st.warning("No files available for download.")
+    else:
+        for file_name in available_files:
+            file_path = os.path.join(local_output_dir, file_name)
+            with open(file_path, 'rb') as f:
+                st.download_button(
+                    label=f"Download {file_name}",
+                    data=f,
+                    file_name=file_name,
+                    mime='application/octet-stream' if file_name.endswith('.parquet') else 'image/png'
+                )
+except Exception as e:
+    st.error(f"Failed to list downloadable files: {str(e)}")
 
 # Footer
 st.markdown("""
 ---
-**Note**: To run this app, ensure all required files are present and execute `streamlit run water_quality_analysis.py`.
+**Note**: To run this app, ensure all required files are present and execute `streamlit run water_quality_dashboard.py`.
 """)
-
-# Download Files
-files_to_download = [
-    'combined_results.parquet', 'weather_conditions.parquet', 'wind_directions.parquet',
-    'sites.parquet', 'site_summary.parquet', 'site_predictions.parquet',
-    'mae_comparison.png', 'mse_comparison.png', 'rmse_comparison.png', 'r2_comparison.png'
-]
-for file_name in files_to_download:
-    file_path = os.path.join(local_output_dir, file_name)
-    if os.path.exists(file_path):
-        files.download(file_path)
-    else:
-        print(f"Warning: {file_name} not found.")
-
-# Clean up Spark session
-spark.stop()
