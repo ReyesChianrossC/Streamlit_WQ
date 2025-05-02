@@ -98,7 +98,7 @@ for metric, caption in [
         else:
             with st.spinner(f"Loading {caption}..."):
                 image = Image.open(file_path)
-            st.image(image, caption=caption, use_container_width=True)
+            st.image(image, caption=caption, use_column_width=True)
     except Exception as e:
         st.error(f"Failed to load {metric}: {str(e)}")
 
@@ -150,39 +150,36 @@ try:
         if site_horizon_data.empty:
             st.warning(f"No predictions available for {selected_site}, {selected_horizon}.")
         else:
-            # Detailed view for selected model
+            # Detailed view for selected model (unaggregated predictions)
             site_data = site_horizon_data[site_horizon_data['model'] == selected_model]
             if not site_data.empty:
-                st.subheader(f"Predicted Water Quality for {selected_site} ({selected_model}, {selected_horizon})")
+                st.subheader(f"Raw Predictions for {selected_site} ({selected_model}, {selected_horizon})")
                 pred_cols = [col for col in site_data.columns if col.startswith('pred_')]
-                summary_data = site_data[pred_cols].agg(['mean', 'min', 'max', 'std']).transpose().reset_index()
-                summary_data['Metric'] = summary_data['index'].str.replace('pred_', '')
-                summary_data = summary_data[['Metric', 'mean', 'min', 'max', 'std']]
-                summary_data[['mean', 'min', 'max', 'std']] = summary_data[['mean', 'min', 'max', 'std']].round(3).astype(str).replace('nan', 'N/A')
-                st.dataframe(summary_data, use_container_width=True, height=600)
+                display_cols = ['site', 'model', 'horizon'] + pred_cols
+                display_data = site_data[display_cols].reset_index(drop=True).round(3).astype(str)
+                st.dataframe(display_data, use_container_width=True, height=600)
                 st.write(f"Number of predictions: {len(site_data)}")
-                if len(site_data) == 1:
-                    st.warning("Only one prediction available. Standard deviation is undefined.")
             else:
                 st.warning(f"No predictions for {selected_model} at {selected_site}, {selected_horizon}.")
 
-            # Model comparison table
+            # Model comparison table (unaggregated, limited rows)
             st.subheader(f"Model Comparison for {selected_site} ({selected_horizon})")
             comparison_data = []
             for model in model_list:
                 model_data = site_horizon_data[site_horizon_data['model'] == model]
                 if not model_data.empty:
-                    pred_cols = [col for col in model_data.columns if col.startswith('pred_')]
-                    model_summary = model_data[pred_cols].mean().to_dict()
-                    model_summary['Model'] = model
-                    comparison_data.append(model_summary)
+                    # Limit to first 5 predictions per model to avoid overwhelming display
+                    model_data = model_data.head(5)
+                    model_data = model_data[display_cols].reset_index(drop=True)
+                    model_data['Row'] = model_data.index  # Add row identifier
+                    model_data = model_data[['Row', 'model'] + pred_cols]
+                    comparison_data.append(model_data)
             if comparison_data:
-                comparison_df = pd.DataFrame(comparison_data)
-                comparison_df = comparison_df[['Model'] + [f"pred_{col}" for col in water_cols]]
-                comparison_df = comparison_df.round(3).astype(str)
+                comparison_df = pd.concat(comparison_data, ignore_index=True).round(3).astype(str)
                 def highlight_selected_model(row):
-                    return ['background-color: #d3d3d3' if row['Model'] == selected_model else '' for _ in row]
+                    return ['background-color: #d3d3d3' if row['model'] == selected_model else '' for _ in row]
                 st.dataframe(comparison_df.style.apply(highlight_selected_model, axis=1), use_container_width=True)
+                st.markdown("**Note**: Showing up to 5 predictions per model for brevity.")
             else:
                 st.warning("No predictions available for any model.")
 except Exception as e:
