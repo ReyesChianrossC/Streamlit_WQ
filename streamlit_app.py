@@ -15,7 +15,7 @@ def load_parquet(file_path):
 st.set_page_config(page_title="Water Quality Analysis Dashboard", layout="wide")
 st.title("Water Quality Analysis Dashboard")
 st.markdown("""
-This dashboard displays the results of a water quality analysis, including model performance metrics, data summaries, site-specific statistics, and model comparisons.
+This dashboard displays the results of a water quality analysis, including model performance metrics, data summaries, site-specific predictions, and model comparisons.
 The metrics compare different models for predicting water quality parameters over various time horizons (Next Week, Next Month, Next Year).
 """)
 
@@ -104,6 +104,10 @@ for metric, caption in [
 
 # Site-Specific Predictions
 st.header("Site-Specific Predictions")
+st.markdown("""
+This section displays raw, model-specific predictions for each site, replacing previous model aggregated results. 
+Select a site, prediction horizon, and model to view unaggregated predictions or compare predictions across all models.
+""")
 try:
     with st.spinner("Loading site predictions and sites data..."):
         site_predictions = load_parquet(os.path.join(local_output_dir, 'site_predictions.parquet'))
