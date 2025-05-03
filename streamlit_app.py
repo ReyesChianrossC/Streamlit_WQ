@@ -242,17 +242,17 @@ st.markdown("### Downloads")
 
 # ZIP for all graphs
 zip_filename = "all_graphs.zip"
-if st.button("Create ZIP of All Graphs"):
-    with zipfile.ZipFile(zip_filename, 'w') as zipf:
-        for plot_file in plot_files:
-            if os.path.exists(plot_file):
-                zipf.write(plot_file)
-    st.success("ZIP file created!")
-
-if os.path.exists(zip_filename):
+if not os.path.exists(zip_filename):
+    if st.button("Create ZIP of All Graphs"):
+        with zipfile.ZipFile(zip_filename, 'w') as zipf:
+            for plot_file in plot_files:
+                if os.path.exists(plot_file):
+                    zipf.write(plot_file)
+        st.success("ZIP file created!")
+else:
     with open(zip_filename, "rb") as f:
         st.download_button(
-            label="Download All Graphs",
+            label="Download ZIP of All Graphs",
             data=f,
             file_name=zip_filename,
             mime="application/zip"
@@ -260,26 +260,24 @@ if os.path.exists(zip_filename):
 
 # ZIP for GitHub repo resources (excluding Streamlit file)
 github_zip_filename = "github_resources.zip"
-if st.button("Create ZIP of GitHub Repo Resources"):
-    with zipfile.ZipFile(github_zip_filename, 'w') as zipf:
-        # Assuming the GitHub repo resources are in a directory or list of files
-        github_files = [
-            "weather_conditions.parquet",
-            "wind_directions.parquet",
-            "sites.parquet",
-            "site_summary.parquet",
-            "combined_results.parquet"
-            # Add other files as needed, excluding the Streamlit file
-        ]
-        for repo_file in github_files:
-            if os.path.exists(repo_file):
-                zipf.write(repo_file)
-    st.success("GitHub resources ZIP file created!")
-
-if os.path.exists(github_zip_filename):
+if not os.path.exists(github_zip_filename):
+    if st.button("Create ZIP of GitHub Repo Resources"):
+        with zipfile.ZipFile(github_zip_filename, 'w') as zipf:
+            github_files = [
+                "weather_conditions.parquet",
+                "wind_directions.parquet",
+                "sites.parquet",
+                "site_summary.parquet",
+                "combined_results.parquet"
+            ]
+            for repo_file in github_files:
+                if os.path.exists(repo_file):
+                    zipf.write(repo_file)
+        st.success("GitHub resources ZIP file created!")
+else:
     with open(github_zip_filename, "rb") as f:
         st.download_button(
-            label="Download GitHub Repo Resources",
+            label="Download ZIP of GitHub Repo Resources",
             data=f,
             file_name=github_zip_filename,
             mime="application/zip"
