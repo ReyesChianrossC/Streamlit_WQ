@@ -289,7 +289,7 @@ else:
 # -------------------------------
 st.markdown("### Group Members")
 
-# Custom CSS to center the images in a horizontal belt
+# Custom CSS to center the images in a horizontal belt with rounded edges and black border
 st.markdown("""
     <style>
     .center-images {
@@ -303,6 +303,8 @@ st.markdown("""
         width: 100px;
         height: 100px;
         object-fit: cover;
+        border-radius: 10px;  /* Softens the edges */
+        border: 2px solid black;  /* Adds a slight black border */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -313,7 +315,7 @@ group_members = [
     {"name": "Gregorio", "image": "2.png"},
     {"name": "Agana", "image": "3.png"},
     {"name": "Casa", "image": "4.jpg"},
-    {"name": "Jeremillos", "image": "5.jpg"},  # Added the new member
+    {"name": "Jeremillos", "image": "5.jpg"},
 ]
 
 # Create a div to hold the images and center them
@@ -330,7 +332,7 @@ for member in group_members:
 image_html += '</div>'
 
 # Render the centered images with names
-st.markdown(image_html, unsafe_allow_html=True)# -------------------------------
+st.markdown(image_html, unsafe_allow_html=True)
 # 9. Contact Section
 # -------------------------------
 st.markdown("### Contact / More Info")
