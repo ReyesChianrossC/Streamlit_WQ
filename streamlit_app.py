@@ -7,32 +7,45 @@ import zipfile
 # Set page config as the first Streamlit command
 st.set_page_config(layout="wide")
 
-# Custom CSS for the banner image
+# Custom CSS and JavaScript for the banner image
 st.markdown("""
     <style>
     .banner-container {
-        position: relative;
-        width: 100%;
-        z-index: -1;  /* Place banner behind content */
-    }
-    .banner-image {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100px;  /* Adjust height to match 'Water Quality Prediction Results' section */
+        z-index: -1;  /* Place banner behind content */
+    }
+    .banner-image {
+        width: 100%;
         object-fit: cover;  /* Ensure image covers the area */
-        opacity: 0.5;  /* Optional: Slight transparency to make text readable */
+        opacity: 0.5;  /* Slight transparency to make text readable */
     }
     .content {
         position: relative;
         z-index: 1;  /* Ensure content is above the banner */
     }
+    #title-section {
+        margin: 0;
+    }
     </style>
+    <script>
+    function adjustBannerHeight() {
+        const titleSection = document.getElementById('title-section');
+        const bannerImage = document.querySelector('.banner-image');
+        if (titleSection && bannerImage) {
+            const height = titleSection.offsetHeight;
+            bannerImage.style.height = height + 'px';
+        }
+    }
+    window.onload = adjustBannerHeight;
+    window.onresize = adjustBannerHeight;
+    </script>
 """, unsafe_allow_html=True)
 
 # Load and display the banner image
-banner_image_path = "banner.jpg"  # Replace with actual banner image path
+banner_image_path = "banner.jpg"
 if os.path.exists(banner_image_path):
     with open(banner_image_path, "rb") as image_file:
         encoded_banner = base64.b64encode(image_file.read()).decode()
@@ -46,6 +59,9 @@ else:
 
 # Wrap content in a div to ensure it stays above the banner
 st.markdown('<div class="content">', unsafe_allow_html=True)
+
+# Wrap the title section in a div with an ID for JavaScript targeting
+st.markdown('<div id="title-section">', unsafe_allow_html=True)
 
 st.title("Water Quality Prediction Results")
 st.markdown("## Table of Contents")
