@@ -287,7 +287,7 @@ else:
 # -------------------------------
 # 8. Group 1 Members
 # -------------------------------
-st.markdown("### Group 1 Members")
+st.markdown("### Group Members")
 
 # Custom CSS to center the images in a horizontal belt
 st.markdown("""
@@ -313,6 +313,7 @@ group_members = [
     {"name": "Gregorio", "image": "2.png"},
     {"name": "Agana", "image": "3.png"},
     {"name": "Casa", "image": "4.jpg"},
+    {"name": "Jeremillos", "image": "5.jpg"},  # Added the new member
 ]
 
 # Create a div to hold the images and center them
@@ -321,14 +322,15 @@ for member in group_members:
     if os.path.exists(member["image"]):
         with open(member["image"], "rb") as image_file:
             encoded = base64.b64encode(image_file.read()).decode()
-        image_html += f'<div style="text-align: center;"><img src="data:image/jpeg;base64,{encoded}" alt="{member["name"]}"><p>{member["name"]}</p></div>'
+        # Determine MIME type based on file extension
+        mime_type = "image/png" if member["image"].lower().endswith(".png") else "image/jpeg"
+        image_html += f'<div style="text-align: center;"><img src="data:{mime_type};base64,{encoded}" alt="{member["name"]}"><p>{member["name"]}</p></div>'
     else:
         st.warning(f"Image for {member['name']} not found: {member['image']}")
 image_html += '</div>'
 
 # Render the centered images with names
-st.markdown(image_html, unsafe_allow_html=True)
-# -------------------------------
+st.markdown(image_html, unsafe_allow_html=True)# -------------------------------
 # 9. Contact Section
 # -------------------------------
 st.markdown("### Contact / More Info")
