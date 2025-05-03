@@ -17,7 +17,7 @@ st.markdown("""
     }
     .banner-image {
         width: 100%;
-        height: 100%;
+        height: 50%;
         object-fit: cover;  /* Ensure image covers the area */
         object-position: center;  /* Crop top and bottom, focus on the center */
         opacity: 0.7;  /* Slightly more visible */
