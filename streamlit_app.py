@@ -2,49 +2,60 @@ import streamlit as st
 import pandas as pd
 import base64
 import os
+import uuid
 import zipfile
 
 # Set page config as the first Streamlit command
 st.set_page_config(layout="wide")
 
-# Custom CSS for the banner image
+# Custom CSS for the banner and content
 st.markdown("""
     <style>
     .banner-container {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        z-index: -1;  /* Place banner behind content */
+        height: 200px;  /* Increased height for better visibility */
+        z-index: 0;  /* Behind content but not completely obscured */
+        background: linear-gradient(to right, #4b6cb7, #182848);  /* Fallback gradient */
     }
     .banner-image {
         width: 100%;
-        height: 150px;  /* Fixed height to match title section */
+        height: 100%;
         object-fit: cover;  /* Ensure image covers the area */
-        opacity: 0.5;  /* Slight transparency to make text readable */
+        opacity: 0.7;  /* Slightly more visible */
     }
     .content {
         position: relative;
         z-index: 1;  /* Ensure content is above the banner */
+        padding-top: 220px;  /* Prevent content from overlapping banner */
     }
     #title-section {
         margin: 0;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);  /* Semi-transparent background for readability */
+        border-radius: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Load and display the banner image with debug
+# Load and display the banner image
 banner_image_path = "banner.jpg"
+st.markdown('<div class="banner-container">', unsafe_allow_html=True)
 if os.path.exists(banner_image_path):
-    with open(banner_image_path, "rb") as image_file:
-        encoded_banner = base64.b64encode(image_file.read()).decode()
-    st.markdown(f"""
-        <div class="banner-container">
-            <img class="banner-image" src="data:image/jpeg;base64,{encoded_banner}" alt="Banner" onerror="this.style.display='none';console.log('Banner image failed to load');">
-        </div>
-    """, unsafe_allow_html=True)
+    try:
+        with open(banner_image_path, "rb") as image_file:
+            encoded_banner = base64.b64encode(image_file.read()).decode()
+        st.markdown(
+            f'<img class="banner-image" src="data:image/jpeg;base64,{encoded_banner}" alt="Banner">',
+            unsafe_allow_html=True
+        )
+    except Exception as e:
+        st.error(f"Failed to load banner image: {e}")
 else:
-    st.warning("Banner image 'banner.jpg' not found.")
+    st.warning("Banner image 'banner.jpg' not found. Using fallback gradient.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Wrap content in a div to ensure it stays above the banner
 st.markdown('<div class="content">', unsafe_allow_html=True)
