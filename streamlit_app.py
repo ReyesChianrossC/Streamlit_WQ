@@ -5,8 +5,6 @@ import zipfile
 
 st.set_page_config(layout="wide")
 
-print(df.columns.tolist())
-
 st.title("Water Quality Prediction Results")
 st.markdown("## 📋 Table of Contents")
 st.markdown("""
@@ -28,19 +26,16 @@ st.markdown("### Model Performance Metrics")
 if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
     
-    forecast_options = {
-        "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "Final R² - Next Week"],
-        "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "Final R² - Next Month"],
-        "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year", "Final RMSE - Next Year", "Final R² - Next Year"]
-    }
+    # Use the exact column names from the DataFrame
+    selected_columns = ["Model", "Final MAE", "Final MSE", "Final RMSE", "R2 Score"]
     
-    selected_forecast = st.selectbox("Select Forecast Range", list(forecast_options.keys()))
-    
-    selected_columns = ["Model"] + forecast_options[selected_forecast]
-    filtered_df = df[selected_columns]
-    
-    st.dataframe(filtered_df)
-
+    # Filter only existing columns to avoid KeyError
+    selected_columns = [col for col in selected_columns if col in df.columns]
+    if len(selected_columns) < 2:
+        st.error("Not enough valid columns found.")
+    else:
+        filtered_df = df[selected_columns]
+        st.dataframe(filtered_df)
 else:
     st.error("combined_results.parquet not found.")
 
@@ -51,17 +46,18 @@ st.markdown("### Compare Models")
 if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
     models = df["Model"].unique()
-    selected_models = st.multiselect("Select Models to Compare", models, default=[models[0], models[1]])
-    selected_forecast = st.selectbox("Select Forecast Range for Comparison", ["Next Week", "Next Month", "Next Year"])
+    selected_models = st.multiselect("Select Models to Compare", models, default=[models[0], models[1]] if len(models) > 1 else [])
     
-    metrics_map = {
-        "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "Final R² - Next Week"],
-        "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "Final R² - Next Month"],
-        "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year", "Final RMSE - Next Year", "Final R² - Next Year"]
-    }
+    # Use the exact column names from the DataFrame
+    selected_columns = ["Model", "Final MAE", "Final MSE", "Final RMSE", "R2 Score"]
     
-    comparison_df = df[df["Model"].isin(selected_models)][["Model"] + metrics_map[selected_forecast]]
-    st.dataframe(comparison_df)
+    # Filter only existing columns
+    selected_columns = [col for col in selected_columns if col in df.columns]
+    if len(selected_columns) < 2:
+        st.error("Not enough valid columns found.")
+    else:
+        comparison_df = df[df["Model"].isin(selected_models)][selected_columns]
+        st.dataframe(comparison_df)
 else:
     st.error("combined_results.parquet not found.")
 
@@ -70,7 +66,6 @@ else:
 # -------------------------------
 st.markdown("### Data Summaries")
 
-# Unique weather conditions
 if os.path.exists("weather_conditions.parquet"):
     weather_df = pd.read_parquet("weather_conditions.parquet")
     unique_weather = weather_df['weather_condition'].unique()
@@ -79,7 +74,6 @@ if os.path.exists("weather_conditions.parquet"):
 else:
     st.error("weather_conditions.parquet not found.")
 
-# Unique sites
 if os.path.exists("sites.parquet"):
     site_df = pd.read_parquet("sites.parquet")
     unique_sites = site_df['site'].unique()
