@@ -26,9 +26,9 @@ if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
     
     forecast_options = {
-        "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week"],
-        "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month"],
-        "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year"]
+        "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "Final R² - Next Week"],
+        "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "Final R² - Next Month"],
+        "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year", "Final RMSE - Next Year", "Final R² - Next Year"]
     }
     
     selected_forecast = st.selectbox("Select Forecast Range", list(forecast_options.keys()))
