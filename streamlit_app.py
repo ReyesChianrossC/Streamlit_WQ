@@ -8,19 +8,19 @@ st.set_page_config(layout="wide")
 st.title("Water Quality Prediction Results")
 st.markdown("## 📋 Table of Contents")
 st.markdown("""
-1. [📊 Model Performance Metrics](#model-performance-metrics)  
-2. [📈 Data Summaries](#data-summaries)  
-3. [🖼️ Model Performance Visualizations](#model-performance-visualizations)  
-4. [📍 Site Specific Summary](#site-specific-summary)  
-5. [⬇️ Download All Graphs](#download-all-graphs)  
-6. [👥 Group 1 Members](#group-1-members)  
-7. [📬 Contact / More Info](#contact--more-info)
+1. [Model Performance Metrics](#model-performance-metrics)  
+2. [Data Summaries](#data-summaries)  
+3. [Model Performance Visualizations](#model-performance-visualizations)  
+4. [Site Specific Summary](#site-specific-summary)  
+5. [Download All Graphs](#download-all-graphs)  
+6. [Group 1 Members](#group-1-members)  
+7. [Contact / More Info](#contact--more-info)
 """, unsafe_allow_html=True)
 
 # -------------------------------
 # 1. Model Performance Metrics
 # -------------------------------
-st.markdown("### 📊 Model Performance Metrics")
+st.markdown("### Model Performance Metrics")
 if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
     st.dataframe(df)
@@ -30,7 +30,7 @@ else:
 # -------------------------------
 # 2. Data Summaries
 # -------------------------------
-st.markdown("### 📈 Data Summaries")
+st.markdown("### Data Summaries")
 
 # Unique weather conditions
 if os.path.exists("weather_conditions.parquet"):
@@ -53,7 +53,7 @@ else:
 # -------------------------------
 # 3. Model Performance Visualizations
 # -------------------------------
-st.markdown("### 🖼️ Model Performance Visualizations")
+st.markdown("### Model Performance Visualizations")
 plot_files = [
     "mae_comparison.png",
     "mse_comparison.png",
@@ -69,7 +69,7 @@ for plot_file in plot_files:
 # -------------------------------
 # 4. Site Specific Summary
 # -------------------------------
-st.markdown("### 📍 Site Specific Summary")
+st.markdown("### Site Specific Summary")
 if os.path.exists("site_summary.parquet"):
     site_summary = pd.read_parquet("site_summary.parquet")
     site_list = site_summary['site'].unique()
@@ -83,7 +83,7 @@ else:
 # -------------------------------
 # 5. Download All Graphs
 # -------------------------------
-st.markdown("### ⬇️ Download All Graphs")
+st.markdown("### Download All Graphs")
 
 zip_filename = "all_graphs.zip"
 if st.button("Create ZIP of All Graphs"):
@@ -105,7 +105,7 @@ if os.path.exists(zip_filename):
 # -------------------------------
 # 6. Group 1 Members
 # -------------------------------
-st.markdown("### 👥 Group 1 Members")
+st.markdown("### Group 1 Members")
 st.markdown("""
 - Agana  
 - Casa  
@@ -117,13 +117,13 @@ st.markdown("""
 # -------------------------------
 # 7. Contact Section
 # -------------------------------
-st.markdown("### 📬 Contact / More Info")
+st.markdown("### Contact / More Info")
 st.markdown("""
-For more information, visit the [GitHub Repo](https://github.com/ReyesChianrossC)
+For more information, visit the [https://github.com/ReyesChianrossC](https://github.com/ReyesChianrossC)
 """)
 
 # -------------------------------
 # 8. Back to Top Anchor
 # -------------------------------
 st.markdown("---")
-st.markdown("<a href='#water-quality-prediction-results'>⬆️ Back to Top</a>", unsafe_allow_html=True)
+st.markdown("<a href='#water-quality-prediction-results'>⬆Back to Top</a>", unsafe_allow_html=True)
