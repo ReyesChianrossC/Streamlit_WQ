@@ -185,7 +185,7 @@ else:
 # 6. Raw Data Exploration
 # -------------------------------
 st.markdown("### Raw Data Exploration")
-st.markdown("Explore the raw data files generated from the pipeline.")
+st.markdown("Explore the raw data files generated from the machine learning pipelines.")
 
 # Combined Results
 with st.expander("Combined Results"):
