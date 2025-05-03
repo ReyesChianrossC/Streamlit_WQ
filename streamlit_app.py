@@ -287,32 +287,6 @@ else:
 # -------------------------------
 # 8. Group 1 Members
 # -------------------------------
-st.markdown("### Group 1 Members")
-st.markdown("""
-- Agana  
-- Casa  
-- Gregorio  
-- Jeremillos  
-- Reyes
-""")
-
-# -------------------------------
-# 9. Contact Section
-# -------------------------------
-st.markdown("### Contact / More Info")
-st.markdown("""
-For more information, visit the host @ [https://github.com/ReyesChianrossC](https://github.com/ReyesChianrossC)
-""")
-
-# -------------------------------
-# 10. Back to Top Anchor
-# -------------------------------
-st.markdown("---")
-st.markdown("<a href='#water-quality-prediction-results'>⬆Back to Top</a>", unsafe_allow_html=True)
-
-# -------------------------------
-# 8. Group Members
-# -------------------------------
 st.markdown("### Group Members")
 
 # Custom CSS to center the images in a horizontal belt
@@ -354,3 +328,17 @@ image_html += '</div>'
 
 # Render the centered images with names
 st.markdown(image_html, unsafe_allow_html=True)
+# -------------------------------
+# 9. Contact Section
+# -------------------------------
+st.markdown("### Contact / More Info")
+st.markdown("""
+For more information, visit the host @ [https://github.com/ReyesChianrossC](https://github.com/ReyesChianrossC)
+""")
+
+# -------------------------------
+# 10. Back to Top Anchor
+# -------------------------------
+st.markdown("---")
+st.markdown("<a href='#water-quality-prediction-results'>⬆Back to Top</a>", unsafe_allow_html=True)
+
