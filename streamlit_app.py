@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import base64
 import os
+import mimetypes
 import zipfile
 
 st.set_page_config(layout="wide")
@@ -307,41 +308,41 @@ st.markdown("""
         border-radius: 10px;
         border: 4px solid black;
     }
+    .center-images p {
+        text-align: center;
+        margin: 5px 0 0 0;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Define group members and their links
+# Define group members with image URLs (replace with actual URLs)
 group_members = [
-    {"name": "Reyes", "image": "1.png", "link": "https://www.facebook.com/chian.yooki"},
-    {"name": "Gregorio", "image": "2.png", "link": "https://www.facebook.com/GregorioAce"},
-    {"name": "Agana", "image": "3.png", "link": "https://www.facebook.com/jlen.hernan"},
-    {"name": "Casa", "image": "4.jpg", "link": "https://www.facebook.com/kaneuzaki"},
-    {"name": "Jeremillos", "image": "5.jpg", "link": "https://www.facebook.com/danlynniee"},
+    {"name": "Reyes", "image": "https://example.com/images/1.png", "link": "https://www.facebook.com/chian.yooki"},
+    {"name": "Gregorio", "image": "https://example.com/images/2.png", "link": "https://www.facebook.com/GregorioAce"},
+    {"name": "Agana", "image": "https://example.com/images/3.png", "link": "https://www.facebook.com/jlen.hernan"},
+    {"name": "Casa", "image": "https://example.com/images/4.jpg", "link": "https://www.facebook.com/kaneuzaki"},
+    {"name": "Jeremillos", "image": "https://example.com/images/5.jpg", "link": "https://www.facebook.com/danlynniee"},
 ]
 
 # Create HTML content
 image_html = '<div class="center-images">'
 for member in group_members:
-    if os.path.exists(member["image"]):
-        with open(member["image"], "rb") as image_file:
-            encoded = base64.b64encode(image_file.read()).decode()
-        mime_type = "image/png" if member["image"].lower().endswith(".png") else "image/jpeg"
-        image_html += f'''
-        <div style="text-align: center;">
+    # Guess MIME type based on file extension
+    mime_type, _ = mimetypes.guess_type(member["image"])
+    if not mime_type or not mime_type.startswith("image/"):
+        mime_type = "image/jpeg"  # Fallback MIME type
+    # Add member to HTML
+    image_html += f'''
+        <div>
             <a href="{member["link"]}" target="_blank">
-                <img src="data:{mime_type};base64,{encoded}" alt="{member["name"]}">
+                <img src="{member["image"]}" alt="{member["name"]}">
             </a>
             <p>{member["name"]}</p>
         </div>
-        '''
-    else:
-        st.warning(f"Image for {member['name']} not found: {member['image']}")
+    '''
 image_html += '</div>'
 
 # Render in Streamlit
-st.markdown(image_html, unsafe_allow_html=True)
-
-# Finally, render the HTML in Streamlit
 st.markdown(image_html, unsafe_allow_html=True)
 # 9. Contact Section
 # -------------------------------
