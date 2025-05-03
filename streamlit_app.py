@@ -304,7 +304,7 @@ st.markdown("""
         height: 100px;
         object-fit: cover;
         border-radius: 10px;  /* Softens the edges */
-        border: 2px solid black;  /* Adds a slight black border */
+        border: 4px solid black;  /* Adds a slight black border */
     }
     </style>
 """, unsafe_allow_html=True)
