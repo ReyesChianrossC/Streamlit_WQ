@@ -13,7 +13,7 @@ st.markdown("""
     <style>
     .banner-container {
         width: 100%;
-        height: 150px;  /* Fixed height for the banner */
+        height: 70px;  /* Fixed height for the banner */
     }
     .banner-image {
         width: 100%;
