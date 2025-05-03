@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import base64
 import os
 import zipfile
 
@@ -312,13 +313,6 @@ st.markdown("<a href='#water-quality-prediction-results'>⬆Back to Top</a>", un
 # -------------------------------
 # 8. Group Members
 # -------------------------------
-import streamlit as st
-import os
-import base64  # Add this import to resolve the NameError
-
-# -------------------------------
-# 8. Group Members
-# -------------------------------
 st.markdown("### Group Members")
 
 # Custom CSS to center the images in a horizontal belt
@@ -341,10 +335,10 @@ st.markdown("""
 
 # List of group members' image paths (adjust paths as needed)
 group_members = [
-    {"Reyes": "Member 1", "image": "1.png"},
-    {"Gregorio": "Member 2", "image": "2.png"},
-    {"Agana": "Member 3", "image": "3.png"},
-    {"Casa": "Member 4", "image": "4.jpg"},
+    {"name": "Reyes", "image": "1.png"},
+    {"name": "Gregorio", "image": "2.png"},
+    {"name": "Agana", "image": "3.png"},
+    {"name": "Casa", "image": "4.jpg"},
 ]
 
 # Create a div to hold the images and center them
