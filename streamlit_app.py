@@ -312,6 +312,13 @@ st.markdown("<a href='#water-quality-prediction-results'>⬆Back to Top</a>", un
 # -------------------------------
 # 8. Group Members
 # -------------------------------
+import streamlit as st
+import os
+import base64  # Add this import to resolve the NameError
+
+# -------------------------------
+# 8. Group Members
+# -------------------------------
 st.markdown("### Group Members")
 
 # Custom CSS to center the images in a horizontal belt
