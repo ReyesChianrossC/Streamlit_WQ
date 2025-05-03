@@ -5,6 +5,8 @@ import zipfile
 
 st.set_page_config(layout="wide")
 
+print(df.columns.tolist())
+
 st.title("Water Quality Prediction Results")
 st.markdown("## 📋 Table of Contents")
 st.markdown("""
