@@ -287,7 +287,7 @@ else:
 # -------------------------------
 # 8. Group 1 Members
 # -------------------------------
-st.markdown("### Group Members")
+st.markdown("### Group 1 Members")
 
 # Custom CSS to center the images in a horizontal belt with rounded edges and black border
 st.markdown("""
