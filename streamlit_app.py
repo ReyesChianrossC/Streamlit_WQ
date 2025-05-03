@@ -13,7 +13,7 @@ st.markdown("""
     <style>
     .banner-container {
         width: 100%;
-        height: 100px;  /* Reduced height to make the banner smaller */
+        height: 50%;  /* Reduced height to make the banner smaller */
     }
     .banner-image {
         width: 100%;
