@@ -4,6 +4,46 @@ import base64
 import os
 import zipfile
 
+# Custom CSS for the banner image
+st.markdown("""
+    <style>
+    .banner-container {
+        position: relative;
+        width: 100%;
+        z-index: -1;  /* Place banner behind content */
+    }
+    .banner-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;  /* Adjust height to match 'Water Quality Prediction Results' section */
+        object-fit: cover;  /* Ensure image covers the area */
+        opacity: 0.5;  /* Optional: Slight transparency to make text readable */
+    }
+    .content {
+        position: relative;
+        z-index: 1;  /* Ensure content is above the banner */
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Load and display the banner image
+banner_image_path = "banner.jpg"  # Replace with actual banner image path
+if os.path.exists(banner_image_path):
+    with open(banner_image_path, "rb") as image_file:
+        encoded_banner = base64.b64encode(image_file.read()).decode()
+    st.markdown(f"""
+        <div class="banner-container">
+            <img class="banner-image" src="data:image/jpeg;base64,{encoded_banner}" alt="Banner">
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.warning("Banner image 'banner.jpg' not found.")
+
+# Wrap content in a div to ensure it stays above the banner
+st.markdown('<div class="content">', unsafe_allow_html=True)
+
 st.set_page_config(layout="wide")
 
 st.title("Water Quality Prediction Results")
