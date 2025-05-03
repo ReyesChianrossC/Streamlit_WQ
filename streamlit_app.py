@@ -121,6 +121,6 @@ except Exception as e:
 st.markdown("""
 ---
 **Note**: Ensure all required files (Parquet and PNGs) are included in the `/content` directory.
-To run locally, install dependencies (`pip install streamlit pandas pillow pyarrow plotly`) and execute `streamlit run water_quality_analysis.py`.
+To run locally, install dependencies (`pip install streamlit pandas pillow pyarrow plotly`) and execute `streamlit run streamlit_app.py`.
 For Streamlit Cloud, include a `requirements.txt` with the above packages in your GitHub repository.
 """)
