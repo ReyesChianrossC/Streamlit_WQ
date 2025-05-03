@@ -57,8 +57,7 @@ st.markdown('<div class="content">', unsafe_allow_html=True)
 # Wrap the title section in a div with an ID for JavaScript targeting
 st.markdown('<div id="title-section">', unsafe_allow_html=True)
 
-st.title("Taal Water Quality Prediction Results Dashboard")
-st.title("of Group 1")
+st.title("Taal Water Quality Prediction Dashboard")
 st.markdown("## Table of Contents")
 st.markdown("""
 1. [Model Performance Metrics](#model-performance-metrics)  
