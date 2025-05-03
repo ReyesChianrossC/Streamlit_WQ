@@ -13,8 +13,7 @@ st.markdown("""
     <style>
     .banner-container {
         width: 100%;
-        height: 150px;  /* Adjusted height to match the image proportions */
-        background: linear-gradient(to right, #4b6cb7, #182848);  /* Fallback gradient */
+        height: 150px;  /* Adjusted height to match the banner proportions */
     }
     .banner-image {
         width: 100%;
@@ -28,7 +27,7 @@ st.markdown("""
     #title-section {
         margin: 0;
         padding: 20px;
-        background: rgba(255, 255, 255, 0.9);  /* Semi-transparent background for readability */
+        background: transparent;  /* Remove the white background */
         border-radius: 10px;
     }
     </style>
@@ -48,7 +47,7 @@ if os.path.exists(banner_image_path):
     except Exception as e:
         st.error(f"Failed to load banner image: {e}")
 else:
-    st.warning("Banner image 'banner.jpg' not found. Using fallback gradient.")
+    st.warning("Banner image 'banner.jpg' not found.")
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Wrap content in a div
