@@ -33,14 +33,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Load and display the banner image
+# Load and display the banner image with debug
 banner_image_path = "banner.jpg"
 if os.path.exists(banner_image_path):
     with open(banner_image_path, "rb") as image_file:
         encoded_banner = base64.b64encode(image_file.read()).decode()
     st.markdown(f"""
         <div class="banner-container">
-            <img class="banner-image" src="data:image/jpeg;base64,{encoded_banner}" alt="Banner">
+            <img class="banner-image" src="data:image/jpeg;base64,{encoded_banner}" alt="Banner" onerror="this.style.display='none';console.log('Banner image failed to load');">
         </div>
     """, unsafe_allow_html=True)
 else:
