@@ -25,14 +25,22 @@ st.markdown("### Model Performance Metrics")
 
 if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
+    # Debug: Print available columns
+    st.write("Available columns in combined_results.parquet:", df.columns.tolist())
     
-    # Use the exact column names from the DataFrame
-    selected_columns = ["Model", "Final MAE", "Final MSE", "Final RMSE", "R2 Score"]
+    # Define metrics based on the actual column names
+    forecast_options = {
+        "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "R2 Score - Next Week"],
+        "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "R2 Score - Next Month"],
+        "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year", "Final RMSE - Next Year", "R2 Score - Next Year"]
+    }
     
-    # Filter only existing columns to avoid KeyError
-    selected_columns = [col for col in selected_columns if col in df.columns]
-    if len(selected_columns) < 2:
-        st.error("Not enough valid columns found.")
+    selected_forecast = st.selectbox("Select Forecast Range", list(forecast_options.keys()))
+    
+    # Filter only existing columns
+    selected_columns = [col for col in ["Model"] + forecast_options[selected_forecast] if col in df.columns]
+    if len(selected_columns) < 2:  # Need at least "Model" and one metric
+        st.error("Not enough valid columns found. Please check the column names in combined_results.parquet.")
     else:
         filtered_df = df[selected_columns]
         st.dataframe(filtered_df)
@@ -48,13 +56,19 @@ if os.path.exists("combined_results.parquet"):
     models = df["Model"].unique()
     selected_models = st.multiselect("Select Models to Compare", models, default=[models[0], models[1]] if len(models) > 1 else [])
     
-    # Use the exact column names from the DataFrame
-    selected_columns = ["Model", "Final MAE", "Final MSE", "Final RMSE", "R2 Score"]
+    # Define metrics based on the actual column names
+    metrics_map = {
+        "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "R2 Score - Next Week"],
+        "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "R2 Score - Next Month"],
+        "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year", "Final RMSE - Next Year", "R2 Score - Next Year"]
+    }
+    
+    selected_forecast = st.selectbox("Select Forecast Range for Comparison", ["Next Week", "Next Month", "Next Year"])
     
     # Filter only existing columns
-    selected_columns = [col for col in selected_columns if col in df.columns]
+    selected_columns = [col for col in ["Model"] + metrics_map[selected_forecast] if col in df.columns]
     if len(selected_columns) < 2:
-        st.error("Not enough valid columns found.")
+        st.error("Not enough valid columns found. Please check the column names in combined_results.parquet.")
     else:
         comparison_df = df[df["Model"].isin(selected_models)][selected_columns]
         st.dataframe(comparison_df)
