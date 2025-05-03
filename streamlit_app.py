@@ -16,7 +16,6 @@ st.markdown("""
 6. [Raw Data Exploration](#raw-data-exploration)  
 7. [Download All Graphs](#download-all-graphs)  
 8. [Group 1 Members](#group-1-members)  
-9. [Contact / More Info](#contact--more-info)
 """, unsafe_allow_html=True)
 
 # -------------------------------
