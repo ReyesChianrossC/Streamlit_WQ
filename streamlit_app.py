@@ -6,7 +6,7 @@ import zipfile
 st.set_page_config(layout="wide")
 
 st.title("Water Quality Prediction Results")
-st.markdown("## 📋 Table of Contents")
+st.markdown("## Table of Contents")
 st.markdown("""
 1. [Model Performance Metrics](#model-performance-metrics)  
 2. [Compare Models](#compare-models)  
