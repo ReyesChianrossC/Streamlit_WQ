@@ -173,6 +173,7 @@ if os.path.exists("site_summary.parquet"):
 
 else:
     st.error("site_summary.parquet not found.")# -------------------------------
+# -------------------------------
 # 6. Raw Data Exploration
 # -------------------------------
 st.markdown("### Raw Data Exploration")
@@ -191,6 +192,8 @@ with st.expander("Combined Results"):
 with st.expander("Site Summary"):
     if os.path.exists("site_summary.parquet"):
         site_summary = pd.read_parquet("site_summary.parquet")
+        # Remove rows where 'site' is None
+        site_summary = site_summary[site_summary['site'].notna()]
         st.write("**Site Summary Data**")
         st.dataframe(site_summary)
     else:
@@ -218,6 +221,8 @@ with st.expander("Wind Directions"):
 with st.expander("Sites"):
     if os.path.exists("sites.parquet"):
         site_df = pd.read_parquet("sites.parquet")
+        # Remove rows where 'site' is None
+        site_df = site_df[site_df['site'].notna()]
         st.write("**Sites Data**")
         st.dataframe(site_df)
     else:
