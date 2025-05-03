@@ -236,10 +236,11 @@ with st.expander("Sites"):
         st.error("sites.parquet not found.")
 
 # -------------------------------
-# 7. Download All Graphs
+# 7. Downloads
 # -------------------------------
-st.markdown("### Download All Graphs")
+st.markdown("### Downloads")
 
+# ZIP for all graphs
 zip_filename = "all_graphs.zip"
 if st.button("Create ZIP of All Graphs"):
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
@@ -254,6 +255,33 @@ if os.path.exists(zip_filename):
             label="Download All Graphs",
             data=f,
             file_name=zip_filename,
+            mime="application/zip"
+        )
+
+# ZIP for GitHub repo resources (excluding Streamlit file)
+github_zip_filename = "github_resources.zip"
+if st.button("Create ZIP of GitHub Repo Resources"):
+    with zipfile.ZipFile(github_zip_filename, 'w') as zipf:
+        # Assuming the GitHub repo resources are in a directory or list of files
+        github_files = [
+            "weather_conditions.parquet",
+            "wind_directions.parquet",
+            "sites.parquet",
+            "site_summary.parquet",
+            "combined_results.parquet"
+            # Add other files as needed, excluding the Streamlit file
+        ]
+        for repo_file in github_files:
+            if os.path.exists(repo_file):
+                zipf.write(repo_file)
+    st.success("GitHub resources ZIP file created!")
+
+if os.path.exists(github_zip_filename):
+    with open(github_zip_filename, "rb") as f:
+        st.download_button(
+            label="Download GitHub Repo Resources",
+            data=f,
+            file_name=github_zip_filename,
             mime="application/zip"
         )
 
