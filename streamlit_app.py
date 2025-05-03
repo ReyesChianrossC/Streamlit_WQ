@@ -287,29 +287,48 @@ else:
 # -------------------------------
 # 8. Group 1 Members
 # -------------------------------
-# Create a div to hold the images and center them
+st.markdown("### Group 1 Members")
+
+# Custom CSS to center the images
+st.markdown("""
+    <style>
+    .center-images {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .center-images img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 4px solid black;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Define group members and their links
+group_members = [
+    {"name": "Reyes", "image": "1.png", "link": "https://www.facebook.com/chian.yooki"},
+    {"name": "Gregorio", "image": "2.png", "link": "https://www.facebook.com/GregorioAce"},
+    {"name": "Agana", "image": "3.png", "link": "https://www.facebook.com/jlen.hernan"},
+    {"name": "Casa", "image": "4.jpg", "link": "https://www.facebook.com/kaneuzaki"},
+    {"name": "Jeremillos", "image": "5.jpg", "link": "https://www.facebook.com/danlynniee"},
+]
+
+# Create HTML content
 image_html = '<div class="center-images">'
-
-# Define links for each member
-member_links = {
-    "Reyes": "https://www.facebook.com/chian.yooki",
-    "Gregorio": "https://www.facebook.com/GregorioAce",
-    "Agana": "https://www.facebook.com/jlen.hernan",
-    "Casa": "https://www.facebook.com/kaneuzaki",
-    "Jeremillos": "https://www.facebook.com/danlynniee"
-}
-
 for member in group_members:
     if os.path.exists(member["image"]):
         with open(member["image"], "rb") as image_file:
             encoded = base64.b64encode(image_file.read()).decode()
-        # Determine MIME type based on file extension
         mime_type = "image/png" if member["image"].lower().endswith(".png") else "image/jpeg"
-        # Wrap the image in a hyperlink tag
-        link = member_links.get(member["name"], "#")  # Fallback to "#" if no link found
         image_html += f'''
         <div style="text-align: center;">
-            <a href="{link}" target="_blank">
+            <a href="{member["link"]}" target="_blank">
                 <img src="data:{mime_type};base64,{encoded}" alt="{member["name"]}">
             </a>
             <p>{member["name"]}</p>
@@ -318,6 +337,9 @@ for member in group_members:
     else:
         st.warning(f"Image for {member['name']} not found: {member['image']}")
 image_html += '</div>'
+
+# Render in Streamlit
+st.markdown(image_html, unsafe_allow_html=True)
 
 # Finally, render the HTML in Streamlit
 st.markdown(image_html, unsafe_allow_html=True)
