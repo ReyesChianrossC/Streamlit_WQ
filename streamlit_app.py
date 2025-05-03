@@ -141,7 +141,8 @@ if os.path.exists("site_summary.parquet"):
                 filtered['avg_bottom_temperature'].iloc[0] if 'avg_bottom_temperature' in filtered.columns else "-"
             ]
         }
-        st.table(pd.DataFrame(data))
+        df = pd.DataFrame(data)
+        st.table(df.style.set_properties(**{'text-align': 'left'}))
 
     with col2:
         data = {
@@ -153,7 +154,8 @@ if os.path.exists("site_summary.parquet"):
                 filtered['avg_phosphate'].iloc[0] if 'avg_phosphate' in filtered.columns else "-"
             ]
         }
-        st.table(pd.DataFrame(data))
+        df = pd.DataFrame(data)
+        st.table(df.style.set_properties(**{'text-align': 'left'}))
 
     with col3:
         data = {
@@ -165,11 +167,11 @@ if os.path.exists("site_summary.parquet"):
                 filtered['avg_air_temperature'].iloc[0] if 'avg_air_temperature' in filtered.columns else "-"
             ]
         }
-        st.table(pd.DataFrame(data))
+        df = pd.DataFrame(data)
+        st.table(df.style.set_properties(**{'text-align': 'left'}))
 
 else:
-    st.error("site_summary.parquet not found.")
-# -------------------------------
+    st.error("site_summary.parquet not found.")# -------------------------------
 # 6. Raw Data Exploration
 # -------------------------------
 st.markdown("### Raw Data Exploration")
