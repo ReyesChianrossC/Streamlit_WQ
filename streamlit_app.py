@@ -13,9 +13,10 @@ st.markdown("""
 3. [Data Summaries](#data-summaries)  
 4. [Model Performance Visualizations](#model-performance-visualizations)  
 5. [Site Specific Summary](#site-specific-summary)  
-6. [Download All Graphs](#download-all-graphs)  
-7. [Group 1 Members](#group-1-members)  
-8. [Contact / More Info](#contact--more-info)
+6. [Raw Data Exploration](#raw-data-exploration)  
+7. [Download All Graphs](#download-all-graphs)  
+8. [Group 1 Members](#group-1-members)  
+9. [Contact / More Info](#contact--more-info)
 """, unsafe_allow_html=True)
 
 # -------------------------------
@@ -25,10 +26,7 @@ st.markdown("### Model Performance Metrics")
 
 if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
-    # Debug: Print available columns
-    st.write("Available columns in combined_results.parquet:", df.columns.tolist())
     
-    # Define metrics based on the actual column names
     forecast_options = {
         "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "R2 Score - Next Week"],
         "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "R2 Score - Next Month"],
@@ -37,9 +35,8 @@ if os.path.exists("combined_results.parquet"):
     
     selected_forecast = st.selectbox("Select Forecast Range", list(forecast_options.keys()))
     
-    # Filter only existing columns
     selected_columns = [col for col in ["Model"] + forecast_options[selected_forecast] if col in df.columns]
-    if len(selected_columns) < 2:  # Need at least "Model" and one metric
+    if len(selected_columns) < 2:
         st.error("Not enough valid columns found. Please check the column names in combined_results.parquet.")
     else:
         filtered_df = df[selected_columns]
@@ -56,7 +53,6 @@ if os.path.exists("combined_results.parquet"):
     models = df["Model"].unique()
     selected_models = st.multiselect("Select Models to Compare", models, default=[models[0], models[1]] if len(models) > 1 else [])
     
-    # Define metrics based on the actual column names
     metrics_map = {
         "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "R2 Score - Next Week"],
         "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "R2 Score - Next Month"],
@@ -65,7 +61,6 @@ if os.path.exists("combined_results.parquet"):
     
     selected_forecast = st.selectbox("Select Forecast Range for Comparison", ["Next Week", "Next Month", "Next Year"])
     
-    # Filter only existing columns
     selected_columns = [col for col in ["Model"] + metrics_map[selected_forecast] if col in df.columns]
     if len(selected_columns) < 2:
         st.error("Not enough valid columns found. Please check the column names in combined_results.parquet.")
@@ -80,6 +75,7 @@ else:
 # -------------------------------
 st.markdown("### Data Summaries")
 
+# Unique weather conditions
 if os.path.exists("weather_conditions.parquet"):
     weather_df = pd.read_parquet("weather_conditions.parquet")
     unique_weather = weather_df['weather_condition'].unique()
@@ -88,6 +84,16 @@ if os.path.exists("weather_conditions.parquet"):
 else:
     st.error("weather_conditions.parquet not found.")
 
+# Unique wind directions
+if os.path.exists("wind_directions.parquet"):
+    wind_df = pd.read_parquet("wind_directions.parquet")
+    unique_winds = wind_df['wind_direction'].unique()
+    st.write("**Unique Wind Directions:**")
+    st.write(unique_winds)
+else:
+    st.error("wind_directions.parquet not found.")
+
+# Unique sites
 if os.path.exists("sites.parquet"):
     site_df = pd.read_parquet("sites.parquet")
     unique_sites = site_df['site'].unique()
@@ -127,7 +133,58 @@ else:
     st.error("site_summary.parquet not found.")
 
 # -------------------------------
-# 6. Download All Graphs
+# 6. Raw Data Exploration
+# -------------------------------
+st.markdown("### Raw Data Exploration")
+st.markdown("Explore the raw data files generated from the pipeline.")
+
+# Combined Results
+with st.expander("Combined Results"):
+    if os.path.exists("combined_results.parquet"):
+        df = pd.read_parquet("combined_results.parquet")
+        st.write("**Combined Model Metrics (All Forecast Ranges)**")
+        st.dataframe(df)
+    else:
+        st.error("combined_results.parquet not found.")
+
+# Site Summary
+with st.expander("Site Summary"):
+    if os.path.exists("site_summary.parquet"):
+        site_summary = pd.read_parquet("site_summary.parquet")
+        st.write("**Site Summary Data**")
+        st.dataframe(site_summary)
+    else:
+        st.error("site_summary.parquet not found.")
+
+# Weather Conditions
+with st.expander("Weather Conditions"):
+    if os.path.exists("weather_conditions.parquet"):
+        weather_df = pd.read_parquet("weather_conditions.parquet")
+        st.write("**Weather Conditions Data**")
+        st.dataframe(weather_df)
+    else:
+        st.error("weather_conditions.parquet not found.")
+
+# Wind Directions
+with st.expander("Wind Directions"):
+    if os.path.exists("wind_directions.parquet"):
+        wind_df = pd.read_parquet("wind_directions.parquet")
+        st.write("**Wind Directions Data**")
+        st.dataframe(wind_df)
+    else:
+        st.error("wind_directions.parquet not found.")
+
+# Sites
+with st.expander("Sites"):
+    if os.path.exists("sites.parquet"):
+        site_df = pd.read_parquet("sites.parquet")
+        st.write("**Sites Data**")
+        st.dataframe(site_df)
+    else:
+        st.error("sites.parquet not found.")
+
+# -------------------------------
+# 7. Download All Graphs
 # -------------------------------
 st.markdown("### Download All Graphs")
 
@@ -149,7 +206,7 @@ if os.path.exists(zip_filename):
         )
 
 # -------------------------------
-# 7. Group 1 Members
+# 8. Group 1 Members
 # -------------------------------
 st.markdown("### Group 1 Members")
 st.markdown("""
@@ -161,7 +218,7 @@ st.markdown("""
 """)
 
 # -------------------------------
-# 8. Contact Section
+# 9. Contact Section
 # -------------------------------
 st.markdown("### Contact / More Info")
 st.markdown("""
@@ -169,7 +226,7 @@ For more information, visit the [https://github.com/ReyesChianrossC](https://git
 """)
 
 # -------------------------------
-# 9. Back to Top Anchor
+# 10. Back to Top Anchor
 # -------------------------------
 st.markdown("---")
 st.markdown("<a href='#water-quality-prediction-results'>⬆Back to Top</a>", unsafe_allow_html=True)
