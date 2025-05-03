@@ -131,7 +131,6 @@ if os.path.exists("site_summary.parquet"):
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.write(f"**Summary for {selected_site}:**")
         data = {
             "Metric": ["Site", "Avg Surface Temp (°C)", "Avg Middle Temp (°C)", "Avg Bottom Temp (°C)"],
             "Value": [
