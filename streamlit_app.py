@@ -308,3 +308,48 @@ For more information, visit the host @ [https://github.com/ReyesChianrossC](http
 # -------------------------------
 st.markdown("---")
 st.markdown("<a href='#water-quality-prediction-results'>⬆Back to Top</a>", unsafe_allow_html=True)
+
+# -------------------------------
+# 8. Group Members
+# -------------------------------
+st.markdown("### Group Members")
+
+# Custom CSS to center the images in a horizontal belt
+st.markdown("""
+    <style>
+    .center-images {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .center-images img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# List of group members' image paths (adjust paths as needed)
+group_members = [
+    {"Reyes": "Member 1", "image": "1.png"},
+    {"Gregorio": "Member 2", "image": "2.png"},
+    {"Agana": "Member 3", "image": "3.png"},
+    {"Casa": "Member 4", "image": "4.jpg"},
+]
+
+# Create a div to hold the images and center them
+image_html = '<div class="center-images">'
+for member in group_members:
+    if os.path.exists(member["image"]):
+        with open(member["image"], "rb") as image_file:
+            encoded = base64.b64encode(image_file.read()).decode()
+        image_html += f'<div style="text-align: center;"><img src="data:image/jpeg;base64,{encoded}" alt="{member["name"]}"><p>{member["name"]}</p></div>'
+    else:
+        st.warning(f"Image for {member['name']} not found: {member['image']}")
+image_html += '</div>'
+
+# Render the centered images with names
+st.markdown(image_html, unsafe_allow_html=True)
