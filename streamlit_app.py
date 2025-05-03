@@ -267,7 +267,7 @@ st.markdown("""
 # -------------------------------
 st.markdown("### Contact / More Info")
 st.markdown("""
-For more information, visit the [https://github.com/ReyesChianrossC](https://github.com/ReyesChianrossC)
+For more information, visit the host @ [https://github.com/ReyesChianrossC](https://github.com/ReyesChianrossC)
 """)
 
 # -------------------------------
