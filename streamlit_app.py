@@ -7,7 +7,7 @@ import zipfile
 # Set page config as the first Streamlit command
 st.set_page_config(layout="wide")
 
-# Custom CSS and JavaScript for the banner image
+# Custom CSS for the banner image
 st.markdown("""
     <style>
     .banner-container {
@@ -19,6 +19,7 @@ st.markdown("""
     }
     .banner-image {
         width: 100%;
+        height: 150px;  /* Fixed height to match title section */
         object-fit: cover;  /* Ensure image covers the area */
         opacity: 0.5;  /* Slight transparency to make text readable */
     }
@@ -30,18 +31,6 @@ st.markdown("""
         margin: 0;
     }
     </style>
-    <script>
-    function adjustBannerHeight() {
-        const titleSection = document.getElementById('title-section');
-        const bannerImage = document.querySelector('.banner-image');
-        if (titleSection && bannerImage) {
-            const height = titleSection.offsetHeight;
-            bannerImage.style.height = height + 'px';
-        }
-    }
-    window.onload = adjustBannerHeight;
-    window.onresize = adjustBannerHeight;
-    </script>
 """, unsafe_allow_html=True)
 
 # Load and display the banner image
