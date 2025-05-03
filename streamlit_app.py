@@ -21,9 +21,23 @@ st.markdown("""
 # 1. Model Performance Metrics
 # -------------------------------
 st.markdown("### Model Performance Metrics")
+
 if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
-    st.dataframe(df)
+    
+    forecast_options = {
+        "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week"],
+        "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month"],
+        "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year"]
+    }
+    
+    selected_forecast = st.selectbox("Select Forecast Range", list(forecast_options.keys()))
+    
+    selected_columns = ["Model"] + forecast_options[selected_forecast]
+    filtered_df = df[selected_columns]
+    
+    st.dataframe(filtered_df)
+
 else:
     st.error("combined_results.parquet not found.")
 
