@@ -13,12 +13,13 @@ st.markdown("""
     <style>
     .banner-container {
         width: 100%;
-        height: 150px;  /* Adjusted height to match the banner proportions */
+        height: 150px;  /* Fixed height for the banner */
     }
     .banner-image {
         width: 100%;
         height: 100%;
         object-fit: cover;  /* Ensure image covers the area */
+        object-position: center;  /* Crop top and bottom, focus on the center */
         opacity: 0.7;  /* Slightly more visible */
     }
     .content {
