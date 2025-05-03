@@ -4,6 +4,9 @@ import base64
 import os
 import zipfile
 
+# Set page config as the first Streamlit command
+st.set_page_config(layout="wide")
+
 # Custom CSS for the banner image
 st.markdown("""
     <style>
@@ -43,8 +46,6 @@ else:
 
 # Wrap content in a div to ensure it stays above the banner
 st.markdown('<div class="content">', unsafe_allow_html=True)
-
-st.set_page_config(layout="wide")
 
 st.title("Water Quality Prediction Results")
 st.markdown("## Table of Contents")
