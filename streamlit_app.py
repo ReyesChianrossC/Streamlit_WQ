@@ -132,46 +132,40 @@ if os.path.exists("site_summary.parquet"):
     
     with col1:
         st.write(f"**Summary for {selected_site}:**")
-        if 'site' in filtered.columns:
-            st.write("**Site:**")
-            st.write(filtered['site'].iloc[0])
-        if 'avg_surface_temperature' in filtered.columns:
-            st.write("**Avg Surface Temp (°C):**")
-            st.write(filtered['avg_surface_temperature'].iloc[0])
-        if 'avg_middle_temperature' in filtered.columns:
-            st.write("**Avg Middle Temp (°C):**")
-            st.write(filtered['avg_middle_temperature'].iloc[0])
-        if 'avg_bottom_temperature' in filtered.columns:
-            st.write("**Avg Bottom Temp (°C):**")
-            st.write(filtered['avg_bottom_temperature'].iloc[0])
+        data = {
+            "Metric": ["Site", "Avg Surface Temp (°C)", "Avg Middle Temp (°C)", "Avg Bottom Temp (°C)"],
+            "Value": [
+                filtered['site'].iloc[0] if 'site' in filtered.columns else "-",
+                filtered['avg_surface_temperature'].iloc[0] if 'avg_surface_temperature' in filtered.columns else "-",
+                filtered['avg_middle_temperature'].iloc[0] if 'avg_middle_temperature' in filtered.columns else "-",
+                filtered['avg_bottom_temperature'].iloc[0] if 'avg_bottom_temperature' in filtered.columns else "-"
+            ]
+        }
+        st.table(pd.DataFrame(data))
 
     with col2:
-        if 'avg_ph' in filtered.columns:
-            st.write("**Avg pH:**")
-            st.write(filtered['avg_ph'].iloc[0])
-        if 'avg_ammonia' in filtered.columns:
-            st.write("**Avg Ammonia (mg/L):**")
-            st.write(filtered['avg_ammonia'].iloc[0])
-        if 'avg_nitrate' in filtered.columns:
-            st.write("**Avg Nitrate (mg/L):**")
-            st.write(filtered['avg_nitrate'].iloc[0])
-        if 'avg_phosphate' in filtered.columns:
-            st.write("**Avg Phosphate (mg/L):**")
-            st.write(filtered['avg_phosphate'].iloc[0])
+        data = {
+            "Metric": ["Avg pH", "Avg Ammonia (mg/L)", "Avg Nitrate (mg/L)", "Avg Phosphate (mg/L)"],
+            "Value": [
+                filtered['avg_ph'].iloc[0] if 'avg_ph' in filtered.columns else "-",
+                filtered['avg_ammonia'].iloc[0] if 'avg_ammonia' in filtered.columns else "-",
+                filtered['avg_nitrate'].iloc[0] if 'avg_nitrate' in filtered.columns else "-",
+                filtered['avg_phosphate'].iloc[0] if 'avg_phosphate' in filtered.columns else "-"
+            ]
+        }
+        st.table(pd.DataFrame(data))
 
     with col3:
-        if 'avg_dissolved_oxygen' in filtered.columns:
-            st.write("**Avg Dissolved Oxygen (mg/L):**")
-            st.write(filtered['avg_dissolved_oxygen'].iloc[0])
-        if 'avg_sulfide' in filtered.columns:
-            st.write("**Avg Sulfide (mg/L):**")
-            st.write(filtered['avg_sulfide'].iloc[0])
-        if 'avg_carbon_dioxide' in filtered.columns:
-            st.write("**Avg Carbon Dioxide (mg/L):**")
-            st.write(filtered['avg_carbon_dioxide'].iloc[0])
-        if 'avg_air_temperature' in filtered.columns:
-            st.write("**Avg Air Temp (°C):**")
-            st.write(filtered['avg_air_temperature'].iloc[0])
+        data = {
+            "Metric": ["Avg Dissolved Oxygen (mg/L)", "Avg Sulfide (mg/L)", "Avg Carbon Dioxide (mg/L)", "Avg Air Temp (°C)"],
+            "Value": [
+                filtered['avg_dissolved_oxygen'].iloc[0] if 'avg_dissolved_oxygen' in filtered.columns else "-",
+                filtered['avg_sulfide'].iloc[0] if 'avg_sulfide' in filtered.columns else "-",
+                filtered['avg_carbon_dioxide'].iloc[0] if 'avg_carbon_dioxide' in filtered.columns else "-",
+                filtered['avg_air_temperature'].iloc[0] if 'avg_air_temperature' in filtered.columns else "-"
+            ]
+        }
+        st.table(pd.DataFrame(data))
 
 else:
     st.error("site_summary.parquet not found.")
