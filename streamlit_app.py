@@ -12,12 +12,8 @@ st.set_page_config(layout="wide")
 st.markdown("""
     <style>
     .banner-container {
-        position: fixed;
-        top: 0;
-        left: 0;
         width: 100%;
-        height: 200px;  /* Increased height for better visibility */
-        z-index: 0;  /* Behind content but not completely obscured */
+        height: 150px;  /* Adjusted height to match the image proportions */
         background: linear-gradient(to right, #4b6cb7, #182848);  /* Fallback gradient */
     }
     .banner-image {
@@ -27,9 +23,7 @@ st.markdown("""
         opacity: 0.7;  /* Slightly more visible */
     }
     .content {
-        position: relative;
-        z-index: 1;  /* Ensure content is above the banner */
-        padding-top: 220px;  /* Prevent content from overlapping banner */
+        padding-top: 20px;  /* Small padding to separate content from banner */
     }
     #title-section {
         margin: 0;
@@ -57,7 +51,7 @@ else:
     st.warning("Banner image 'banner.jpg' not found. Using fallback gradient.")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Wrap content in a div to ensure it stays above the banner
+# Wrap content in a div
 st.markdown('<div class="content">', unsafe_allow_html=True)
 
 # Wrap the title section in a div with an ID for JavaScript targeting
