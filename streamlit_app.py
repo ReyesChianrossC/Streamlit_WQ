@@ -124,6 +124,8 @@ st.markdown("### Site Specific Summary")
 if os.path.exists("site_summary.parquet"):
     site_summary = pd.read_parquet("site_summary.parquet")
     site_list = site_summary['site'].unique()
+    # Remove 'None' from site_list if it exists
+    site_list = [site for site in site_list if site is not None]
     selected_site = st.selectbox("Select a site:", site_list)
     filtered = site_summary[site_summary['site'] == selected_site]
 
