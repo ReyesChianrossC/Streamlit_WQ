@@ -80,7 +80,8 @@ if os.path.exists("weather_conditions.parquet"):
     weather_df = pd.read_parquet("weather_conditions.parquet")
     unique_weather = weather_df['weather_condition'].unique()
     st.write("**Unique Weather Conditions:**")
-    st.write(unique_weather)
+    weather_df_display = pd.DataFrame(unique_weather, columns=["Weather Condition"])
+    st.dataframe(weather_df_display, use_container_width=False)
 else:
     st.error("weather_conditions.parquet not found.")
 
@@ -89,7 +90,8 @@ if os.path.exists("wind_directions.parquet"):
     wind_df = pd.read_parquet("wind_directions.parquet")
     unique_winds = wind_df['wind_direction'].unique()
     st.write("**Unique Wind Directions:**")
-    st.write(unique_winds)
+    wind_df_display = pd.DataFrame(unique_winds, columns=["Wind Direction"])
+    st.dataframe(wind_df_display, use_container_width=False)
 else:
     st.error("wind_directions.parquet not found.")
 
@@ -98,7 +100,8 @@ if os.path.exists("sites.parquet"):
     site_df = pd.read_parquet("sites.parquet")
     unique_sites = site_df['site'].unique()
     st.write("**Unique Sites:**")
-    st.write(unique_sites)
+    site_df_display = pd.DataFrame(unique_sites, columns=["Site"])
+    st.dataframe(site_df_display, use_container_width=False)
 else:
     st.error("sites.parquet not found.")
 
