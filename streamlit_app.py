@@ -157,22 +157,22 @@ if os.path.exists("combined_results.parquet"):
 
     styles = pd.DataFrame("", index=df.index, columns=df.columns)
 
-    for col in df.columns:
-        if col == "Model":
-            styles[col] = "color: white"
-        elif col in gradient_map:
-            hue, light_start, light_end, reverse = gradient_map[col]
-            valid_vals = df[col].dropna()
-            if len(valid_vals) < 2:
-                continue
-            # Rank values appropriately
-            ranks = valid_vals.rank(method='min', ascending=reverse)
-            norm_ranks = (ranks - 1) / (len(valid_vals) - 1)
-            lightness_vals = light_start - norm_ranks * (light_start - light_end)
-
-            for i in valid_vals.index:
-                lightness = lightness_vals[i]
-                styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
+        for col in df.columns:
+            if col == "Model":
+                styles[col] = "color: white"
+            elif col in gradient_map:
+                hue, light_start, light_end, reverse = gradient_map[col]
+                valid_vals = df[col].dropna()
+                if len(valid_vals) < 2:
+                    continue
+                # Rank values appropriately
+                ranks = valid_vals.rank(method='min', ascending=reverse)
+                norm_ranks = (ranks - 1) / (len(valid_vals) - 1)
+                lightness_vals = light_start - norm_ranks * (light_start - light_end)
+    
+                for i in valid_vals.index:
+                    lightness = lightness_vals[i]
+                    styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
 
     return styles
 
