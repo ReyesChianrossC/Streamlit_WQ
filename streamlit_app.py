@@ -95,9 +95,10 @@ if os.path.exists("combined_results.parquet"):
 else:
     st.error("combined_results.parquet not found.")
 
-# -------------------------------
-# 2. Compare Models
-# -------------------------------
+import streamlit as st
+import pandas as pd
+import numpy as np
+
 st.markdown("### Compare Models")
 if os.path.exists("combined_results.parquet"):
     df = pd.read_parquet("combined_results.parquet")
@@ -130,10 +131,12 @@ if os.path.exists("combined_results.parquet"):
             # For R2 Score, higher is better, so we don't invert
             if "R2 Score" in col_name:
                 hue = 120 * norm_val  # Green (0) to Red (120)
+                lightness = 90 - (norm_val * 40)  # 90% (pale) to 50% (intense)
             else:
                 # For MAE, MSE, RMSE, lower is better, so invert the hue
                 hue = 120 * (1 - norm_val)  # Red (120) to Green (0)
-            return f"background-color: hsl({hue}, 70%, 80%)"
+                lightness = 90 - ((1 - norm_val) * 40)  # 90% (pale) to 50% (intense)
+            return f"background-color: hsl({hue}, 70%, {lightness}%)"
         
         # Create a styler object to apply the color gradient
         styled_df = comparison_df.style
@@ -146,7 +149,6 @@ if os.path.exists("combined_results.parquet"):
         st.dataframe(styled_df)
 else:
     st.error("combined_results.parquet not found.")
-
 # -------------------------------
 # 3. Data Summaries
 # -------------------------------
