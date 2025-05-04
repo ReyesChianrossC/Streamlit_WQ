@@ -113,48 +113,39 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------
 # 2. Exploratory Data Analysis
 # -------------------------------
-st.subheader('Exploratory Data Analysis')
+st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
+st.markdown("### Exploratory Data Analysis")
 
-# Custom CSS for 2 images per row (1x1 aspect ratio layout)
+# Custom CSS for horizontal image belt
 st.markdown("""
     <style>
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);  /* 2 columns */
-            gap: 10px;
-        }
-        .grid-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .image-belt {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .image-belt img {
+        width: 33%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Grid layout for images
-st.markdown('<div class="grid-container">', unsafe_allow_html=True)
+# List of EDA images
+eda_images = ["EDA1.png", "EDA2.png", "EDA3.png"]
+cols = st.columns(3)
 
-# First image - Heatmap (EDA0.png)
-st.markdown('<div class="grid-item">', unsafe_allow_html=True)
-st.image('EDA0.png', caption="Heatmap", use_column_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Second image - EDA1.png
-st.markdown('<div class="grid-item">', unsafe_allow_html=True)
-st.image('EDA1.png', caption="EDA1", use_column_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Third image - EDA2.png
-st.markdown('<div class="grid-item">', unsafe_allow_html=True)
-st.image('EDA2.png', caption="EDA2", use_column_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Fourth image - EDA3.png
-st.markdown('<div class="grid-item">', unsafe_allow_html=True)
-st.image('EDA3.png', caption="EDA3", use_column_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Close grid container
+for idx, image_file in enumerate(eda_images):
+    with cols[idx]:
+        if os.path.exists(image_file):
+            st.image(image_file, caption=image_file.replace(".png", ""), use_column_width=True)
+        else:
+            st.error(f"{image_file} not found.")
 st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------
 # 3. Model Performance Metrics
