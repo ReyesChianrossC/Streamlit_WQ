@@ -267,38 +267,31 @@ if os.path.exists("site_summary.parquet"):
         st.table(df1)
 
     with col2:
-        # Group by mg/L (split into two tables of 3 rows each)
+        # Group by mg/L (merged into one table)
         data2 = {
-            "Metric": ["Avg Ammonia (mg/L)", "Avg Nitrate (mg/L)", "Avg Phosphate (mg/L)"],
+            "Metric": ["Avg Ammonia (mg/L)", "Avg Nitrate (mg/L)", "Avg Phosphate (mg/L)", 
+                       "Avg Dissolved Oxygen (mg/L)", "Avg Sulfide (mg/L)", "Avg Carbon Dioxide (mg/L)"],
             "Value": [
                 filtered['avg_ammonia'].iloc[0] if 'avg_ammonia' in filtered.columns else "-",
                 filtered['avg_nitrate'].iloc[0] if 'avg_nitrate' in filtered.columns else "-",
-                filtered['avg_phosphate'].iloc[0] if 'avg_phosphate' in filtered.columns else "-"
-            ]
-        }
-        df2 = pd.DataFrame(data2)
-        st.table(df2)
-
-        data3 = {
-            "Metric": ["Avg Dissolved Oxygen (mg/L)", "Avg Sulfide (mg/L)", "Avg Carbon Dioxide (mg/L)"],
-            "Value": [
+                filtered['avg_phosphate'].iloc[0] if 'avg_phosphate' in filtered.columns else "-",
                 filtered['avg_dissolved_oxygen'].iloc[0] if 'avg_dissolved_oxygen' in filtered.columns else "-",
                 filtered['avg_sulfide'].iloc[0] if 'avg_sulfide' in filtered.columns else "-",
                 filtered['avg_carbon_dioxide'].iloc[0] if 'avg_carbon_dioxide' in filtered.columns else "-"
             ]
         }
-        df3 = pd.DataFrame(data3)
-        st.table(df3)
+        df2 = pd.DataFrame(data2)
+        st.table(df2)
 
-        # Group by pH
-        data4 = {
+        # Group by pH (separate table below)
+        data3 = {
             "Metric": ["Avg pH"],
             "Value": [
                 filtered['avg_ph'].iloc[0] if 'avg_ph' in filtered.columns else "-"
             ]
         }
-        df4 = pd.DataFrame(data4)
-        st.table(df4)
+        df3 = pd.DataFrame(data3)
+        st.table(df3)
 
 else:
     st.error("site_summary.parquet not found.")
