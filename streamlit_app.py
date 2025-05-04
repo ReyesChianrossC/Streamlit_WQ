@@ -97,10 +97,6 @@ else:
 # -------------------------------
 # 2. Compare Models
 # -------------------------------
-import os
-import pandas as pd
-import streamlit as st
-
 st.markdown("### Compare Models")
 
 if os.path.exists("combined_results.parquet"):
@@ -127,34 +123,18 @@ if os.path.exists("combined_results.parquet"):
         st.error("Not enough valid columns found. Please check your data.")
     else:
         comparison_df = df[df["Model"].isin(selected_models)][valid_columns]
+        comparison_df = comparison_df.reset_index(drop=True)
 
-        # Compute min/max for normalization
-        min_max = {
-            col: (comparison_df[col].min(), comparison_df[col].max())
-            for col in comparison_df.columns if col != "Model"
-        }
+        # Rename columns for cleaner display
+        renamed_df = comparison_df.rename(columns={
+            metric_columns[0]: "Final MAE",
+            metric_columns[1]: "Final MSE",
+            metric_columns[2]: "Final RMSE",
+            metric_columns[3]: "R2 Score"
+        })
 
-        # Create horizontal layout
-        col1, col2, col3, col4, col5 = st.columns([1.5, 1, 1, 1, 1])
-
-        with col1:
-            st.markdown("**Model**")
-            for model in comparison_df["Model"]:
-                st.write(model)
-
-        for i, (col, streamlit_col) in enumerate(zip(metric_columns, [col2, col3, col4, col5])):
-            col_min, col_max = min_max[col]
-            with streamlit_col:
-                st.markdown(f"**{col.split(' -')[0]}**")
-                for val in comparison_df[col]:
-                    if pd.isna(val) or col_max == col_min:
-                        bg_style = ""
-                    else:
-                        norm_val = (val - col_min) / (col_max - col_min)
-                        hue = 120  # green
-                        lightness = 90 - norm_val * 40
-                        bg_style = f"background-color: hsl({hue}, 70%, {lightness}%); color: black;"
-                    st.markdown(f"<div style='{bg_style}; padding:4px'>{val:.4f}</div>", unsafe_allow_html=True)
+        # Display clean table
+        st.dataframe(renamed_df, use_container_width=True)
 
 else:
     st.error("combined_results.parquet not found.")
