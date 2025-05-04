@@ -116,14 +116,13 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
 st.markdown("### Exploratory Data Analysis")
 
-# Custom CSS for smaller images
+# Custom CSS for uniform image sizes
 st.markdown("""
     <style>
     .eda-image {
-        width: 100%;
-        max-width: 400px; /* Resize images to be smaller */
-        height: auto;
-        object-fit: cover;
+        width: 400px; /* Fixed width for all images */
+        height: 300px; /* Fixed height for all images */
+        object-fit: contain; /* Ensure images fit within the dimensions without distortion */
         border-radius: 10px;
         border: 2px solid #ddd;
         margin: 10px 0;
@@ -142,7 +141,14 @@ for i in range(0, len(eda_images), 2):
             image_file = eda_images[i + j]
             with col:
                 if os.path.exists(image_file):
-                    st.image(image_file, caption=image_file.replace(".png", ""), use_column_width=False, width=400)
+                    # Use HTML to apply the eda-image class for consistent sizing
+                    with open(image_file, "rb") as image_file_data:
+                        encoded = base64.b64encode(image_file_data.read()).decode()
+                    st.markdown(
+                        f'<img class="eda-image" src="data:image/png;base64,{encoded}" alt="{image_file.replace(".png", "")}">',
+                        unsafe_allow_html=True
+                    )
+                    st.caption(image_file.replace(".png", ""))
                 else:
                     st.error(f"{image_file} not found.")
 
