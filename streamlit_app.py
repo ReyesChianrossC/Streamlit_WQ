@@ -134,31 +134,43 @@ if os.path.exists("combined_results.parquet"):
         }
         comparison_df = comparison_df.rename(columns=clean_names)
 
-        # Fixed gradient styling function for the entire dataframe
+        # Updated gradient styling function based on metric values
         def style_dataframe(df):
-            # Define fixed gradient ranges for each metric
+            # Define fixed hue and lightness, with saturation range for each metric
             gradient_map = {
-                "Final MAE": (200, 80, 50),  # Hue=200 (blue), light=80% to dark=50%
-                "Final MSE": (120, 80, 50),  # Hue=120 (green), light=80% to dark=50%
-                "Final RMSE": (260, 80, 50), # Hue=260 (purple), light=80% to dark=50%
-                "R2 Score": (40, 80, 50)     # Hue=40 (orange), light=80% to dark=50%
+                "Final MAE": (200, 50, 20, 100),  # Hue=200 (blue), light=50%, sat=20% to 100%
+                "Final MSE": (120, 50, 20, 100),  # Hue=120 (green), light=50%, sat=20% to 100%
+                "Final RMSE": (260, 50, 20, 100), # Hue=260 (purple), light=50%, sat=20% to 100%
+                "R2 Score": (40, 50, 20, 100)     # Hue=40 (orange), light=50%, sat=20% to 100%
             }
-            n_rows = len(df)
-            # Create a style DataFrame with the same shape as df
             styles = pd.DataFrame("", index=df.index, columns=df.columns)
             for col in df.columns:
                 if col == "Model":
                     styles[col] = "color: white"
                 else:
-                    hue, light_start, light_end = gradient_map[col]
-                    for i in range(n_rows):
-                        if pd.isna(df[col].iloc[i]):
+                    hue, lightness, sat_min, sat_max = gradient_map[col]
+                    col_values = pd.to_numeric(df[col], errors='coerce')
+                    if col == "R2 Score":
+                        # For R2 Score, higher is better
+                        min_val, max_val = col_values.min(), col_values.max()
+                        if pd.isna(min_val) or pd.isna(max_val) or min_val == max_val:
+                            norm_values = [0.5] * len(col_values)  # Default if no range
+                        else:
+                            norm_values = (col_values - min_val) / (max_val - min_val)
+                    else:
+                        # For MAE, MSE, RMSE, lower is better
+                        min_val, max_val = col_values.min(), col_values.max()
+                        if pd.isna(min_val) or pd.isna(max_val) or min_val == max_val:
+                            norm_values = [0.5] * len(col_values)  # Default if no range
+                        else:
+                            norm_values = 1 - (col_values - min_val) / (max_val - min_val)  # Invert for lower-is-better
+                    for i, norm in enumerate(norm_values):
+                        if pd.isna(col_values.iloc[i]):
                             styles.at[i, col] = ""
                         else:
-                            # Linear interpolation of lightness based on row index
-                            norm_index = i / (n_rows - 1) if n_rows > 1 else 0
-                            lightness = light_start - (norm_index * (light_start - light_end))
-                            styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
+                            # Linear interpolation of saturation based on normalized value
+                            saturation = sat_min + norm * (sat_max - sat_min)
+                            styles.at[i, col] = f"background-color: hsl({hue}, {saturation:.1f}%, {lightness}%); color: black"
             return styles
 
         # Display the combined table with styling
