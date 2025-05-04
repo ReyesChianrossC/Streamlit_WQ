@@ -137,12 +137,11 @@ if os.path.exists("combined_results.parquet"):
         # Fixed gradient styling function for the entire dataframe
         def style_dataframe(df):
             gradient_map = {
-                "Final MAE": (210, 80, 50),
-                "Final MSE": (210, 80, 50),
-                "Final RMSE": (210, 80, 50),
-                "R2 Score": (210, 80, 50)
+                "Final MAE": (210, 80, 50, True),
+                "Final MSE": (210, 80, 50, True),
+                "Final RMSE": (210, 80, 50, True),
+                "R2 Score": (210, 80, 50, False)
             }
-
 
             styles = pd.DataFrame("", index=df.index, columns=df.columns)
 
