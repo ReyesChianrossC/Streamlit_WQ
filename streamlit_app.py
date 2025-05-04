@@ -97,6 +97,7 @@ else:
 # -------------------------------
 # 2. Compare Models
 # -------------------------------
+
 st.markdown("### Compare Models")
 
 if os.path.exists("combined_results.parquet"):
@@ -144,13 +145,11 @@ if os.path.exists("combined_results.parquet"):
                 if col_max == col_min:
                     return "background-color: hsl(120, 60%, 70%); color: black"  # Neutral color
                 norm_val = (val - col_min) / (col_max - col_min)
-                norm_val = max(0.2, min(0.8, norm_val))  # Clamp for small differences
                 if col_name == "R2 Score":
                     lightness = 50 + (norm_val * 30)  # 50% to 80%, higher is better
                 else:
                     lightness = 80 - (norm_val * 30)  # 80% to 50%, lower is better
-                text_color = "white" if lightness < 60 else "black"
-                return f"background-color: hsl(120, 60%, {lightness}%); color: {text_color}"
+                return f"background-color: hsl(120, 60%, {lightness}%); color: black"
             return col_data.map(color_gradient)
 
         # Horizontal belt layout
