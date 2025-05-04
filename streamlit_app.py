@@ -124,7 +124,7 @@ if os.path.exists("combined_results.parquet"):
     else:
         comparison_df = df[df["Model"].isin(selected_models)][valid_columns].reset_index(drop=True)
 
-        # Column renaming for cleaner display
+        # Clean column names for display
         clean_names = {
             metric_columns[0]: "Final MAE",
             metric_columns[1]: "Final MSE",
@@ -133,7 +133,7 @@ if os.path.exists("combined_results.parquet"):
         }
         comparison_df = comparison_df.rename(columns=clean_names)
 
-        # Function to apply color styling
+        # Gradient styling function
         def style_column(col_data, col_name):
             col_min = col_data.min()
             col_max = col_data.max()
@@ -149,19 +149,20 @@ if os.path.exists("combined_results.parquet"):
                 return f"background-color: hsl({hue}, 70%, {lightness}%); color: black"
             return col_data.map(color_gradient)
 
-        # Create 5 horizontal columns (belt layout)
+        # Horizontal belt layout
         belt_cols = st.columns(5)
 
-        # Display each as an individual styled table
+        # Column 1: Model with index
         with belt_cols[0]:
             st.markdown("**Model**")
             st.dataframe(comparison_df[["Model"]])
 
+        # Columns 2–5: Each metric in separate table with styling
         for i, metric in enumerate(["Final MAE", "Final MSE", "Final RMSE", "R2 Score"], start=1):
             with belt_cols[i]:
                 st.markdown(f"**{metric}**")
                 styled = comparison_df[[metric]].style.apply(style_column, col_name=metric, axis=0)
-                st.dataframe(styled)
+                st.dataframe(styled, hide_index=True)
 
 else:
     st.error("combined_results.parquet not found.")
