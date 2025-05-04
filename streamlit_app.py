@@ -61,18 +61,20 @@ st.title("Taal Water Quality Prediction Dashboard")
 st.markdown("## Table of Contents")
 st.markdown("""
 1. [Unique Data Summaries](#unique-data-summaries)  
-2. [Model Performance Metrics](#model-performance-metrics)  
-3. [Compare Models](#compare-models)  
-4. [Model Performance Visualizations](#model-performance-visualizations)  
-5. [Site Specific Summary](#site-specific-summary)  
-6. [Raw Data Exploration](#raw-data-exploration)  
-7. [Download All Graphs](#download-all-graphs)  
-8. [Group 1 Members](#group-1-members)  
+2. [Exploratory Data Analysis](#exploratory-data-analysis)  
+3. [Model Performance Metrics](#model-performance-metrics)  
+4. [Compare Models](#compare-models)  
+5. [Model Performance Visualizations](#model-performance-visualizations)  
+6. [Site Specific Summary](#site-specific-summary)  
+7. [Raw Data Exploration](#raw-data-exploration)  
+8. [Download All Graphs](#download-all-graphs)  
+9. [Group 1 Members](#group-1-members)  
 """, unsafe_allow_html=True)
 
 # -------------------------------
 # 1. Unique Data Summaries
 # -------------------------------
+st.markdown('<div id="unique-data-summaries">', unsafe_allow_html=True)
 st.markdown("### Unique Data Summaries")
 
 col1, col2, col3 = st.columns(3)
@@ -106,11 +108,50 @@ with col3:
         st.write("**Unique Wind Directions:**")
         wind_df_display = pd.DataFrame(unique_winds, columns=["Wind Direction"])
         st.dataframe(wind_df_display, use_container_width=True)
-
+st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
-# 2. Model Performance Metrics
+# 2. Exploratory Data Analysis
 # -------------------------------
+st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
+st.markdown("### Exploratory Data Analysis")
+
+# Custom CSS for horizontal image belt
+st.markdown("""
+    <style>
+    .image-belt {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .image-belt img {
+        width: 33%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# List of EDA images
+eda_images = ["EDA1.png", "EDA2.png", "EDA3.png"]
+cols = st.columns(3)
+
+for idx, image_file in enumerate(eda_images):
+    with cols[idx]:
+        if os.path.exists(image_file):
+            st.image(image_file, caption=image_file.replace(".png", ""), use_column_width=True)
+        else:
+            st.error(f"{image_file} not found.")
+st.markdown('</div>', unsafe_allow_html=True)
+
+# -------------------------------
+# 3. Model Performance Metrics
+# -------------------------------
+st.markdown('<div id="model-performance-metrics">', unsafe_allow_html=True)
 st.markdown("### Model Performance Metrics")
 
 if os.path.exists("combined_results.parquet"):
@@ -132,9 +173,12 @@ if os.path.exists("combined_results.parquet"):
         st.dataframe(filtered_df)
 else:
     st.error("combined_results.parquet not found.")
+st.markdown('</div>', unsafe_allow_html=True)
+
 # -------------------------------
-# 3. Compare Models
+# 4. Compare Models
 # -------------------------------
+st.markdown('<div id="compare-models">', unsafe_allow_html=True)
 st.markdown("### Compare Models")
 
 if os.path.exists("combined_results.parquet"):
@@ -208,10 +252,12 @@ if os.path.exists("combined_results.parquet"):
 
 else:
     st.error("combined_results.parquet not found.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
-# 4. Model Performance Visualizations
+# 5. Model Performance Visualizations
 # -------------------------------
+st.markdown('<div id="model-performance-visualizations">', unsafe_allow_html=True)
 st.markdown("### Model Performance Visualizations")
 plot_files = [
     "mae_comparison.png",
@@ -224,10 +270,11 @@ for plot_file in plot_files:
         st.image(plot_file, caption=plot_file.replace(".png", "").replace("_", " ").title())
     else:
         st.error(f"{plot_file} not found.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
-# 5. Site Specific Summary
-# -------------------------------
+# 6. Site Specific Summary# -------------------------------
+st.markdown('<div id="site-specific-summary">', unsafe_allow_html=True)
 st.markdown("### Site Specific Summary (Aggregated Raw Data)")
 if os.path.exists("site_summary.parquet"):
     site_summary = pd.read_parquet("site_summary.parquet")
@@ -298,9 +345,12 @@ if os.path.exists("site_summary.parquet"):
 
 else:
     st.error("site_summary.parquet not found.")
+st.markdown('</div>', unsafe_allow_html=True)
+
 # -------------------------------
-# 6. Raw Data Exploration
+# 7. Raw Data Exploration
 # -------------------------------
+st.markdown('<div id="raw-data-exploration">', unsafe_allow_html=True)
 st.markdown("### Raw Data Exploration")
 st.markdown("Explore the raw data files generated from the machine learning pipelines.")
 
@@ -352,18 +402,29 @@ with st.expander("Sites"):
         st.dataframe(site_df)
     else:
         st.error("sites.parquet not found.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
-# 7. Downloads
+# 8. Downloads
 # -------------------------------
+st.markdown('<div id="download-all-graphs">', unsafe_allow_html=True)
 st.markdown("### Downloads")
 
-# ZIP for all graphs
+# ZIP for all graphs, including EDA images
 zip_filename = "all_graphs.zip"
+all_plot_files = [
+    "mae_comparison.png",
+    "mse_comparison.png",
+    "rmse_comparison.png",
+    "r2_comparison.png",
+    "EDA1.png",
+    "EDA2.png",
+    "EDA3.png"
+]
 if not os.path.exists(zip_filename):
     if st.button("Create ZIP of All Graphs"):
         with zipfile.ZipFile(zip_filename, 'w') as zipf:
-            for plot_file in plot_files:
+            for plot_file in all_plot_files:
                 if os.path.exists(plot_file):
                     zipf.write(plot_file)
         st.success("ZIP file created!")
@@ -400,10 +461,12 @@ else:
             file_name=github_zip_filename,
             mime="application/zip"
         )
+st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
-# 8. Group 1 Members
+# 9. Group 1 Members
 # -------------------------------
+st.markdown('<div id="group-1-members">', unsafe_allow_html=True)
 st.markdown("### Group 1 Members")
 
 # Custom CSS to center the images in a horizontal belt with rounded edges and black border
@@ -450,7 +513,10 @@ image_html += '</div>'
 
 # Render the centered images with names
 st.markdown(image_html, unsafe_allow_html=True)
-# 9. Contact Section
+st.markdown('</div>', unsafe_allow_html=True)
+
+# -------------------------------
+# 10. Contact Section
 # -------------------------------
 st.markdown("### Contact / More Info")
 st.markdown("""
@@ -458,7 +524,7 @@ For more information, visit the host @ [https://github.com/ReyesChianrossC](http
 """)
 
 # -------------------------------
-# 10. Back to Top Anchor
+# 11. Back to Top Anchor
 # -------------------------------
 st.markdown("---")
 st.markdown("<a href='#title-section'>⬆Back to Top</a>", unsafe_allow_html=True)
