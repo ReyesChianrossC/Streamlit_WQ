@@ -94,10 +94,6 @@ if os.path.exists("combined_results.parquet"):
         st.dataframe(filtered_df)
 else:
     st.error("combined_results.parquet not found.")
-import os
-import pandas as pd
-import streamlit as st
-
 # -------------------------------
 # 2. Compare Models
 # -------------------------------
@@ -140,42 +136,33 @@ if os.path.exists("combined_results.parquet"):
 
         # Fixed gradient styling function for the entire dataframe
         def style_dataframe(df):
-            # Define fixed gradient ranges for each metric
             gradient_map = {
-                "Final MAE": (200, 80, 50),   # Blue
-                "Final MSE": (120, 80, 50),   # Green
-                "Final RMSE": (260, 80, 50),  # Purple
-                "R2 Score": (40, 80, 50)      # Orange
+                "Final MAE": (200, 80, 50, True),   # Blue, lower is better
+                "Final MSE": (120, 80, 50, True),   # Green, lower is better
+                "Final RMSE": (260, 80, 50, True),  # Purple, lower is better
+                "R2 Score": (40, 80, 50, False)     # Orange, higher is better
             }
-            def style_dataframe(df):
-    gradient_map = {
-        "Final MAE": (200, 80, 50, True),   # Blue, lower is better
-        "Final MSE": (120, 80, 50, True),   # Green, lower is better
-        "Final RMSE": (260, 80, 50, True),  # Purple, lower is better
-        "R2 Score": (40, 80, 50, False)     # Orange, higher is better
-    }
 
-    styles = pd.DataFrame("", index=df.index, columns=df.columns)
+            styles = pd.DataFrame("", index=df.index, columns=df.columns)
 
-        for col in df.columns:
-            if col == "Model":
-                styles[col] = "color: white"
-            elif col in gradient_map:
-                hue, light_start, light_end, reverse = gradient_map[col]
-                valid_vals = df[col].dropna()
-                if len(valid_vals) < 2:
-                    continue
-                # Rank values appropriately
-                ranks = valid_vals.rank(method='min', ascending=reverse)
-                norm_ranks = (ranks - 1) / (len(valid_vals) - 1)
-                lightness_vals = light_start - norm_ranks * (light_start - light_end)
-    
-                for i in valid_vals.index:
-                    lightness = lightness_vals[i]
-                    styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
+            for col in df.columns:
+                if col == "Model":
+                    styles[col] = "color: white"
+                elif col in gradient_map:
+                    hue, light_start, light_end, reverse = gradient_map[col]
+                    valid_vals = df[col].dropna()
+                    if len(valid_vals) < 2:
+                        continue
+                    # Rank values appropriately
+                    ranks = valid_vals.rank(method='min', ascending=reverse)
+                    norm_ranks = (ranks - 1) / (len(valid_vals) - 1)
+                    lightness_vals = light_start - norm_ranks * (light_start - light_end)
 
-    return styles
+                    for i in valid_vals.index:
+                        lightness = lightness_vals[i]
+                        styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
 
+            return styles
 
         # Display the combined table with styling
         styled_df = comparison_df.style.apply(style_dataframe, axis=None)
@@ -183,7 +170,6 @@ if os.path.exists("combined_results.parquet"):
 
 else:
     st.error("combined_results.parquet not found.")
-
 # -------------------------------
 # 3. Data Summaries
 # -------------------------------
