@@ -62,7 +62,7 @@ st.markdown("## Table of Contents")
 st.markdown("""
 1. [Model Performance Metrics](#model-performance-metrics)  
 2. [Compare Models](#compare-models)  
-3. [Data Summaries](#data-summaries)  
+3. [Unique Data Summaries](#unique-data-summaries)  
 4. [Model Performance Visualizations](#model-performance-visualizations)  
 5. [Site Specific Summary](#site-specific-summary)  
 6. [Raw Data Exploration](#raw-data-exploration)  
@@ -173,7 +173,7 @@ else:
 # -------------------------------
 # 3. Data Summaries
 # -------------------------------
-st.markdown("### Data Summaries")
+st.markdown("### Unique Data Summaries")
 
 col1, col2, col3 = st.columns(3)
 
