@@ -116,13 +116,28 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
 st.markdown("### Exploratory Data Analysis")
 
-# Custom CSS for uniform image sizes
+# Custom CSS for image belt
 st.markdown("""
     <style>
-    .eda-image {
-        width: 400px; /* Fixed width for all images */
-        height: 300px; /* Fixed height for all images */
-        object-fit: contain; /* Ensure images fit within the dimensions without distortion */
+    .eda-image-belt {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .eda-image-belt img {
+        width: 33%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+    }
+    .eda-single-image img {
+        width: 100%;
+        max-width: 600px; /* Slightly larger for the single image */
+        height: auto;
+        object-fit: cover;
         border-radius: 10px;
         border: 2px solid #ddd;
         margin: 10px 0;
@@ -133,24 +148,34 @@ st.markdown("""
 # List of EDA images
 eda_images = ["EDA0.png", "EDA1.png", "EDA2.png", "EDA3.png"]
 
-# Display images in pairs using columns
-for i in range(0, len(eda_images), 2):
-    cols = st.columns(2)
-    for j, col in enumerate(cols):
-        if i + j < len(eda_images):
-            image_file = eda_images[i + j]
-            with col:
-                if os.path.exists(image_file):
-                    # Use HTML to apply the eda-image class for consistent sizing
-                    with open(image_file, "rb") as image_file_data:
-                        encoded = base64.b64encode(image_file_data.read()).decode()
-                    st.markdown(
-                        f'<img class="eda-image" src="data:image/png;base64,{encoded}" alt="{image_file.replace(".png", "")}">',
-                        unsafe_allow_html=True
-                    )
-                    st.caption(image_file.replace(".png", ""))
-                else:
-                    st.error(f"{image_file} not found.")
+# Display EDA0.png as the first image (single)
+if os.path.exists(eda_images[0]):
+    with open(eda_images[0], "rb") as image_file:
+        encoded = base64.b64encode(image_file.read()).decode()
+    st.markdown(
+        f'<div class="eda-single-image"><img src="data:image/png;base64,{encoded}" alt="{eda_images[0].replace(".png", "")}"></div>',
+        unsafe_allow_html=True
+    )
+    st.caption(eda_images[0].replace(".png", ""))
+else:
+    st.error(f"{eda_images[0]} not found.")
+
+# Display EDA1.png, EDA2.png, and EDA3.png in a horizontal belt
+st.markdown('<div class="eda-image-belt">', unsafe_allow_html=True)
+cols = st.columns(3)
+for idx, image_file in enumerate(eda_images[1:], start=1):
+    with cols[idx-1]:
+        if os.path.exists(image_file):
+            with open(image_file, "rb") as image_file_data:
+                encoded = base64.b64encode(image_file_data.read()).decode()
+            st.markdown(
+                f'<img src="data:image/png;base64,{encoded}" alt="{image_file.replace(".png", "")}">',
+                unsafe_allow_html=True
+            )
+            st.caption(image_file.replace(".png", ""))
+        else:
+            st.error(f"{image_file} not found.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
