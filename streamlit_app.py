@@ -117,7 +117,33 @@ if os.path.exists("combined_results.parquet"):
         st.error("Not enough valid columns found. Please check the column names in combined_results.parquet.")
     else:
         comparison_df = df[df["Model"].isin(selected_models)][selected_columns]
-        st.dataframe(comparison_df)
+        
+        # Function to apply color gradient based on column values
+        def color_gradient(val, col_min, col_max, col_name):
+            if col_name == "Model" or pd.isna(val):  # Skip Model column and NaN values
+                return ""
+            # Normalize the value to a 0-1 scale based on min/max of the column
+            if col_max == col_min:
+                norm_val = 0.5  # Avoid division by zero
+            else:
+                norm_val = (val - col_min) / (col_max - col_min)
+            # For R2 Score, higher is better, so we don't invert
+            if "R2 Score" in col_name:
+                hue = 120 * norm_val  # Green (0) to Red (120)
+            else:
+                # For MAE, MSE, RMSE, lower is better, so invert the hue
+                hue = 120 * (1 - norm_val)  # Red (120) to Green (0)
+            return f"background-color: hsl({hue}, 70%, 80%)"
+        
+        # Create a styler object to apply the color gradient
+        styled_df = comparison_df.style
+        for col in comparison_df.columns:
+            if col != "Model":  # Skip the Model column
+                col_min = comparison_df[col].min()
+                col_max = comparison_df[col].max()
+                styled_df = styled_df.applymap(lambda x: color_gradient(x, col_min, col_max, col), subset=[col])
+        
+        st.dataframe(styled_df)
 else:
     st.error("combined_results.parquet not found.")
 
