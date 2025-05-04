@@ -115,51 +115,46 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------
 st.subheader('Exploratory Data Analysis')
 
-# Custom CSS for layout
+# Custom CSS for 2 images per row (1x1 aspect ratio layout)
 st.markdown("""
     <style>
-        .left-container {
-            display: inline-block;
-            width: 45%;
-            vertical-align: top;
-            padding-right: 5%;
-        }
-        .right-container {
-            display: inline-block;
-            width: 45%;
-            vertical-align: top;
-        }
-        .container {
+        .grid-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);  /* 2 columns */
             gap: 10px;
+        }
+        .grid-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Layout for 2x2 grid
-st.markdown('<div class="container">', unsafe_allow_html=True)
+# Grid layout for images
+st.markdown('<div class="grid-container">', unsafe_allow_html=True)
 
-# Heatmap on top left
-st.markdown('<div>', unsafe_allow_html=True)
+# First image - Heatmap (EDA0.png)
+st.markdown('<div class="grid-item">', unsafe_allow_html=True)
 st.image('EDA0.png', caption="Heatmap", use_column_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# EDA1 on top right
-st.markdown('<div>', unsafe_allow_html=True)
+# Second image - EDA1.png
+st.markdown('<div class="grid-item">', unsafe_allow_html=True)
 st.image('EDA1.png', caption="EDA1", use_column_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# EDA2 on bottom left
-st.markdown('<div>', unsafe_allow_html=True)
+# Third image - EDA2.png
+st.markdown('<div class="grid-item">', unsafe_allow_html=True)
 st.image('EDA2.png', caption="EDA2", use_column_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# EDA3 on bottom right
-st.markdown('<div>', unsafe_allow_html=True)
+# Fourth image - EDA3.png
+st.markdown('<div class="grid-item">', unsafe_allow_html=True)
 st.image('EDA3.png', caption="EDA3", use_column_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
+# Close grid container
 st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------
 # 3. Model Performance Metrics
