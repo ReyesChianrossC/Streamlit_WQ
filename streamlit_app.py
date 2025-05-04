@@ -116,40 +116,13 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
 st.markdown("### Exploratory Data Analysis")
 
-# Custom CSS for horizontal image belt with hover effect
-st.markdown("""
-    <style>
-    .image-belt {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        margin-top: 20__(
-        margin-bottom: 20px;
-    }
-    .image-belt img {
-        width: 33%;
-        height: auto;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid #ddd;
-        transition: transform 0.3s ease; /* Smooth transition for scaling */
-    }
-    .image-belt img:hover {
-        transform: scale(1.1); /* Enlarge image by 10% on hover */
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# List of EDA images
-eda_images = ["EDA1.png", "EDA2.png", "EDA3.png"]
-cols = st.columns(3)
-
-for idx, image_file in enumerate(eda_images):
-    with cols[idx]:
-        if os.path.exists(image_file):
-            st.image(image_file, caption=image_file.replace(".png", ""), use_column_width=True)
-        else:
-            st.error(f"{image_file} not found.")
+# List of EDA images, with EDA0.png added before EDA1.png
+eda_images = ["EDA0.png", "EDA1.png", "EDA2.png", "EDA3.png"]
+for image_file in eda_images:
+    if os.path.exists(image_file):
+        st.image(image_file, caption=image_file.replace(".png", ""), use_column_width=True)
+    else:
+        st.error(f"{image_file} not found.")
 st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
@@ -415,13 +388,14 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div id="download-all-graphs">', unsafe_allow_html=True)
 st.markdown("### Downloads")
 
-# ZIP for all graphs, including EDA images
+# ZIP for all graphs, including EDA images with EDA0.png
 zip_filename = "all_graphs.zip"
 all_plot_files = [
     "mae_comparison.png",
     "mse_comparison.png",
     "rmse_comparison.png",
     "r2_comparison.png",
+    "EDA0.png",
     "EDA1.png",
     "EDA2.png",
     "EDA3.png"
