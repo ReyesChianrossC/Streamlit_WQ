@@ -94,10 +94,9 @@ if os.path.exists("combined_results.parquet"):
         st.dataframe(filtered_df)
 else:
     st.error("combined_results.parquet not found.")
-
-import streamlit as st
-import pandas as pd
-import numpy as np
+# -------------------------------
+# 2. Compare Models
+# -------------------------------
 
 st.markdown("### Compare Models")
 if os.path.exists("combined_results.parquet"):
@@ -128,14 +127,14 @@ if os.path.exists("combined_results.parquet"):
                 norm_val = 0.5  # Avoid division by zero
             else:
                 norm_val = (val - col_min) / (col_max - col_min)
-            # For R2 Score, higher is better, so we don't invert
+            # For R2 Score, higher is better
             if "R2 Score" in col_name:
-                hue = 120 * norm_val  # Green (0) to Red (120)
-                lightness = 90 - (norm_val * 40)  # 90% (pale) to 50% (intense)
+                hue = 120 * (1 - norm_val)  # Red (120) to Green (0) as value increases
+                lightness = 50 + (norm_val * 40)  # 50% (intense) to 90% (pale) as value increases
             else:
-                # For MAE, MSE, RMSE, lower is better, so invert the hue
-                hue = 120 * (1 - norm_val)  # Red (120) to Green (0)
-                lightness = 90 - ((1 - norm_val) * 40)  # 90% (pale) to 50% (intense)
+                # For MAE, MSE, RMSE, lower is better
+                hue = 120 * norm_val  # Green (0) to Red (120) as value increases
+                lightness = 50 + ((1 - norm_val) * 40)  # 50% (intense) to 90% (pale) as value decreases
             return f"background-color: hsl({hue}, 70%, {lightness}%)"
         
         # Create a styler object to apply the color gradient
