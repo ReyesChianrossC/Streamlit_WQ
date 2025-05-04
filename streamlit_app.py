@@ -116,14 +116,14 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
 st.markdown("### Exploratory Data Analysis")
 
-# Custom CSS for horizontal image belt
+# Custom CSS for horizontal image belt with hover effect
 st.markdown("""
     <style>
     .image-belt {
         display: flex;
         justify-content: space-between;
         gap: 20px;
-        margin-top: 20px;
+        margin-top: 20__(
         margin-bottom: 20px;
     }
     .image-belt img {
@@ -132,6 +132,10 @@ st.markdown("""
         object-fit: cover;
         border-radius: 10px;
         border: 2px solid #ddd;
+        transition: transform 0.3s ease; /* Smooth transition for scaling */
+    }
+    .image-belt img:hover {
+        transform: scale(1.1); /* Enlarge image by 10% on hover */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -273,7 +277,8 @@ for plot_file in plot_files:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
-# 6. Site Specific Summary# -------------------------------
+# 6. Site Specific Summary
+# -------------------------------
 st.markdown('<div id="site-specific-summary">', unsafe_allow_html=True)
 st.markdown("### Site Specific Summary (Aggregated Raw Data)")
 if os.path.exists("site_summary.parquet"):
