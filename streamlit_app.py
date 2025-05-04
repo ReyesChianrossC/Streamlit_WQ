@@ -60,9 +60,9 @@ st.markdown('<div id="title-section">', unsafe_allow_html=True)
 st.title("Taal Water Quality Prediction Dashboard")
 st.markdown("## Table of Contents")
 st.markdown("""
-1. [Model Performance Metrics](#model-performance-metrics)  
-2. [Compare Models](#compare-models)  
-3. [Unique Data Summaries](#unique-data-summaries)  
+1. [Unique Data Summaries](#unique-data-summaries)  
+2. [Model Performance Metrics](#model-performance-metrics)  
+3. [Compare Models](#compare-models)  
 4. [Model Performance Visualizations](#model-performance-visualizations)  
 5. [Site Specific Summary](#site-specific-summary)  
 6. [Raw Data Exploration](#raw-data-exploration)  
@@ -71,7 +71,45 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -------------------------------
-# 1. Model Performance Metrics
+# 1. Unique Data Summaries
+# -------------------------------
+st.markdown("### Unique Data Summaries")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    if os.path.exists("sites.parquet"):
+        site_df = pd.read_parquet("sites.parquet")
+        unique_sites = site_df['site'].unique()
+        # Remove None values
+        unique_sites = [x for x in unique_sites if x is not None]
+        st.write("**Unique Sites:**")
+        site_df_display = pd.DataFrame(unique_sites, columns=["Site"])
+        st.dataframe(site_df_display, use_container_width=True)
+
+with col2:
+    if os.path.exists("weather_conditions.parquet"):
+        weather_df = pd.read_parquet("weather_conditions.parquet")
+        unique_weather = weather_df['weather_condition'].unique()
+        # Remove None values
+        unique_weather = [x for x in unique_weather if x is not None]
+        st.write("**Unique Weather Conditions:**")
+        weather_df_display = pd.DataFrame(unique_weather, columns=["Weather Condition"])
+        st.dataframe(weather_df_display, use_container_width=True)
+
+with col3:
+    if os.path.exists("wind_directions.parquet"):
+        wind_df = pd.read_parquet("wind_directions.parquet")
+        unique_winds = wind_df['wind_direction'].unique()
+        # Remove None values
+        unique_winds = [x for x in unique_winds if x is not None]
+        st.write("**Unique Wind Directions:**")
+        wind_df_display = pd.DataFrame(unique_winds, columns=["Wind Direction"])
+        st.dataframe(wind_df_display, use_container_width=True)
+
+
+# -------------------------------
+# 2. Model Performance Metrics
 # -------------------------------
 st.markdown("### Model Performance Metrics")
 
@@ -95,7 +133,7 @@ if os.path.exists("combined_results.parquet"):
 else:
     st.error("combined_results.parquet not found.")
 # -------------------------------
-# 2. Compare Models
+# 3. Compare Models
 # -------------------------------
 st.markdown("### Compare Models")
 
@@ -170,44 +208,6 @@ if os.path.exists("combined_results.parquet"):
 
 else:
     st.error("combined_results.parquet not found.")
-# -------------------------------
-# 3. Data Summaries
-# -------------------------------
-st.markdown("### Unique Data Summaries")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    if os.path.exists("sites.parquet"):
-        site_df = pd.read_parquet("sites.parquet")
-        unique_sites = site_df['site'].unique()
-        # Remove None values
-        unique_sites = [x for x in unique_sites if x is not None]
-        st.write("**Unique Sites:**")
-        site_df_display = pd.DataFrame(unique_sites, columns=["Site"])
-        st.dataframe(site_df_display, use_container_width=True)
-
-with col2:
-    if os.path.exists("weather_conditions.parquet"):
-        weather_df = pd.read_parquet("weather_conditions.parquet")
-        unique_weather = weather_df['weather_condition'].unique()
-        # Remove None values
-        unique_weather = [x for x in unique_weather if x is not None]
-        st.write("**Unique Weather Conditions:**")
-        weather_df_display = pd.DataFrame(unique_weather, columns=["Weather Condition"])
-        st.dataframe(weather_df_display, use_container_width=True)
-
-with col3:
-    if os.path.exists("wind_directions.parquet"):
-        wind_df = pd.read_parquet("wind_directions.parquet")
-        unique_winds = wind_df['wind_direction'].unique()
-        # Remove None values
-        unique_winds = [x for x in unique_winds if x is not None]
-        st.write("**Unique Wind Directions:**")
-        wind_df_display = pd.DataFrame(unique_winds, columns=["Wind Direction"])
-        st.dataframe(wind_df_display, use_container_width=True)
-
-
 
 # -------------------------------
 # 4. Model Performance Visualizations
