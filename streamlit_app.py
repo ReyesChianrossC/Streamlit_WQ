@@ -134,33 +134,28 @@ if os.path.exists("combined_results.parquet"):
         # Filter dataframe
         comparison_df = df[df["Model"].isin(selected_models)][selected_columns]
 
-        # Function to apply color gradient styling
-        def color_gradient(val, col_min, col_max, col_name):
-            if col_name == "Model" or pd.isna(val):
-                return ""
-            if col_max == col_min or val is None:
+        # Function to apply color gradient styling: higher is better for ALL
+        def color_gradient(val, col_min, col_max):
+            if pd.isna(val) or col_max == col_min:
                 return ""
             norm_val = (val - col_min) / (col_max - col_min)
-            hue = 120  # green hue
-            if "R2 Score" in col_name:
-                lightness = 90 - (norm_val * 40)
-            else:
-                lightness = 90 - ((1 - norm_val) * 40)
+            hue = 120  # green
+            lightness = 90 - norm_val * 40  # darker green for higher value
             return f"background-color: hsl({hue}, 70%, {lightness}%); color: black"
 
-        # Create Styler and apply conditional formatting
+        # Apply styling
         styled_df = comparison_df.style
         for col in comparison_df.columns:
             if col != "Model":
                 col_min = comparison_df[col].min()
                 col_max = comparison_df[col].max()
-                styled_df = styled_df.applymap(lambda x: color_gradient(x, col_min, col_max, col), subset=[col])
+                styled_df = styled_df.applymap(lambda x: color_gradient(x, col_min, col_max), subset=[col])
 
-        # Optional: hide index and format decimals
+        # Optional: hide index and format
         styled_df = styled_df.hide(axis="index")
         styled_df = styled_df.format(precision=6)
 
-        # Display styled DataFrame using st.write
+        # Display
         st.write(styled_df)
 
 else:
