@@ -253,45 +253,48 @@ if os.path.exists("site_summary.parquet"):
     col1, col2 = st.columns(2)
     
     with col1:
+        # Group by °C
         data1 = {
-            "Metric": ["Avg Surface Temp (°C)", "Avg Middle Temp (°C)", "Avg Bottom Temp (°C)"],
+            "Metric": ["Avg Surface Temp (°C)", "Avg Middle Temp (°C)", "Avg Bottom Temp (°C)", "Avg Air Temp (°C)"],
             "Value": [
                 filtered['avg_surface_temperature'].iloc[0] if 'avg_surface_temperature' in filtered.columns else "-",
                 filtered['avg_middle_temperature'].iloc[0] if 'avg_middle_temperature' in filtered.columns else "-",
-                filtered['avg_bottom_temperature'].iloc[0] if 'avg_bottom_temperature' in filtered.columns else "-"
+                filtered['avg_bottom_temperature'].iloc[0] if 'avg_bottom_temperature' in filtered.columns else "-",
+                filtered['avg_air_temperature'].iloc[0] if 'avg_air_temperature' in filtered.columns else "-"
             ]
         }
         df1 = pd.DataFrame(data1)
         st.table(df1)
 
+    with col2:
+        # Group by mg/L (split into two tables of 3 rows each)
         data2 = {
-            "Metric": ["Avg pH", "Avg Ammonia (mg/L)", "Avg Nitrate (mg/L)"],
+            "Metric": ["Avg Ammonia (mg/L)", "Avg Nitrate (mg/L)", "Avg Phosphate (mg/L)"],
             "Value": [
-                filtered['avg_ph'].iloc[0] if 'avg_ph' in filtered.columns else "-",
                 filtered['avg_ammonia'].iloc[0] if 'avg_ammonia' in filtered.columns else "-",
-                filtered['avg_nitrate'].iloc[0] if 'avg_nitrate' in filtered.columns else "-"
+                filtered['avg_nitrate'].iloc[0] if 'avg_nitrate' in filtered.columns else "-",
+                filtered['avg_phosphate'].iloc[0] if 'avg_phosphate' in filtered.columns else "-"
             ]
         }
         df2 = pd.DataFrame(data2)
         st.table(df2)
 
-    with col2:
         data3 = {
-            "Metric": ["Avg Phosphate (mg/L)", "Avg Dissolved Oxygen (mg/L)", "Avg Sulfide (mg/L)"],
+            "Metric": ["Avg Dissolved Oxygen (mg/L)", "Avg Sulfide (mg/L)", "Avg Carbon Dioxide (mg/L)"],
             "Value": [
-                filtered['avg_phosphate'].iloc[0] if 'avg_phosphate' in filtered.columns else "-",
                 filtered['avg_dissolved_oxygen'].iloc[0] if 'avg_dissolved_oxygen' in filtered.columns else "-",
-                filtered['avg_sulfide'].iloc[0] if 'avg_sulfide' in filtered.columns else "-"
+                filtered['avg_sulfide'].iloc[0] if 'avg_sulfide' in filtered.columns else "-",
+                filtered['avg_carbon_dioxide'].iloc[0] if 'avg_carbon_dioxide' in filtered.columns else "-"
             ]
         }
         df3 = pd.DataFrame(data3)
         st.table(df3)
-        
+
+        # Group by pH
         data4 = {
-            "Metric": ["Avg Carbon Dioxide (mg/L)", "Avg Air Temp (°C)"],
+            "Metric": ["Avg pH"],
             "Value": [
-                filtered['avg_carbon_dioxide'].iloc[0] if 'avg_carbon_dioxide' in filtered.columns else "-",
-                filtered['avg_air_temperature'].iloc[0] if 'avg_air_temperature' in filtered.columns else "-"
+                filtered['avg_ph'].iloc[0] if 'avg_ph' in filtered.columns else "-"
             ]
         }
         df4 = pd.DataFrame(data4)
