@@ -113,71 +113,35 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------
 # 2. Exploratory Data Analysis
 # -------------------------------
-st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
-st.markdown("### Exploratory Data Analysis")
+st.subheader('Exploratory Data Analysis')
 
-# Custom CSS for image belt
+# Custom CSS for layout
 st.markdown("""
     <style>
-    .eda-image-belt {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    .eda-image-belt img {
-        width: 33%;
-        height: auto;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid #ddd;
-    }
-    .eda-single-image img {
-        width: 100%;
-        max-width: 600px; /* Slightly larger for the single image */
-        height: auto;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 2px solid #ddd;
-        margin: 10px 0;
-    }
+        .left-container {
+            display: inline-block;
+            width: 45%;
+            vertical-align: top;
+            padding-right: 5%;
+        }
+        .right-container {
+            display: inline-block;
+            width: 45%;
+            vertical-align: top;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# List of EDA images
-eda_images = ["EDA0.png", "EDA1.png", "EDA2.png", "EDA3.png"]
+# Layout for Heatmap on left and EDA images on the right
+col1, col2 = st.columns([2, 3])
 
-# Display EDA0.png as the first image (single)
-if os.path.exists(eda_images[0]):
-    with open(eda_images[0], "rb") as image_file:
-        encoded = base64.b64encode(image_file.read()).decode()
-    st.markdown(
-        f'<div class="eda-single-image"><img src="data:image/png;base64,{encoded}" alt="{eda_images[0].replace(".png", "")}"></div>',
-        unsafe_allow_html=True
-    )
-    st.caption(eda_images[0].replace(".png", ""))
-else:
-    st.error(f"{eda_images[0]} not found.")
+with col1:
+    st.image('EDA0.png', caption="Heatmap", use_column_width=True)
 
-# Display EDA1.png, EDA2.png, and EDA3.png in a horizontal belt
-st.markdown('<div class="eda-image-belt">', unsafe_allow_html=True)
-cols = st.columns(3)
-for idx, image_file in enumerate(eda_images[1:], start=1):
-    with cols[idx-1]:
-        if os.path.exists(image_file):
-            with open(image_file, "rb") as image_file_data:
-                encoded = base64.b64encode(image_file_data.read()).decode()
-            st.markdown(
-                f'<img src="data:image/png;base64,{encoded}" alt="{image_file.replace(".png", "")}">',
-                unsafe_allow_html=True
-            )
-            st.caption(image_file.replace(".png", ""))
-        else:
-            st.error(f"{image_file} not found.")
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
+with col2:
+    st.image('EDA1.png', caption="EDA1", use_column_width=True)
+    st.image('EDA2.png', caption="EDA2", use_column_width=True)
+    st.image('EDA3.png', caption="EDA3", use_column_width=True)
 
 # -------------------------------
 # 3. Model Performance Metrics
