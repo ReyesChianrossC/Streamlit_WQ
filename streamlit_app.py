@@ -120,7 +120,8 @@ if os.path.exists("combined_results.parquet"):
     valid_columns = ["Model"] + [col for col in metric_columns if col in df.columns]
 
     if len(valid_columns) < 2:
-        st.error("Not enough valid columns found. Please check your data.")
+        missing_cols = [col for col in metric_columns if col not in df.columns]
+        st.error(f"Not enough valid columns found. Missing columns: {', '.join(missing_cols)}")
     else:
         comparison_df = df[df["Model"].isin(selected_models)][valid_columns].reset_index(drop=True)
 
@@ -138,15 +139,18 @@ if os.path.exists("combined_results.parquet"):
             col_min = col_data.min()
             col_max = col_data.max()
             def color_gradient(val):
-                if pd.isna(val) or col_max == col_min:
+                if pd.isna(val):
                     return ""
+                if col_max == col_min:
+                    return "background-color: hsl(120, 60%, 70%); color: black"  # Neutral color
                 norm_val = (val - col_min) / (col_max - col_min)
-                hue = 120  # green
+                norm_val = max(0.2, min(0.8, norm_val))  # Clamp for small differences
                 if col_name == "R2 Score":
-                    lightness = 90 - (norm_val * 40)  # Higher is better
+                    lightness = 50 + (norm_val * 30)  # 50% to 80%, higher is better
                 else:
-                    lightness = 90 - ((1 - norm_val) * 40)  # Lower is better
-                return f"background-color: hsl({hue}, 70%, {lightness}%); color: black"
+                    lightness = 80 - (norm_val * 30)  # 80% to 50%, lower is better
+                text_color = "white" if lightness < 60 else "black"
+                return f"background-color: hsl(120, 60%, {lightness}%); color: {text_color}"
             return col_data.map(color_gradient)
 
         # Horizontal belt layout
