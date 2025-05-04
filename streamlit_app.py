@@ -143,23 +143,23 @@ if os.path.exists("combined_results.parquet"):
                 "Final RMSE": (260, 80, 50), # Hue=260 (purple), light=80% to dark=50%
                 "R2 Score": (40, 80, 50)     # Hue=40 (orange), light=80% to dark=50%
             }
-            styles = []
+            n_rows = len(df)
+            # Create a style DataFrame with the same shape as df
+            styles = pd.DataFrame("", index=df.index, columns=df.columns)
             for col in df.columns:
                 if col == "Model":
-                    # No background color for the Model column
-                    styles.append(df[col].map(lambda _: "color: black"))
+                    styles[col] = "color: black"
                 else:
                     hue, light_start, light_end = gradient_map[col]
-                    n_rows = len(df)
-                    def apply_fixed_gradient(index):
-                        if pd.isna(df[col][index]):
-                            return ""
-                        # Linear interpolation of lightness based on row index
-                        norm_index = index / (n_rows - 1) if n_rows > 1 else 0
-                        lightness = light_start - (norm_index * (light_start - light_end))
-                        return f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
-                    styles.append([apply_fixed_gradient(i) for i in range(n_rows)])
-            return pd.DataFrame(styles, index=df.columns).T
+                    for i in range(n_rows):
+                        if pd.isna(df[col].iloc[i]):
+                            styles.at[i, col] = ""
+                        else:
+                            # Linear interpolation of lightness based on row index
+                            norm_index = i / (n_rows - 1) if n_rows > 1 else 0
+                            lightness = light_start - (norm_index * (light_start - light_end))
+                            styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
+            return styles
 
         # Display the combined table with styling
         styled_df = comparison_df.style.apply(style_dataframe, axis=None)
