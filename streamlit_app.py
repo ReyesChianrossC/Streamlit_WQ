@@ -97,7 +97,6 @@ else:
 # -------------------------------
 # 2. Compare Models
 # -------------------------------
-
 st.markdown("### Compare Models")
 
 if os.path.exists("combined_results.parquet"):
@@ -135,37 +134,28 @@ if os.path.exists("combined_results.parquet"):
         }
         comparison_df = comparison_df.rename(columns=clean_names)
 
-        # Gradient styling function
-        def style_column(col_data, col_name):
-            col_min = col_data.min()
-            col_max = col_data.max()
-            def color_gradient(val):
-                if pd.isna(val):
-                    return ""
-                if col_max == col_min:
-                    return "background-color: hsl(120, 60%, 70%); color: black"  # Neutral color
-                norm_val = (val - col_min) / (col_max - col_min)
-                if col_name == "R2 Score":
-                    lightness = 50 + (norm_val * 30)  # 50% to 80%, higher is better
+        # Fixed color styling function for the entire dataframe
+        def style_dataframe(df):
+            # Define fixed colors for each metric
+            color_map = {
+                "Final MAE": "hsl(200, 50%, 80%)",  # Light blue
+                "Final MSE": "hsl(120, 50%, 80%)",  # Light green
+                "Final RMSE": "hsl(260, 50%, 80%)",  # Light purple
+                "R2 Score": "hsl(40, 50%, 80%)"     # Light orange
+            }
+            styles = []
+            for col in df.columns:
+                if col == "Model":
+                    # No background color for the Model column
+                    styles.append(df[col].map(lambda _: "color: black"))
                 else:
-                    lightness = 80 - (norm_val * 30)  # 80% to 50%, lower is better
-                return f"background-color: hsl(120, 60%, {lightness}%); color: black"
-            return col_data.map(color_gradient)
+                    # Apply fixed color for metric columns
+                    styles.append(df[col].map(lambda val: f"background-color: {color_map[col]}; color: black" if not pd.isna(val) else ""))
+            return pd.DataFrame(styles, index=df.columns).T
 
-        # Horizontal belt layout
-        belt_cols = st.columns(5)
-
-        # Column 1: Model with index
-        with belt_cols[0]:
-            st.markdown("**Model**")
-            st.dataframe(comparison_df[["Model"]])
-
-        # Columns 2–5: Each metric in separate table with styling
-        for i, metric in enumerate(["Final MAE", "Final MSE", "Final RMSE", "R2 Score"], start=1):
-            with belt_cols[i]:
-                st.markdown(f"**{metric}**")
-                styled = comparison_df[[metric]].style.apply(style_column, col_name=metric, axis=0)
-                st.dataframe(styled, hide_index=True)
+        # Display the combined table with styling
+        styled_df = comparison_df.style.apply(style_dataframe, axis=None)
+        st.dataframe(styled_df)
 
 else:
     st.error("combined_results.parquet not found.")
