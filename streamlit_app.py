@@ -147,30 +147,35 @@ if os.path.exists("combined_results.parquet"):
                 "Final RMSE": (260, 80, 50),  # Purple
                 "R2 Score": (40, 80, 50)      # Orange
             }
-            styles = pd.DataFrame("", index=df.index, columns=df.columns)
+            def style_dataframe(df):
+    gradient_map = {
+        "Final MAE": (200, 80, 50, True),   # Blue, lower is better
+        "Final MSE": (120, 80, 50, True),   # Green, lower is better
+        "Final RMSE": (260, 80, 50, True),  # Purple, lower is better
+        "R2 Score": (40, 80, 50, False)     # Orange, higher is better
+    }
 
-            for col in df.columns:
-                if col == "Model":
-                    styles[col] = "color: white"
-                elif col in gradient_map:
-                    hue, light_start, light_end = gradient_map[col]
-                    # Rank values in descending order (highest = darkest)
-                    series = df[col]
-                    valid_vals = series.dropna()
-                    ranks = valid_vals.rank(method='min', ascending=False)
+    styles = pd.DataFrame("", index=df.index, columns=df.columns)
 
-                    # Normalize ranks to 0-1
-                    norm_ranks = (ranks - 1) / (len(valid_vals) - 1) if len(valid_vals) > 1 else ranks * 0
-                    lightness_vals = light_start - norm_ranks * (light_start - light_end)
+    for col in df.columns:
+        if col == "Model":
+            styles[col] = "color: white"
+        elif col in gradient_map:
+            hue, light_start, light_end, reverse = gradient_map[col]
+            valid_vals = df[col].dropna()
+            if len(valid_vals) < 2:
+                continue
+            # Rank values appropriately
+            ranks = valid_vals.rank(method='min', ascending=reverse)
+            norm_ranks = (ranks - 1) / (len(valid_vals) - 1)
+            lightness_vals = light_start - norm_ranks * (light_start - light_end)
 
-                    for i in df.index:
-                        val = df.at[i, col]
-                        if pd.isna(val):
-                            styles.at[i, col] = ""
-                        else:
-                            lightness = lightness_vals.get(i, light_start)
-                            styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
-            return styles
+            for i in valid_vals.index:
+                lightness = lightness_vals[i]
+                styles.at[i, col] = f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
+
+    return styles
+
 
         # Display the combined table with styling
         styled_df = comparison_df.style.apply(style_dataframe, axis=None)
