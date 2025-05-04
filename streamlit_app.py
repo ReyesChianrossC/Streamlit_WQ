@@ -122,19 +122,46 @@ if os.path.exists("combined_results.parquet"):
     if len(valid_columns) < 2:
         st.error("Not enough valid columns found. Please check your data.")
     else:
-        comparison_df = df[df["Model"].isin(selected_models)][valid_columns]
-        comparison_df = comparison_df.reset_index(drop=True)
+        comparison_df = df[df["Model"].isin(selected_models)][valid_columns].reset_index(drop=True)
 
-        # Rename columns for cleaner display
-        renamed_df = comparison_df.rename(columns={
+        # Column renaming for cleaner display
+        clean_names = {
             metric_columns[0]: "Final MAE",
             metric_columns[1]: "Final MSE",
             metric_columns[2]: "Final RMSE",
             metric_columns[3]: "R2 Score"
-        })
+        }
+        comparison_df = comparison_df.rename(columns=clean_names)
 
-        # Display clean table
-        st.dataframe(renamed_df, use_container_width=True)
+        # Function to apply color styling
+        def style_column(col_data, col_name):
+            col_min = col_data.min()
+            col_max = col_data.max()
+            def color_gradient(val):
+                if pd.isna(val) or col_max == col_min:
+                    return ""
+                norm_val = (val - col_min) / (col_max - col_min)
+                hue = 120  # green
+                if col_name == "R2 Score":
+                    lightness = 90 - (norm_val * 40)  # Higher is better
+                else:
+                    lightness = 90 - ((1 - norm_val) * 40)  # Lower is better
+                return f"background-color: hsl({hue}, 70%, {lightness}%); color: black"
+            return col_data.map(color_gradient)
+
+        # Create 5 horizontal columns (belt layout)
+        belt_cols = st.columns(5)
+
+        # Display each as an individual styled table
+        with belt_cols[0]:
+            st.markdown("**Model**")
+            st.dataframe(comparison_df[["Model"]])
+
+        for i, metric in enumerate(["Final MAE", "Final MSE", "Final RMSE", "R2 Score"], start=1):
+            with belt_cols[i]:
+                st.markdown(f"**{metric}**")
+                styled = comparison_df[[metric]].style.apply(style_column, col_name=metric, axis=0)
+                st.dataframe(styled)
 
 else:
     st.error("combined_results.parquet not found.")
