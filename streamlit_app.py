@@ -237,12 +237,15 @@ if os.path.exists("site_summary.parquet"):
     selected_site = st.selectbox("Select a site:", site_list)
     filtered = site_summary[site_summary['site'] == selected_site]
 
-    # Add custom CSS for text alignment
+    # Add custom CSS for text alignment and to hide indexes
     st.markdown(
         """
         <style>
         table {
             text-align: left !important;
+        }
+        th:nth-child(1), td:nth-child(1) {
+            display: none !important;  /* Hide the index column */
         }
         </style>
         """,
@@ -266,6 +269,16 @@ if os.path.exists("site_summary.parquet"):
         df1 = pd.DataFrame(data1)
         st.table(df1)
 
+        # Group by pH (placed below the °C table)
+        data3 = {
+            "Metric": ["Avg pH"],
+            "Value": [
+                filtered['avg_ph'].iloc[0] if 'avg_ph' in filtered.columns else "-"
+            ]
+        }
+        df3 = pd.DataFrame(data3)
+        st.table(df3)
+
     with col2:
         # Group by mg/L (merged into one table)
         data2 = {
@@ -282,16 +295,6 @@ if os.path.exists("site_summary.parquet"):
         }
         df2 = pd.DataFrame(data2)
         st.table(df2)
-
-        # Group by pH (separate table below)
-        data3 = {
-            "Metric": ["Avg pH"],
-            "Value": [
-                filtered['avg_ph'].iloc[0] if 'avg_ph' in filtered.columns else "-"
-            ]
-        }
-        df3 = pd.DataFrame(data3)
-        st.table(df3)
 
 else:
     st.error("site_summary.parquet not found.")
