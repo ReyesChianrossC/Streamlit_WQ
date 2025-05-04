@@ -122,11 +122,11 @@ if os.path.exists("combined_results.parquet"):
         def color_gradient(val, col_min, col_max, col_name):
             if col_name == "Model" or pd.isna(val):  # Skip Model column and NaN values
                 return ""
+            # Ensure col_min and col_max are valid numbers
+            if not np.isfinite(col_min) or not np.isfinite(col_max) or col_max == col_min:
+                return ""  # Return empty string if invalid range
             # Normalize the value to a 0-1 scale based on min/max of the column
-            if col_max == col_min:
-                norm_val = 0.5  # Avoid division by zero
-            else:
-                norm_val = (val - col_min) / (col_max - col_min)
+            norm_val = (val - col_min) / (col_max - col_min)
             # Use a fixed green hue (120) for all columns
             hue = 120
             # For R2 Score, higher is better: highest value -> most intense (lightness 50%)
@@ -135,7 +135,7 @@ if os.path.exists("combined_results.parquet"):
             else:
                 # For MAE, MSE, RMSE, lower is better: lowest value -> most intense (lightness 50%)
                 lightness = 90 - ((1 - norm_val) * 40)  # 90% (pale) to 50% (intense)
-            return f"background-color: hsl({hue}, 70%, {lightness}%)"
+            return f"background-color: hsl({hue}, 70%, {lightness}%); color: black"
         
         # Create a styler object to apply the color gradient
         styled_df = comparison_df.style
