@@ -129,20 +129,38 @@ st.markdown("""
             width: 45%;
             vertical-align: top;
         }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# Layout for Heatmap on left and EDA images on the right
-col1, col2 = st.columns([2, 3])
+# Layout for 2x2 grid
+st.markdown('<div class="container">', unsafe_allow_html=True)
 
-with col1:
-    st.image('EDA0.png', caption="Heatmap", use_column_width=True)
+# Heatmap on top left
+st.markdown('<div>', unsafe_allow_html=True)
+st.image('EDA0.png', caption="Heatmap", use_column_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-with col2:
-    st.image('EDA1.png', caption="EDA1", use_column_width=True)
-    st.image('EDA2.png', caption="EDA2", use_column_width=True)
-    st.image('EDA3.png', caption="EDA3", use_column_width=True)
+# EDA1 on top right
+st.markdown('<div>', unsafe_allow_html=True)
+st.image('EDA1.png', caption="EDA1", use_column_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
+# EDA2 on bottom left
+st.markdown('<div>', unsafe_allow_html=True)
+st.image('EDA2.png', caption="EDA2", use_column_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# EDA3 on bottom right
+st.markdown('<div>', unsafe_allow_html=True)
+st.image('EDA3.png', caption="EDA3", use_column_width=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
 # -------------------------------
 # 3. Model Performance Metrics
 # -------------------------------
