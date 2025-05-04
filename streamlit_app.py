@@ -237,6 +237,18 @@ if os.path.exists("site_summary.parquet"):
     selected_site = st.selectbox("Select a site:", site_list)
     filtered = site_summary[site_summary['site'] == selected_site]
 
+    # Add custom CSS for text alignment
+    st.markdown(
+        """
+        <style>
+        table {
+            text-align: left !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     # Define columns for horizontal belt
     col1, col2 = st.columns(2)
     
@@ -250,8 +262,8 @@ if os.path.exists("site_summary.parquet"):
             ]
         }
         df1 = pd.DataFrame(data1)
-        st.table(df1.style.hide_index().set_properties(**{'text-align': 'left'}))
-        
+        st.table(df1)
+
         data2 = {
             "Metric": ["Avg pH", "Avg Ammonia (mg/L)", "Avg Nitrate (mg/L)"],
             "Value": [
@@ -261,7 +273,7 @@ if os.path.exists("site_summary.parquet"):
             ]
         }
         df2 = pd.DataFrame(data2)
-        st.table(df2.style.hide_index().set_properties(**{'text-align': 'left'}))
+        st.table(df2)
 
     with col2:
         data3 = {
@@ -273,7 +285,7 @@ if os.path.exists("site_summary.parquet"):
             ]
         }
         df3 = pd.DataFrame(data3)
-        st.table(df3.style.hide_index().set_properties(**{'text-align': 'left'}))
+        st.table(df3)
         
         data4 = {
             "Metric": ["Avg Carbon Dioxide (mg/L)", "Avg Air Temp (°C)"],
@@ -283,7 +295,7 @@ if os.path.exists("site_summary.parquet"):
             ]
         }
         df4 = pd.DataFrame(data4)
-        st.table(df4.style.hide_index().set_properties(**{'text-align': 'left'}))
+        st.table(df4)
 
 else:
     st.error("site_summary.parquet not found.")
