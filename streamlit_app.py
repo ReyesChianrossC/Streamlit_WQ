@@ -116,13 +116,36 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div id="exploratory-data-analysis">', unsafe_allow_html=True)
 st.markdown("### Exploratory Data Analysis")
 
-# List of EDA images, with EDA0.png added before EDA1.png
+# Custom CSS for smaller images
+st.markdown("""
+    <style>
+    .eda-image {
+        width: 100%;
+        max-width: 400px; /* Resize images to be smaller */
+        height: auto;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+        margin: 10px 0;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# List of EDA images
 eda_images = ["EDA0.png", "EDA1.png", "EDA2.png", "EDA3.png"]
-for image_file in eda_images:
-    if os.path.exists(image_file):
-        st.image(image_file, caption=image_file.replace(".png", ""), use_column_width=True)
-    else:
-        st.error(f"{image_file} not found.")
+
+# Display images in pairs using columns
+for i in range(0, len(eda_images), 2):
+    cols = st.columns(2)
+    for j, col in enumerate(cols):
+        if i + j < len(eda_images):
+            image_file = eda_images[i + j]
+            with col:
+                if os.path.exists(image_file):
+                    st.image(image_file, caption=image_file.replace(".png", ""), use_column_width=False, width=400)
+                else:
+                    st.error(f"{image_file} not found.")
+
 st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------------
