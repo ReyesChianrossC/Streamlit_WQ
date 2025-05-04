@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import base64
 import os
-import numpy as np
 import uuid
 import zipfile
 
@@ -98,55 +97,72 @@ else:
 # -------------------------------
 # 2. Compare Models
 # -------------------------------
-
 st.markdown("### Compare Models")
+
+# Check if the data file exists
 if os.path.exists("combined_results.parquet"):
+    # Load the dataset
     df = pd.read_parquet("combined_results.parquet")
+
+    # Unique models from the dataset
     models = df["Model"].unique()
-    selected_models = st.multiselect("Select Models to Compare", models, default=[models[0], models[1]] if len(models) > 1 else [])
-    
+
+    # Multiselect for models
+    selected_models = st.multiselect(
+        "Select Models to Compare",
+        models,
+        default=[models[0], models[1]] if len(models) > 1 else []
+    )
+
+    # Mapping forecast range to column names
     metrics_map = {
         "Next Week": ["Final MAE - Next Week", "Final MSE - Next Week", "Final RMSE - Next Week", "R2 Score - Next Week"],
         "Next Month": ["Final MAE - Next Month", "Final MSE - Next Month", "Final RMSE - Next Month", "R2 Score - Next Month"],
         "Next Year": ["Final MAE - Next Year", "Final MSE - Next Year", "Final RMSE - Next Year", "R2 Score - Next Year"]
     }
-    
+
+    # Forecast range selection
     selected_forecast = st.selectbox("Select Forecast Range for Comparison", ["Next Week", "Next Month", "Next Year"])
-    
+
+    # Get selected metric columns
     selected_columns = [col for col in ["Model"] + metrics_map[selected_forecast] if col in df.columns]
+
+    # Ensure columns are valid
     if len(selected_columns) < 2:
         st.error("Not enough valid columns found. Please check the column names in combined_results.parquet.")
     else:
+        # Filter dataframe
         comparison_df = df[df["Model"].isin(selected_models)][selected_columns]
-        
-        # Function to apply color gradient based on column values
+
+        # Function to apply color gradient styling
         def color_gradient(val, col_min, col_max, col_name):
-            if col_name == "Model" or pd.isna(val):  # Skip Model column and NaN values
+            if col_name == "Model" or pd.isna(val):
                 return ""
-            # Ensure col_min and col_max are valid numbers
-            if not np.isfinite(col_min) or not np.isfinite(col_max) or col_max == col_min:
-                return ""  # Return empty string if invalid range
-            # Normalize the value to a 0-1 scale based on min/max of the column
+            if col_max == col_min or val is None:
+                return ""
             norm_val = (val - col_min) / (col_max - col_min)
-            # Use a fixed green hue (120) for all columns
-            hue = 120
-            # For R2 Score, higher is better: highest value -> most intense (lightness 50%)
+            hue = 120  # green hue
             if "R2 Score" in col_name:
-                lightness = 90 - (norm_val * 40)  # 90% (pale) to 50% (intense)
+                lightness = 90 - (norm_val * 40)
             else:
-                # For MAE, MSE, RMSE, lower is better: lowest value -> most intense (lightness 50%)
-                lightness = 90 - ((1 - norm_val) * 40)  # 90% (pale) to 50% (intense)
+                lightness = 90 - ((1 - norm_val) * 40)
             return f"background-color: hsl({hue}, 70%, {lightness}%); color: black"
-        
-        # Create a styler object to apply the color gradient
+
+        # Create Styler and apply conditional formatting
         styled_df = comparison_df.style
         for col in comparison_df.columns:
-            if col != "Model":  # Skip the Model column
+            if col != "Model":
                 col_min = comparison_df[col].min()
                 col_max = comparison_df[col].max()
                 styled_df = styled_df.applymap(lambda x: color_gradient(x, col_min, col_max, col), subset=[col])
-        
-        st.dataframe(styled_df)
+
+        # Optional: hide index and format decimals
+        styled_df = styled_df.hide(axis="index")
+        styled_df = styled_df.format(precision=6)
+
+        # Display styled DataFrame using st.write
+        st.write(styled_df)
+
 else:
     st.error("combined_results.parquet not found.")
 # -------------------------------
