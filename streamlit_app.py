@@ -148,7 +148,7 @@ if os.path.exists("combined_results.parquet"):
             styles = pd.DataFrame("", index=df.index, columns=df.columns)
             for col in df.columns:
                 if col == "Model":
-                    styles[col] = "color: black"
+                    styles[col] = "color: white"
                 else:
                     hue, light_start, light_end = gradient_map[col]
                     for i in range(n_rows):
