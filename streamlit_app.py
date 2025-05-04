@@ -137,7 +137,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # List of EDA images
-eda_images = ["EDA1.png", "EDA2.png", "EDA3.png"]
+eda_images = ["Air Temperature vs Surface Temperature.png", "Ph vs Dissolved Oxygen.png", "Nitrate vs Phosphate.png"]
 cols = st.columns(3)
 
 for idx, image_file in enumerate(eda_images):
