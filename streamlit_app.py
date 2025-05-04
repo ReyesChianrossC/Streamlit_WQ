@@ -134,14 +134,14 @@ if os.path.exists("combined_results.parquet"):
         }
         comparison_df = comparison_df.rename(columns=clean_names)
 
-        # Fixed color styling function for the entire dataframe
+        # Fixed gradient styling function for the entire dataframe
         def style_dataframe(df):
-            # Define fixed colors for each metric
-            color_map = {
-                "Final MAE": "hsl(200, 50%, 80%)",  # Light blue
-                "Final MSE": "hsl(120, 50%, 80%)",  # Light green
-                "Final RMSE": "hsl(260, 50%, 80%)",  # Light purple
-                "R2 Score": "hsl(40, 50%, 80%)"     # Light orange
+            # Define fixed gradient ranges for each metric
+            gradient_map = {
+                "Final MAE": (200, 80, 50),  # Hue=200 (blue), light=80% to dark=50%
+                "Final MSE": (120, 80, 50),  # Hue=120 (green), light=80% to dark=50%
+                "Final RMSE": (260, 80, 50), # Hue=260 (purple), light=80% to dark=50%
+                "R2 Score": (40, 80, 50)     # Hue=40 (orange), light=80% to dark=50%
             }
             styles = []
             for col in df.columns:
@@ -149,8 +149,16 @@ if os.path.exists("combined_results.parquet"):
                     # No background color for the Model column
                     styles.append(df[col].map(lambda _: "color: black"))
                 else:
-                    # Apply fixed color for metric columns
-                    styles.append(df[col].map(lambda val: f"background-color: {color_map[col]}; color: black" if not pd.isna(val) else ""))
+                    hue, light_start, light_end = gradient_map[col]
+                    n_rows = len(df)
+                    def apply_fixed_gradient(index):
+                        if pd.isna(df[col][index]):
+                            return ""
+                        # Linear interpolation of lightness based on row index
+                        norm_index = index / (n_rows - 1) if n_rows > 1 else 0
+                        lightness = light_start - (norm_index * (light_start - light_end))
+                        return f"background-color: hsl({hue}, 50%, {lightness:.1f}%); color: black"
+                    styles.append([apply_fixed_gradient(i) for i in range(n_rows)])
             return pd.DataFrame(styles, index=df.columns).T
 
         # Display the combined table with styling
