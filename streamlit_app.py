@@ -228,7 +228,7 @@ for plot_file in plot_files:
 # -------------------------------
 # 5. Site Specific Summary
 # -------------------------------
-st.markdown("### Site Specific Summary (Raw Data)")
+st.markdown("### Site Specific Summary (Aggregated Raw Data)")
 if os.path.exists("site_summary.parquet"):
     site_summary = pd.read_parquet("site_summary.parquet")
     site_list = site_summary['site'].unique()
