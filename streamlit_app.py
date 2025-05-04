@@ -127,14 +127,14 @@ if os.path.exists("combined_results.parquet"):
                 norm_val = 0.5  # Avoid division by zero
             else:
                 norm_val = (val - col_min) / (col_max - col_min)
-            # For R2 Score, higher is better
+            # Use a fixed green hue (120) for all columns
+            hue = 120
+            # For R2 Score, higher is better: highest value -> most intense (lightness 50%)
             if "R2 Score" in col_name:
-                hue = 120 * (1 - norm_val)  # Red (120) to Green (0) as value increases
-                lightness = 50 + (norm_val * 40)  # 50% (intense) to 90% (pale) as value increases
+                lightness = 90 - (norm_val * 40)  # 90% (pale) to 50% (intense)
             else:
-                # For MAE, MSE, RMSE, lower is better
-                hue = 120 * norm_val  # Green (0) to Red (120) as value increases
-                lightness = 50 + ((1 - norm_val) * 40)  # 50% (intense) to 90% (pale) as value decreases
+                # For MAE, MSE, RMSE, lower is better: lowest value -> most intense (lightness 50%)
+                lightness = 90 - ((1 - norm_val) * 40)  # 90% (pale) to 50% (intense)
             return f"background-color: hsl({hue}, 70%, {lightness}%)"
         
         # Create a styler object to apply the color gradient
