@@ -1,22 +1,34 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from tensorflow.keras.models import load_model
+from sklearn.preprocessing import MinMaxScaler
+import tensorflow as tf  # Explicitly import tensorflow to check availability
 
 # Load precomputed data from GitHub repository
 @st.cache_data
 def load_data():
-    site_summary = pd.read_parquet("site_summary.parquet")
-    sites = pd.read_parquet("sites.parquet")['site'].tolist()
-    return site_summary, sites
+    try:
+        site_summary = pd.read_parquet("site_summary.parquet")
+        sites = pd.read_parquet("sites.parquet")['site'].tolist()
+        return site_summary, sites
+    except FileNotFoundError:
+        st.error("Data files (site_summary.parquet or sites.parquet) not found. Please upload them to the repository.")
+        return None, None
 
 # Load pre-trained hybrid model
 @st.cache_resource
 def load_model():
-    return load_model("cnn_lstm_hybrid_model.h5")
+    try:
+        return tf.keras.models.load_model("cnn_lstm_hybrid_model.h5")
+    except Exception as e:
+        st.error("Failed to load the model. Ensure tensorflow and the model file (cnn_lstm_hybrid_model.h5) are available.")
+        return None
 
 site_summary, sites = load_data()
 model = load_model()
+
+if site_summary is None or sites is None or model is None:
+    st.stop()
 
 # App title and layout
 st.title("Water Quality Prediction Dashboard")
