@@ -1,15 +1,22 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import load_model
 
-# Load precomputed data
-site_summary = pd.read_parquet("site_summary.parquet")
-sites = pd.read_parquet("sites.parquet")['site'].tolist()
+# Load precomputed data from GitHub repository
+@st.cache_data
+def load_data():
+    site_summary = pd.read_parquet("site_summary.parquet")
+    sites = pd.read_parquet("sites.parquet")['site'].tolist()
+    return site_summary, sites
 
-# Load pre-trained hybrid CNN-LSTM model (assumed saved from Colab)
-model = load_model("cnn_lstm_hybrid_model.h5")
+# Load pre-trained hybrid model
+@st.cache_resource
+def load_model():
+    return load_model("cnn_lstm_hybrid_model.h5")
+
+site_summary, sites = load_data()
+model = load_model()
 
 # App title and layout
 st.title("Water Quality Prediction Dashboard")
@@ -20,12 +27,10 @@ st.sidebar.header("Prediction Settings")
 location = st.sidebar.selectbox("Select Location", sites)
 time_frame = st.sidebar.selectbox("Select Time Frame", ["Week", "Month", "Year"])
 
-# Prediction logic (simplified using precomputed averages and model)
+# Prediction logic
 def predict_water_quality(location, time_frame):
-    # Fetch baseline data for the selected location
     site_data = site_summary[site_summary['site'] == location].iloc[0]
     
-    # Parameters to predict
     params = {
         'surface_temperature': site_data['avg_surface_temperature'],
         'middle_temperature': site_data['avg_middle_temperature'],
@@ -37,28 +42,20 @@ def predict_water_quality(location, time_frame):
         'dissolved_oxygen': site_data['avg_dissolved_oxygen']
     }
     
-    # Normalize input (simplified for demo)
     scaler = MinMaxScaler()
     input_data = np.array(list(params.values())).reshape(1, -1)
     scaled_input = scaler.fit_transform(input_data)
-    
-    # Reshape for CNN-LSTM (adjust based on your model's input shape)
     shaped_input = scaled_input.reshape(1, 1, len(params), 1)
     
-    # Predict using hybrid model
     prediction = model.predict(shaped_input)
     prediction = scaler.inverse_transform(prediction)
     
-    # Assign predictions
     for i, param in enumerate(params.keys()):
         params[param] = prediction[0][i]
     
-    # Calculate WQI (simplified formula, adjust as needed)
     wqi = (params['dissolved_oxygen'] * 0.3 + params['ph'] * 0.2 + 
            (1 - params['ammonia']) * 0.2 + (1 - params['nitrate']) * 0.15 + 
            (1 - params['phosphate']) * 0.15) * 100
-    
-    # WQI Classification
     wqi_class = "Good" if wqi > 70 else "Moderate" if wqi > 50 else "Poor"
     
     return params, wqi, wqi_class
