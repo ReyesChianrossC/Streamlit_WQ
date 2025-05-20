@@ -1,33 +1,20 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-import tensorflow as tf  # Explicitly import tensorflow to check availability
 
-# Load precomputed data from GitHub repository
+# Load precomputed data
 @st.cache_data
 def load_data():
     try:
-        site_summary = pd.read_parquet("site_summary.parquet")
-        sites = pd.read_parquet("sites.parquet")['site'].tolist()
-        return site_summary, sites
+        predictions = pd.read_parquet("predictions.parquet")
+        sites = predictions['site'].unique().tolist()
+        return predictions, sites
     except FileNotFoundError:
-        st.error("Data files (site_summary.parquet or sites.parquet) not found. Please upload them to the repository.")
+        st.error("Predictions file (predictions.parquet) not found. Please upload it to the repository.")
         return None, None
 
-# Load pre-trained hybrid model
-@st.cache_resource
-def load_model():
-    try:
-        return tf.keras.models.load_model("cnn_lstm_hybrid_model.h5")
-    except Exception as e:
-        st.error("Failed to load the model. Ensure tensorflow and the model file (cnn_lstm_hybrid_model.h5) are available.")
-        return None
+predictions, sites = load_data()
 
-site_summary, sites = load_data()
-model = load_model()
-
-if site_summary is None or sites is None or model is None:
+if predictions is None or sites is None:
     st.stop()
 
 # App title and layout
@@ -39,65 +26,41 @@ st.sidebar.header("Prediction Settings")
 location = st.sidebar.selectbox("Select Location", sites)
 time_frame = st.sidebar.selectbox("Select Time Frame", ["Week", "Month", "Year"])
 
-# Prediction logic
-def predict_water_quality(location, time_frame):
-    site_data = site_summary[site_summary['site'] == location].iloc[0]
-    
-    params = {
-        'surface_temperature': site_data['avg_surface_temperature'],
-        'middle_temperature': site_data['avg_middle_temperature'],
-        'bottom_temperature': site_data['avg_bottom_temperature'],
-        'ph': site_data['avg_ph'],
-        'ammonia': site_data['avg_ammonia'],
-        'nitrate': site_data['avg_nitrate'],
-        'phosphate': site_data['avg_phosphate'],
-        'dissolved_oxygen': site_data['avg_dissolved_oxygen']
-    }
-    
-    scaler = MinMaxScaler()
-    input_data = np.array(list(params.values())).reshape(1, -1)
-    scaled_input = scaler.fit_transform(input_data)
-    shaped_input = scaled_input.reshape(1, 1, len(params), 1)
-    
-    prediction = model.predict(shaped_input)
-    prediction = scaler.inverse_transform(prediction)
-    
-    for i, param in enumerate(params.keys()):
-        params[param] = prediction[0][i]
-    
-    wqi = (params['dissolved_oxygen'] * 0.3 + params['ph'] * 0.2 + 
-           (1 - params['ammonia']) * 0.2 + (1 - params['nitrate']) * 0.15 + 
-           (1 - params['phosphate']) * 0.15) * 100
-    wqi_class = "Good" if wqi > 70 else "Moderate" if wqi > 50 else "Poor"
-    
-    return params, wqi, wqi_class
+# Filter precomputed predictions
+def get_prediction(location, time_frame):
+    result = predictions[(predictions['site'] == location) & (predictions['time_frame'] == time_frame)]
+    if result.empty:
+        return None
+    return result.iloc[0]
 
-# Get predictions
-params, wqi, wqi_class = predict_water_quality(location, time_frame)
+prediction = get_prediction(location, time_frame)
 
 # Display in a card-like format
-st.subheader(f"{location} - {time_frame} Prediction")
-col1, col2 = st.columns([1, 2])
-with col1:
-    st.image("https://via.placeholder.com/100x150.png?text=Water+Icon", use_column_width=True)
-with col2:
-    st.markdown(f"<h2 style='margin: 0;'>{location}</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>Temperature (Surface):</b> {params['surface_temperature']:.2f}°C</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>Dissolved Oxygen:</b> {params['dissolved_oxygen']:.2f} mg/L</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>pH:</b> {params['ph']:.2f}</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>Ammonia:</b> {params['ammonia']:.2f} mg/L</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>Nitrate:</b> {params['nitrate']:.2f} mg/L</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>Phosphate:</b> {params['phosphate']:.2f} mg/L</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>WQI:</b> {wqi:.2f}</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='margin: 0;'><b>WQI Classification:</b> {wqi_class}</p>", unsafe_allow_html=True)
+if prediction is not None:
+    st.subheader(f"{location} - {time_frame} Prediction")
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.image("https://via.placeholder.com/100x150.png?text=Water+Icon", use_column_width=True)
+    with col2:
+        st.markdown(f"<h2 style='margin: 0;'>{location}</h2>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>Temperature (Surface):</b> {prediction['surface_temperature']:.2f}°C</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>Dissolved Oxygen:</b> {prediction['dissolved_oxygen']:.2f} mg/L</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>pH:</b> {prediction['ph']:.2f}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>Ammonia:</b> {prediction['ammonia']:.2f} mg/L</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>Nitrate:</b> {prediction['nitrate']:.2f} mg/L</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>Phosphate:</b> {prediction['phosphate']:.2f} mg/L</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>WQI:</b> {prediction['wqi']:.2f}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='margin: 0;'><b>WQI Classification:</b> {prediction['wqi_classification']}</p>", unsafe_allow_html=True)
 
-# Recommendation section
-st.markdown("---")
-st.subheader("Recommendation")
-st.write(f"Based on the predicted WQI of {wqi:.2f} and classification '{wqi_class}', consider the following:")
-if wqi_class == "Good":
-    st.write("Maintain current water management practices. Regular monitoring is recommended.")
-elif wqi_class == "Moderate":
-    st.write("Implement moderate intervention, such as reducing nutrient input and enhancing aeration.")
+    # Recommendation section
+    st.markdown("---")
+    st.subheader("Recommendation")
+    st.write(f"Based on the predicted WQI of {prediction['wqi']:.2f} and classification '{prediction['wqi_classification']}', consider the following:")
+    if prediction['wqi_classification'] == "Good":
+        st.write("Maintain current water management practices. Regular monitoring is recommended.")
+    elif prediction['wqi_classification'] == "Moderate":
+        st.write("Implement moderate intervention, such as reducing nutrient input and enhancing aeration.")
+    else:
+        st.write("Urgent action required: Reduce pollution sources, increase dissolved oxygen levels, and consult environmental experts.")
 else:
-    st.write("Urgent action required: Reduce pollution sources, increase dissolved oxygen levels, and consult environmental experts.")
+    st.error(f"No prediction available for {location} - {time_frame}. Please ensure the data is precomputed.")
