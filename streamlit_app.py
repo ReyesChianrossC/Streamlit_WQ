@@ -57,7 +57,7 @@ with col2:
         # Card-like display
         col_img, col_text = st.columns([1, 2])
         with col_img:
-            st.image("https://via.placeholder.com/100x150.png?text=Water+Icon", use_column_width=True)
+            st.image("https://via.placeholder.com/100x150.png?text=Water+Icon", use_container_width=True)
         with col_text:
             st.markdown(f"<h2 style='margin: 0;'>{location}</h2>", unsafe_allow_html=True)
             st.markdown(f"<p style='margin: 0;'><b>Temperature (Surface):</b> {prediction['surface_temperature']:.2f}°C</p>", unsafe_allow_html=True)
