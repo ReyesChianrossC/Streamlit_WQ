@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 
+st.set_page_config(layout="wide")
+
 # Load precomputed data
 @st.cache_data
 def load_data():
@@ -20,7 +22,6 @@ if predictions is None or sites is None:
     st.stop()
 
 # --- UI: Main Tab ---
-st.set_page_config(layout="wide")
 st.title("🌊 Water Quality Prediction Dashboard")
 st.markdown("#### 📌 Main Objective: Predict water quality indicators by site and time frame")
 
