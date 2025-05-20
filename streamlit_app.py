@@ -7,70 +7,73 @@ def load_data():
     try:
         predictions = pd.read_parquet("predictions.parquet")
         if 'site' not in predictions.columns:
-            st.error("Column 'site' not found in predictions.parquet. Available columns: " + str(predictions.columns.tolist()))
+            st.error("Missing column: 'site'. Found: " + str(predictions.columns.tolist()))
             return None, None
         sites = predictions['site'].unique().tolist()
-        return predictions, sites
-    except FileNotFoundError:
-        st.error("Predictions file (predictions.parquet) not found. Please upload it to the repository.")
-        return None, None
+        return predictions, sorted(sites)
     except Exception as e:
-        st.error(f"Error loading data: {str(e)}")
+        st.error(f"Failed to load predictions: {e}")
         return None, None
 
 predictions, sites = load_data()
 if predictions is None or sites is None:
     st.stop()
 
-# App title
-st.title("Water Quality Prediction Dashboard")
-st.markdown("---")
+# --- UI: Main Tab ---
+st.set_page_config(layout="wide")
+st.title("🌊 Water Quality Prediction Dashboard")
+st.markdown("#### 📌 Main Objective: Predict water quality indicators by site and time frame")
 
-# Layout: Controls and Results
-col1, col2 = st.columns([1, 2])
+# Tabs (only modifying the first tab as requested)
+tab1, _, _ = st.tabs(["📍 Prediction View", "📊 Trends (coming soon)", "🗺️ Map (coming soon)"])
 
-# --- LEFT: Compact control panel ---
-with col1:
+with tab1:
+    st.markdown("### 🔎 Select Parameters")
     with st.container(border=True):
-        st.header("Prediction Settings")
-        location = st.selectbox("Select Location", sites)
-        time_frame = st.selectbox("Select Time Frame", ["Week", "Month", "Year"])
-        wqi_threshold = st.slider("WQI Threshold for 'Good'", min_value=50.0, max_value=100.0, value=70.0)
-        do_threshold = st.slider("Dissolved Oxygen Threshold (mg/L)", min_value=0.0, max_value=10.0, value=5.0)
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            location = st.selectbox("🌍 Select Location", sites, index=0)
+        with col2:
+            time_frame = st.selectbox("📅 Select Time Frame", ["Week", "Month", "Year"], index=0)
 
-# --- RIGHT: Prediction Results ---
-def get_prediction(location, time_frame):
-    result = predictions[(predictions['site'] == location) & (predictions['time_frame'] == time_frame)]
-    if result.empty:
-        return None
-    return result.iloc[0]
+    # Fetch prediction
+    def get_prediction(site, timeframe):
+        result = predictions[(predictions['site'] == site) & (predictions['time_frame'] == timeframe)]
+        return result.iloc[0] if not result.empty else None
 
-prediction = get_prediction(location, time_frame)
+    prediction = get_prediction(location, time_frame)
 
-with col2:
     if prediction is not None:
-        st.subheader(f"{location} - {time_frame} Prediction")
-        
-        # Display prediction results
-        st.markdown(f"**Temperature (Surface):** {prediction['surface_temperature']:.2f}°C")
-        st.markdown(f"**Dissolved Oxygen:** {prediction['dissolved_oxygen']:.2f} mg/L")
-        st.markdown(f"**pH:** {prediction['ph']:.2f}")
-        st.markdown(f"**Ammonia:** {prediction['ammonia']:.2f} mg/L")
-        st.markdown(f"**Nitrate:** {prediction['nitrate']:.2f} mg/L")
-        st.markdown(f"**Phosphate:** {prediction['phosphate']:.2f} mg/L")
-        st.markdown(f"**WQI:** {prediction['wqi']:.2f}")
-        st.markdown(f"**WQI Classification:** {prediction['wqi_classification']}")
+        st.markdown("### 📦 Prediction Result")
+        with st.container(border=True):
+            # Three-column layout for clean cards
+            col1, col2, col3 = st.columns(3)
 
-        # Recommendation section
-        st.markdown("---")
-        st.subheader("Recommendation")
-        st.write(f"Based on the predicted WQI of {prediction['wqi']:.2f} and classification '{prediction['wqi_classification']}', consider the following:")
+            # Column 1
+            with col1:
+                st.metric("🌡️ Temp (Surface)", f"{prediction['surface_temperature']:.2f} °C")
+                st.metric("💧 Dissolved Oxygen", f"{prediction['dissolved_oxygen']:.2f} mg/L")
+                st.metric("🧪 pH", f"{prediction['ph']:.2f}")
 
-        if prediction['wqi'] >= wqi_threshold:
-            st.success("Maintain current water management practices. Regular monitoring is recommended.")
-        elif prediction['dissolved_oxygen'] < do_threshold:
-            st.error("Urgent action required: Increase dissolved oxygen levels and consult environmental experts.")
-        else:
-            st.warning("Implement moderate intervention, such as reducing nutrient input and enhancing aeration.")
+            # Column 2
+            with col2:
+                st.metric("🧫 Ammonia", f"{prediction['ammonia']:.2f} mg/L")
+                st.metric("🌿 Nitrate", f"{prediction['nitrate']:.2f} mg/L")
+                st.metric("🌿 Phosphate", f"{prediction['phosphate']:.2f} mg/L")
+
+            # Column 3
+            with col3:
+                st.metric("📈 WQI", f"{prediction['wqi']:.2f}")
+                st.metric("🏷️ Classification", prediction['wqi_classification'])
+
+        # Recommendation Card
+        st.markdown("### 🧭 Recommendation")
+        with st.container(border=True):
+            if prediction['wqi_classification'].lower() == "good":
+                st.success("Maintain current water management practices. Regular monitoring is recommended.")
+            elif prediction['dissolved_oxygen'] < 5:
+                st.error("Urgent: Increase dissolved oxygen levels and consult environmental experts.")
+            else:
+                st.warning("Consider moderate intervention: reduce nutrients, increase aeration, and monitor closely.")
     else:
-        st.error(f"No prediction available for {location} - {time_frame}. Please ensure the data is precomputed.")
+        st.warning(f"No prediction available for {location} - {time_frame}.")
