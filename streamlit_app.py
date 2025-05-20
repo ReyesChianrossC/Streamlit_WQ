@@ -1,7 +1,82 @@
 import streamlit as st
 import pandas as pd
 
+# Set page configuration
 st.set_page_config(layout="wide")
+
+# Custom CSS for the weather widget aesthetic
+st.markdown(
+    """
+    <style>
+    /* Gradient background */
+    .stApp {
+        background: linear-gradient(135deg, #1e1e2f 0%, #3b1e5a 50%, #5e1e7d 100%);
+        color: white;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Style for the title */
+    h1 {
+        color: white;
+        text-align: center;
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+    }
+
+    /* Style for the container (card) */
+    .stContainer {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px 0;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Style for the select boxes */
+    .stSelectbox > div > div {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        border-radius: 10px;
+        border: none;
+    }
+
+    /* Style for the metrics (prediction results) */
+    .stMetric {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stMetric label {
+        color: #a1a1ff;
+        font-size: 1.1em;
+    }
+
+    .stMetric .stMetricValue {
+        color: white;
+        font-size: 1.5em;
+    }
+
+    /* Style for recommendation card */
+    .recommendation-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 15px;
+        margin-top: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .recommendation-card p {
+        color: white;
+        font-size: 1.1em;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Load precomputed data
 @st.cache_data
@@ -23,13 +98,12 @@ if predictions is None or sites is None:
 
 # --- UI: Main Tab ---
 st.title("🌊 Water Quality Prediction Dashboard")
-st.markdown("#### 📌 Main Objective: Predict water quality indicators by site and time frame")
 
-# Tabs (only modifying the first tab as requested)
+# Tabs
 tab1, _, _ = st.tabs(["📍 Prediction View", "📊 Trends (coming soon)", "🗺️ Map (coming soon)"])
 
 with tab1:
-    st.markdown("### 🔎 Select Parameters")
+    st.markdown("#### 🔎 Select Parameters")
     with st.container(border=True):
         col1, col2 = st.columns([1, 1])
         with col1:
@@ -71,10 +145,10 @@ with tab1:
         st.markdown("### 🧭 Recommendation")
         with st.container(border=True):
             if prediction['wqi_classification'].lower() == "good":
-                st.success("Maintain current water management practices. Regular monitoring is recommended.")
+                st.markdown('<div class="recommendation-card"><p>✅ Maintain current water management practices. Regular monitoring is recommended.</p></div>', unsafe_allow_html=True)
             elif prediction['dissolved_oxygen'] < 5:
-                st.error("Urgent: Increase dissolved oxygen levels and consult environmental experts.")
+                st.markdown('<div class="recommendation-card"><p>🚨 Urgent: Increase dissolved oxygen levels and consult environmental experts.</p></div>', unsafe_allow_html=True)
             else:
-                st.warning("Consider moderate intervention: reduce nutrients, increase aeration, and monitor closely.")
+                st.markdown('<div class="recommendation-card"><p>⚠️ Consider moderate intervention: reduce nutrients, increase aeration, and monitor closely.</p></div>', unsafe_allow_html=True)
     else:
-        st.warning(f"No prediction available for {location} - {time_frame}.")
+        st.markdown('<div class="recommendation-card"><p>⚠️ No prediction available for ' + location + ' - ' + time_frame + '.</p></div>', unsafe_allow_html=True)
