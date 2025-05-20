@@ -6,10 +6,17 @@ import pandas as pd
 def load_data():
     try:
         predictions = pd.read_parquet("predictions.parquet")
+        st.write("Loaded columns:", predictions.columns.tolist())  # Debug: Print columns
+        if 'site' not in predictions.columns:
+            st.error("Column 'site' not found in predictions.parquet. Available columns are: " + str(predictions.columns.tolist()))
+            return None, None
         sites = predictions['site'].unique().tolist()
         return predictions, sites
     except FileNotFoundError:
         st.error("Predictions file (predictions.parquet) not found. Please upload it to the repository.")
+        return None, None
+    except Exception as e:
+        st.error(f"Error loading data: {str(e)}")
         return None, None
 
 predictions, sites = load_data()
