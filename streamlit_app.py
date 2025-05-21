@@ -139,7 +139,12 @@ with st.container():
             # Use the "Week" value as baseline for comparison, or average if "Week" is selected
             baseline_data = predictions_df[(predictions_df['site'] == location) & (predictions_df['time_frame'] == "Week")].iloc[0]
             if timeframe == "Week":
-                baseline_data = predictions_df[predictions_df['site'] == location].mean()
+                # Select only numeric columns for mean calculation
+                numeric_columns = [
+                    'surface_temperature', 'middle_temperature', 'bottom_temperature',
+                    'ph', 'ammonia', 'nitrate', 'phosphate', 'dissolved_oxygen', 'wqi'
+                ]
+                baseline_data = predictions_df[predictions_df['site'] == location][numeric_columns].mean()
 
             # Parameters to compare
             params = {
@@ -171,4 +176,4 @@ with st.container():
                 st.write(change)
             st.write(f"WQI Classification: {selected_data['wqi_classification']}")
 
-st.caption("Updated: 02:11 PM PST, Wednesday, May 21, 2025")
+st.caption("Updated: 02:12 PM PST, Wednesday, May 21, 2025")
