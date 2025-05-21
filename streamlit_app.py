@@ -88,7 +88,7 @@ st.markdown("""
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
             font-size: 16px;
-            font-weight: 700; /* Increased to bold */
+            font-weight: 700; /* Increased font weight */
             cursor: pointer;
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
@@ -99,46 +99,8 @@ st.markdown("""
             border-radius: 10px;
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
-.datasets {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 20px;
-}
-
-.dataset-card {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  width: 300px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.dataset-card:hover {
-  transform: scale(1.05);
-}
-
-.dataset-card h3 {
-  margin-top: 0;
-  color: #333;
-}
-
-.dataset-card p {
-  color: #666;
-}
-
-.dataset-card a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.dataset-card a:hover {
-  text-decoration: underline;
-}
             font-size: 16px;
-            font-weight: 700; /* Increased to bold */
+            font-weight: 700; /* Increased font weight */
             cursor: pointer;
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
@@ -192,4 +154,8 @@ st.markdown("""
             <select class="location-selector">
                 <option value="location1">Location 1</option>
                 <option value="location2">Location 2</option>
-                <option value="location3">Location
+                <option value="location3">Location 3</option>
+            </select>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
