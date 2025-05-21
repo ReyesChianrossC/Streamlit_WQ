@@ -45,8 +45,8 @@ st.markdown("""
         padding: 0.6em 1.2em;
         box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4);
         transition: all 0.3s ease;
-        width: auto; /* Adjusted to fit content */
-        margin: 0;
+        width: 100%; /* Match dropdown width within column */
+        height: 100%; /* Ensure consistent height */
     }
     .stButton>button:hover {
         background: linear-gradient(90deg, #00c4cc, #007bff);
@@ -116,7 +116,7 @@ st.title("Prediction App", anchor=False)
 
 with st.container():
     # Horizontal belt layout using columns
-    col1, col2, col3 = st.columns([1, 1, 0.8])  # Adjust column ratios as needed
+    col1, col2, col3 = st.columns([1, 1, 1])  # Equal widths for consistent sizing
     with col1:
         timeframe = st.selectbox("Time Frame", ["Week", "Month", "Year"], key="timeframe")
     with col2:
@@ -126,16 +126,19 @@ with st.container():
             "Bilibinwang", "Subic-Ilaya", "San Nicolas"
         ], key="location")
     with col3:
-        if st.button("Predict"):
-            with st.spinner("Generating prediction..."):
-                image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
-                if os.path.exists(image_path):
-                    st.image(image_path, caption=f"{location} {timeframe} Prediction", use_column_width=True)
+        predict_clicked = st.button("Predict")
+
+    # Image display below the belt
+    if predict_clicked:
+        with st.spinner("Generating prediction..."):
+            image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
+            if os.path.exists(image_path):
+                st.image(image_path, caption=f"{location} {timeframe} Prediction", use_container_width=True)
+            else:
+                fallback_image = "bar_chart_actual_values.png"
+                if os.path.exists(fallback_image):
+                    st.image(fallback_image, caption=f"Showing actual values for {location} - {timeframe} (Prediction image not found)", use_container_width=True)
                 else:
-                    fallback_image = "bar_chart_actual_values.png"
-                    if os.path.exists(fallback_image):
-                        st.image(fallback_image, caption=f"Showing actual values for {location} - {timeframe} (Prediction image not found)", use_column_width=True)
-                    else:
-                        st.error(f"No prediction image found for {location} - {timeframe}, and fallback image 'bar_chart_actual_values.png' is missing.")
+                    st.error(f"No prediction image found for {location} - {timeframe}, and fallback image 'bar_chart_actual_values.png' is missing.")
 
 st.caption("Updated: May 21, 2025")
