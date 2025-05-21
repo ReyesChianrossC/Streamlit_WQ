@@ -1,71 +1,71 @@
 import streamlit as st
 
-# CSS for container card style
+# CSS for compact card style
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=inter:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
     html, body, [class*="css"] {
-        font-family: 'inter', sans-serif;
+        font-family: 'Inter', sans-serif;
     }
 
-    div[data-testid="stverticalblock"] > div:first-child {
+    div[data-testid="stVerticalBlock"] > div:first-child {
         background: white;
-        padding: 20px 30px;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-        max-width: 400px;
-        margin: 20px auto;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        max-width: 350px;
+        margin: 15px auto;
     }
 
-    .stbutton>button {
+    .stButton>button {
         background: linear-gradient(to bottom, #0082e0, #00c0d1);
         color: white;
         font-weight: bold;
         border: none;
-        border-radius: 8px;
-        padding: 0.6em 1.2em;
-        box-shadow: 0 4px 10px rgba(0, 130, 224, 0.4);
+        border-radius: 6px;
+        padding: 0.5em 1em;
+        box-shadow: 0 3px 8px rgba(0, 130, 224, 0.3);
         transition: 0.3s ease;
         width: 100%;
-        margin-top: 12px;
+        margin-top: 10px;
     }
-    .stbutton>button:hover {
+    .stButton>button:hover {
         background: linear-gradient(to top, #00c0d1, #0082e0);
-        box-shadow: 0 0 12px rgba(0, 130, 224, 0.7);
+        box-shadow: 0 0 10px rgba(0, 130, 224, 0.6);
     }
 
-    .stselectbox>div {
+    .stSelectbox>div {
         background: linear-gradient(to bottom, #0082e0, #00c0d1);
         color: white;
         font-weight: bold;
-        border-radius: 8px;
-        padding: 0.4em;
-        margin-bottom: 12px;
+        border-radius: 6px;
+        padding: 0.3em;
+        margin-bottom: 10px;
+    }
+
+    .stCaption {
+        text-align: center;
+        color: #666;
+        margin-top: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("CNN with LSTM Prediction")
+st.title("Prediction Widget")
 
 with st.container():
-    timeframe = st.selectbox("Select Time Frame", ["week", "month", "year"])
-    location = st.selectbox("Select Location", [
-        "tanauan", "talisay", "aya", "tumaway", "sampaloc",
-        "berinayan", "balakilong", "buso-buso", "bañaga",
-        "bilibinwang", "subic-ilaya", "san nicolas"
+    timeframe = st.selectbox("Time Frame", ["Week", "Month", "Year"])
+    location = st.selectbox("Location", [
+        "Tanauan", "Talisay", "Aya", "Tumaway", "Sampaloc",
+        "Berinayan", "Balakilong", "Buso-Buso", "Bañaga",
+        "Bilibinwang", "Subic-Ilaya", "San Nicolas"
     ])
 
     if st.button("Predict"):
-        # Debugging outputs
-        st.write("Timeframe selected:", timeframe)
-        st.write("Location selected:", location)
-
-        if timeframe == "week" and location == "tanauan":
-            try:
-                st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
-            except FileNotFoundError:
-                st.error("Image file not found.")
-        else:
-            st.info(f"No chart available for {location} - {timeframe.lower()}.")
+        image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
+        try:
+            st.image(image_path, caption=f"Prediction for {location} - {timeframe}")
+        except FileNotFoundError:
+            st.error(f"No prediction image found for {location} - {timeframe}.")
 
 st.caption("Last updated: May 21, 2025")
