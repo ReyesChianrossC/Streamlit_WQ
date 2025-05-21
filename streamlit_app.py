@@ -85,7 +85,7 @@ st.markdown("""
         .predict-button {
             padding: 12px 24px;
             border-radius: 10px;
-            border: 2px solid #00C0D1;
+            border: none; /* Remove border */
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
             font-size: 19px;
             font-weight: 700;
@@ -98,7 +98,7 @@ st.markdown("""
         .by-week-selector, .location-selector {
             padding: 12px 24px;
             border-radius: 10px;
-            border: 2px solid #00C0D1;
+            border: none; /* Remove border */
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
             font-size: 19px;
             font-weight: 700;
