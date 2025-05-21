@@ -36,7 +36,7 @@ st.markdown("""
         }
         .title-wrapper {
             position: absolute;
-            top: 70px;
+            top: 30px;
             width: 100%;
             display: flex;
             justify-content: center;
@@ -145,13 +145,21 @@ st.markdown("""
         }
         .chart-container {
             position: absolute;
-            top: 120px;
-            width: 100%;
-            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            height: auto;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 2;
+        }
+        .chart-image {
+            width: 100%;
+            height: auto;
+            display: none;  /* Initially hidden */
         }
     </style>
 
@@ -164,7 +172,7 @@ st.markdown("""
             <div class="title">CNN with LSTM Prediction</div>
         </div>
         <div class="chart-container">
-            <canvas id="prediction-chart"></canvas>
+            <img id="prediction-chart" class="chart-image" src="bar_chart_actual_values.png" alt="Predicted Parameters Chart">
         </div>
         <div class="predict-wrapper">
             <button class="predict-button" id="predict-button">Predict</button>
@@ -192,4 +200,19 @@ st.markdown("""
         </div>
         <div id="results"></div>
     </div>
+
+    <script>
+        document.getElementById('predict-button').addEventListener('click', function() {
+            const timeFrame = document.getElementById('by-week-selector').value;
+            const location = document.getElementById('location-selector').value;
+            const chartImage = document.getElementById('prediction-chart');
+
+            // Check if "Week" and "TANAUAN" are selected
+            if (timeFrame === 'week' && location === 'TANAUAN') {
+                chartImage.style.display = 'block';  // Show the chart
+            } else {
+                chartImage.style.display = 'none';   // Hide the chart
+            }
+        });
+    </script>
 """, unsafe_allow_html=True)
