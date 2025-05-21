@@ -73,41 +73,45 @@ st.markdown("""
             justify-content: center;
             font-family: 'Inter', sans-serif;
         }
+        .content-wrapper {
+            margin-top: 200px;
+            z-index: 2;
+            width: 100%;
+        }
+        .stSelectbox, .stButton {
+            width: 100%;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# HTML Layout Box Start
+# BEGIN container within the box
 st.markdown('<div class="vertical-box">', unsafe_allow_html=True)
 st.markdown('<div class="background-image"></div>', unsafe_allow_html=True)
 
-# SCI Button
+# Static HTML elements
 st.markdown('<div class="stat-comparison-container"><button class="stat-comparison-button">SCI</button></div>', unsafe_allow_html=True)
-
-# Title
 st.markdown('<div class="title-wrapper"><div class="title">CNN with LSTM Prediction</div></div>', unsafe_allow_html=True)
 
-st.markdown("<br><br><br><br><br>", unsafe_allow_html=True)
+# Create a Streamlit container that visually stays inside the box
+with st.container():
+    st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
 
-# --- Streamlit Widgets ---
-# Time frame and location selections
-time_frame = st.selectbox("Select Time Frame", ["Week", "Month", "Year"])
-location = st.selectbox("Select Location", [
-    "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC", "BERINAYAN",
-    "BALAKILONG", "BUSO-BUSO", "BAÑAGA", "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
-])
+    time_frame = st.selectbox("Select Time Frame", ["Week", "Month", "Year"])
+    location = st.selectbox("Select Location", [
+        "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC", "BERINAYAN",
+        "BALAKILONG", "BUSO-BUSO", "BAÑAGA", "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
+    ])
 
-# Predict Button
-predict_clicked = st.button("Predict")
+    predict_clicked = st.button("Predict")
 
-# Conditional display of the chart
-if predict_clicked:
-    if time_frame.lower() == "week" and location == "TANAUAN":
-        st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
-    else:
-        st.info(f"No prediction chart available for {location} - {time_frame}.")
+    if predict_clicked:
+        if time_frame.lower() == "week" and location == "TANAUAN":
+            st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
+        else:
+            st.info(f"No prediction chart available for {location} - {time_frame}.")
 
-# HTML Layout Box End
-st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)  # Close content-wrapper
+st.markdown('</div>', unsafe_allow_html=True)  # Close vertical-box
 
-# Timestamp
+# Footer
 st.write(f"Last updated: 01:10 PM PST, Wednesday, May 21, 2025")
