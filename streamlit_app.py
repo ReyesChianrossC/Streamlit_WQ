@@ -159,20 +159,16 @@ with st.container():
                 'WQI': 'wqi'
             }
 
-            # Calculate and format changes in a compact way
+            # Calculate and format original to changed values
             changes = []
             for display_name, param in params.items():
-                change = selected_data[param] - baseline_data[param]
-                if change > 0:
-                    changes.append(f"- {display_name}: +{change:.6f}")
-                elif change < 0:
-                    changes.append(f"- {display_name}: {change:.6f}")
-                else:
-                    changes.append(f"- {display_name}: 0.000000")
+                original = baseline_data[param]
+                changed = selected_data[param]
+                changes.append(f"- {display_name}: [{original:.6f}] → [{changed:.6f}]")
 
             # Display the results in a compact list
             st.write("### Water Quality Changes:")
             st.write("\n".join(changes))
             st.write(f"WQI Class: {selected_data['wqi_classification']}")
 
-st.caption("Updated: 02:13 PM PST, Wednesday, May 21, 2025")
+st.caption("Updated: 02:22 PM PST, Wednesday, May 21, 2025")
