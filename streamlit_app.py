@@ -1,78 +1,91 @@
 import streamlit as st
-import pandas as pd
 
-# ✅ Set page config early
-st.set_page_config(
-    page_title="Water Quality Prediction",
-    layout="centered"  # ⬅️ Makes it a compact single-box look
-)
+# Custom HTML & CSS
+st.markdown("""
+    <style>
+        .vertical-box {
+            height: 400px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1.5px solid #d0d0d0;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+        }
+        .title {
+            position: absolute;
+            top: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000000;
+        }
+        .predict-wrapper, .by-week-wrapper {
+            width: 100%;  /* Ensure wrappers span full width of vertical-box */
+        }
+        .predict-button, .by-week-selector, .location-selector {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            cursor: pointer;
+            color: #000000;
+        }
+        .predict-wrapper {
+            display: flex;
+            justify-content: center;  /* Explicitly center Predict button */
+            margin-bottom: 10px;  /* Add spacing between Predict and By Week/Location */
+        }
+        .by-week-wrapper {
+            display: flex;
+            flex-direction: row;  /* Arrange By Week and Location selectors side by side */
+            align-items: center;  /* Vertically align selectors in the wrapper */
+            width: 100%;  /* Ensure wrapper spans full width for proper stretching */
+            gap: 10px;  /* Add spacing between By Week and Location selectors */
+        }
+        .by-week-selector {
+            flex-shrink: 0;  /* Prevent By Week selector from shrinking */
+            -webkit-appearance: none;  /* Remove default browser styling */
+            -moz-appearance: none;
+            appearance: none;
+            text-align: left;  /* Align text to the left */
+        }
+        .location-selector {
+            flex: 1;  /* Make Location selector occupy remaining horizontal space */
+            -webkit-appearance: none;  /* Remove default browser styling */
+            -moz-appearance: none;
+            appearance: none;
+            text-align: left;  /* Align text to the left */
+        }
+        .predict-button:hover, .by-week-selector:hover, .location-selector:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
 
-# ✅ Load data
-@st.cache_data
-def load_data():
-    try:
-        predictions = pd.read_parquet("predictions.parquet")
-        if 'site' not in predictions.columns:
-            st.error("Column 'site' not found. Available columns: " + str(predictions.columns.tolist()))
-            return None, None
-        sites = predictions['site'].unique().tolist()
-        return predictions, sites
-    except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return None, None
-
-predictions, sites = load_data()
-if predictions is None or sites is None:
-    st.stop()
-
-# ✅ UI Title
-st.markdown("## 💧 Water Quality Prediction")
-st.markdown("### 🧪 Select location and time frame to predict parameters")
-st.markdown("---")
-
-# ✅ Unified box-style UI container
-with st.container(border=True):
-    # Input controls
-    st.markdown("### 🎛️ Settings")
-    location = st.selectbox("📍 Select Location", sites)
-    time_frame = st.selectbox("🕒 Select Time Frame", ["Week", "Month", "Year"])
-    wqi_threshold = st.slider("✅ WQI Threshold (Good)", 50.0, 100.0, 70.0)
-    do_threshold = st.slider("💧 DO Threshold (mg/L)", 0.0, 10.0, 5.0)
-
-    # Fetch prediction
-    def get_prediction(location, time_frame):
-        result = predictions[(predictions['site'] == location) & (predictions['time_frame'] == time_frame)]
-        return result.iloc[0] if not result.empty else None
-
-    prediction = get_prediction(location, time_frame)
-
-    st.markdown("---")
-
-    if prediction is not None:
-        # Display results in a nice card layout
-        st.markdown(f"### 📊 Results for **{location}** ({time_frame})")
-        colA, colB = st.columns([1, 2])
-        with colA:
-            st.image("https://via.placeholder.com/100x150.png?text=Water+Icon", use_container_width=True)
-
-        with colB:
-            st.markdown(f"**🌡️ Temp (Surface):** {prediction['surface_temperature']:.2f} °C")
-            st.markdown(f"**💧 Dissolved Oxygen:** {prediction['dissolved_oxygen']:.2f} mg/L")
-            st.markdown(f"**🧪 pH:** {prediction['ph']:.2f}")
-            st.markdown(f"**🧫 Ammonia:** {prediction['ammonia']:.2f} mg/L")
-            st.markdown(f"**🌿 Nitrate:** {prediction['nitrate']:.2f} mg/L")
-            st.markdown(f"**🌿 Phosphate:** {prediction['phosphate']:.2f} mg/L")
-            st.markdown(f"**📈 WQI:** {prediction['wqi']:.2f}")
-            st.markdown(f"**🏷️ Classification:** {prediction['wqi_classification']}")
-
-        # Recommendation section
-        st.markdown("---")
-        st.markdown("### 🧭 Recommendation")
-        if prediction['wqi'] >= wqi_threshold:
-            st.success("Maintain current water management practices. Regular monitoring is recommended.")
-        elif prediction['dissolved_oxygen'] < do_threshold:
-            st.error("Urgent: Increase DO levels and consult environmental experts.")
-        else:
-            st.warning("Consider moderate intervention: reduce nutrients, enhance aeration, monitor closely.")
-    else:
-        st.warning(f"No prediction available for {location} - {time_frame}.")
+    <div class="vertical-box">
+        <div class="title">TaalWQ</div>
+        <div class="predict-wrapper">
+            <button class="predict-button">Predict</button>
+        </div>
+        <div class="by-week-wrapper">
+            <select class="by-week-selector">
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+            </select>
+            <select class="location-selector">
+                <option value="location1">Location 1</option>
+                <option value="location2">Location 2</option>
+                <option value="location3">Location 3</option>
+            </select>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
