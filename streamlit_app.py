@@ -29,7 +29,7 @@ st.markdown("""
             background-image: url('https://raw.githubusercontent.com/ReyesChianrossC/Streamlit_WQ/main/taal.png'); /* Taal image from GitHub */
             background-size: cover;
             background-position: center;
-            opacity: 0.1; /* Very low opacity */
+            opacity: 0.2; /* Very low opacity */
             z-index: 1; /* Above gradient, below content */
         }
         .title-wrapper {
