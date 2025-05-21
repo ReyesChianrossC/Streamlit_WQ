@@ -4,15 +4,15 @@ import streamlit as st
 st.markdown("""
     <style>
         .vertical-box {
-            height: 400px;
+            height: 480px;
             width: 100%;
-            max-width: 400px;
+            max-width: 480px;
             margin: 0 auto;
             background-color: #ffffff;
-            border: 1.5px solid #d0d0d0;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
-            padding: 20px;
+            border: 1.8px solid #d0d0d0;
+            border-radius: 14px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.06);
+            padding: 24px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -21,9 +21,9 @@ st.markdown("""
         }
         .title {
             position: absolute;
-            top: 20px;
+            top: 24px;
             text-align: center;
-            font-size: 24px;
+            font-size: 29px;
             font-weight: bold;
             color: #000000;
         }
@@ -31,25 +31,25 @@ st.markdown("""
             width: 100%;  /* Ensure wrappers span full width of vertical-box */
         }
         .predict-button, .by-week-selector, .location-selector {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 1.2px solid #ccc;
             background-color: #f9f9f9;
-            font-size: 16px;
+            font-size: 19px;
             cursor: pointer;
             color: #000000;
         }
         .predict-wrapper {
             display: flex;
             justify-content: center;  /* Explicitly center Predict button */
-            margin-bottom: 10px;  /* Add spacing between Predict and By Week/Location */
+            margin-bottom: 12px;  /* Add spacing between Predict and By Week/Location */
         }
         .by-week-wrapper {
             display: flex;
             flex-direction: row;  /* Arrange By Week and Location selectors side by side */
             align-items: center;  /* Vertically align selectors in the wrapper */
             width: 100%;  /* Ensure wrapper spans full width for proper stretching */
-            gap: 10px;  /* Add spacing between By Week and Location selectors */
+            gap: 12px;  /* Add spacing between By Week and Location selectors */
         }
         .by-week-selector {
             flex-shrink: 0;  /* Prevent By Week selector from shrinking */
