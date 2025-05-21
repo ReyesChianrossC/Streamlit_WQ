@@ -10,17 +10,17 @@ st.markdown("""
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
-            background: linear-gradient(to bottom, #4A90E2, #6A9DE0); /* Softer blue gradient */
-            border: 2px solid #4A90E2;
+            background: linear-gradient(to bottom, #0082E0, #00C0D1, #8AE7D4); /* Vertical linear gradient: Fiji Blue, Sea Serpent, Seychelles Blue */
+            border: 2px solid #0082E0; /* Fiji Blue border */
             border-radius: 14px;
-            box-shadow: 0 0 10px rgba(74, 144, 226, 0.3); /* Subtle shadow */
+            box-shadow: 0 0 15px rgba(0, 130, 224, 0.6); /* Fiji Blue glow */
             padding: 24px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: center;
             position: relative;
-            overflow: hidden;
+            overflow: hidden; /* Ensure image doesn't overflow */
         }
         .background-image {
             position: absolute;
@@ -28,27 +28,27 @@ st.markdown("""
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://raw.githubusercontent.com/ReyesChianrossC/Streamlit_WQ/main/taal.png');
+            background-image: url('https://raw.githubusercontent.com/ReyesChianrossC/Streamlit_WQ/main/taal.png'); /* Taal image from GitHub */
             background-size: cover;
             background-position: center;
-            opacity: 0.05; /* Very subtle opacity */
-            z-index: 1;
+            opacity: 0.1; /* Very low opacity */
+            z-index: 1; /* Above gradient, below content */
         }
         .title-wrapper {
             position: absolute;
-            top: 70px;
+            top: 70px; /* Position below stat-comparison-container */
             width: 100%;
             display: flex;
-            justify-content: center;
-            z-index: 2;
+            justify-content: center; /* Center the title horizontally */
+            z-index: 2; /* Above background image */
         }
         .title {
             text-align: center;
             font-size: 29px;
-            font-weight: 900;
-            color: #E0E7FF; /* Light blue for harmony */
-            text-shadow: 0 0 6px rgba(224, 231, 255, 0.7), 1px 1px 0 #000;
-            font-family: 'Inter', sans-serif;
+            font-weight: 900; /* Bolder for contrast */
+            color: #AFD238; /* Atlantis Green for title */
+            text-shadow: 0 0 8px rgba(175, 210, 56, 0.8), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Green glow with black border outline */
+            font-family: 'Inter', sans-serif; /* Inter font */
         }
         .stat-comparison-container {
             position: absolute;
@@ -56,83 +56,83 @@ st.markdown("""
             right: 24px;
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
-            z-index: 2;
+            align-items: flex-end; /* Align button to the right */
+            z-index: 2; /* Above background image */
         }
         .stat-comparison-button {
-            width: 40px;
+            width: 40px; /* 1x1 square */
             height: 40px;
             border-radius: 10px;
-            border: 2px solid #4A90E2;
-            background: linear-gradient(to bottom, #4A90E2, #6A9DE0);
+            border: 2px solid #00C0D1; /* Sea Serpent border */
+            background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 700; /* Bold for contrast */
             cursor: pointer;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 2px #000000;
+            color: #E6EFEA; /* Gray Tint for high contrast */
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Black border outline */
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 0;
-            box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
-            font-family: 'Inter', sans-serif;
+            box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
+            font-family: 'Inter', sans-serif; /* Inter font */
         }
         .predict-wrapper, .by-week-wrapper {
-            width: 100%;
-            z-index: 2;
+            width: 100%; /* Full width of vertical-box */
+            z-index: 2; /* Above background image */
         }
         .predict-button {
             padding: 12px 24px;
             border-radius: 10px;
-            border: 2px solid #4A90E2;
-            background: linear-gradient(to bottom, #4A90E2, #6A9DE0);
+            border: 2px solid #00C0D1; /* Sea Serpent border */
+            background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 19px;
-            font-weight: 700;
+            font-weight: 700; /* Bold for contrast */
             cursor: pointer;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 2px #000000;
-            box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
-            font-family: 'Inter', sans-serif;
+            color: #E6EFEA; /* Gray Tint for high contrast */
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Black border outline */
+            box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
+            font-family: 'Inter', sans-serif; /* Inter font */
         }
         .by-week-selector, .location-selector {
             padding: 12px 24px;
             border-radius: 10px;
-            border: 2px solid #4A90E2;
-            background: linear-gradient(to bottom, #4A90E2, #6A9DE0);
+            border: 2px solid #00C0D1; /* Sea Serpent border */
+            background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 19px;
-            font-weight: 700;
+            font-weight: 700; /* Bold for contrast */
             cursor: pointer;
-            color: #FFFFFF;
-            text-shadow: 1px 1px 2px #000000;
-            box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
-            font-family: 'Inter', sans-serif;
+            color: #E6EFEA; /* Gray Tint for high contrast */
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Black border outline */
+            box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
+            font-family: 'Inter', sans-serif; /* Inter font */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
             text-align: left;
         }
         .by-week-selector {
-            flex-shrink: 0;
+            flex-shrink: 0; /* Prevent shrinking */
         }
         .location-selector {
-            flex: 1;
+            flex: 1; /* Occupy remaining space */
         }
         .predict-wrapper {
             display: flex;
-            justify-content: center;
-            margin-bottom: 12px;
+            justify-content: center; /* Center Predict button */
+            margin-bottom: 12px; /* Spacing */
         }
         .by-week-wrapper {
             display: flex;
-            flex-direction: row;
-            align-items: center;
+            flex-direction: row; /* Side-by-side selectors */
+            align-items: center; /* Vertically align */
             width: 100%;
-            gap: 12px;
+            gap: 12px; /* Spacing between selectors */
         }
         .stat-comparison-button:hover, .predict-button:hover, .by-week-selector:hover, .location-selector:hover {
-            background: linear-gradient(to top, #6A9DE0, #4A90E2);
-            box-shadow: 0 0 12px rgba(74, 144, 226, 0.5);
+            background: linear-gradient(to top, #00C0D1, #0082E0); /* Reverse vertical gradient on hover */
+            box-shadow: 0 0 15px rgba(0, 130, 224, 0.7); /* Stronger Fiji Blue glow on hover */
         }
     </style>
 
