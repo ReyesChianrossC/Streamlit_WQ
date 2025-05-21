@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 
 # CSS for enhanced and vibrant design
 st.markdown("""
@@ -108,10 +109,16 @@ with st.container():
 
     if st.button("Predict"):
         with st.spinner("Generating prediction..."):
+            # Try to load the dynamic image path
             image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
-            try:
+            if os.path.exists(image_path):
                 st.image(image_path, caption=f"{location} {timeframe} Prediction", use_column_width=True)
-            except FileNotFoundError:
-                st.error(f"No prediction available for {location} - {timeframe}.")
+            else:
+                # Fallback to bar_chart_actual_values.png if the dynamic image is not found
+                fallback_image = "bar_chart_actual_values.png"
+                if os.path.exists(fallback_image):
+                    st.image(fallback_image, caption=f"Showing actual values for {location} - {timeframe} (Prediction image not found)", use_column_width=True)
+                else:
+                    st.error(f"No prediction image found for {location} - {timeframe}, and fallback image 'bar_chart_actual_values.png' is missing.")
 
 st.caption("Updated: May 21, 2025")
