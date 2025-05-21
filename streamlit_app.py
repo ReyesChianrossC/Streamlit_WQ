@@ -8,10 +8,10 @@ st.markdown("""
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
-            background: radial-gradient(circle, #8000ff, #a100a1, #4b0082); /* Random purple-dominant radial gradient */
-            border: 2px solid #8000ff; /* Vibrant purple border */
+            background: linear-gradient(to bottom, #0082E0, #00C0D1, #8AE7D4); /* Vertical linear gradient: Fiji Blue, Sea Serpent, Seychelles Blue */
+            border: 2px solid #0082E0; /* Fiji Blue border */
             border-radius: 14px;
-            box-shadow: 0 0 15px rgba(128, 0, 255, 0.6); /* Strong purple glow */
+            box-shadow: 0 0 15px rgba(0, 130, 224, 0.6); /* Fiji Blue glow */
             padding: 24px;
             display: flex;
             flex-direction: column;
@@ -29,7 +29,7 @@ st.markdown("""
             background-image: url('https://raw.githubusercontent.com/ReyesChianrossC/Streamlit_WQ/main/taal.png'); /* Taal image from GitHub */
             background-size: cover;
             background-position: center;
-            opacity: 0.3; /* Very low opacity */
+            opacity: 0.1; /* Very low opacity */
             z-index: 1; /* Above gradient, below content */
         }
         .title-wrapper {
@@ -44,8 +44,8 @@ st.markdown("""
             text-align: center;
             font-size: 29px;
             font-weight: bold;
-            color: #a100a1; /* Rich purple for title */
-            text-shadow: 0 0 8px rgba(128, 0, 255, 0.8); /* Purple glow effect */
+            color: #AFD238; /* Atlantis Green for title */
+            text-shadow: 0 0 8px rgba(175, 210, 56, 0.8); /* Atlantis Green glow */
             font-family: 'Courier New', Courier, monospace; /* Retro font */
         }
         .stat-comparison-container {
@@ -61,17 +61,17 @@ st.markdown("""
             width: 40px; /* 1x1 square */
             height: 40px;
             border-radius: 10px;
-            border: 2px solid #4b0082; /* Dark purple border */
-            background: radial-gradient(circle, #8000ff, #a100a1); /* Purple-dominant radial gradient */
+            border: 2px solid #00C0D1; /* Sea Serpent border */
+            background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 16px;
             cursor: pointer;
-            color: #ffffff; /* White text for contrast */
+            color: #E6EFEA; /* Gray Tint text for contrast */
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 0;
-            box-shadow: 0 0 10px rgba(128, 0, 255, 0.5); /* Purple glow */
+            box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Courier New', Courier, monospace; /* Retro font */
         }
         .predict-wrapper, .by-week-wrapper {
@@ -81,23 +81,23 @@ st.markdown("""
         .predict-button {
             padding: 12px 24px;
             border-radius: 10px;
-            border: 2px solid #4b0082; /* Dark purple border */
-            background: radial-gradient(circle, #8000ff, #a100a1); /* Purple-dominant radial gradient */
+            border: 2px solid #00C0D1; /* Sea Serpent border */
+            background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 19px;
             cursor: pointer;
-            color: #ffffff; /* White text for contrast */
-            box-shadow: 0 0 10px rgba(128, 0, 255, 0.5); /* Purple glow */
+            color: #E6EFEA; /* Gray Tint text for contrast */
+            box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Courier New', Courier, monospace; /* Retro font */
         }
         .by-week-selector, .location-selector {
             padding: 12px 24px;
             border-radius: 10px;
-            border: 2px solid #4b0082; /* Dark purple border */
-            background: radial-gradient(circle, #8000ff, #a100a1); /* Purple-dominant radial gradient */
+            border: 2px solid #00C0D1; /* Sea Serpent border */
+            background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 19px;
             cursor: pointer;
-            color: #ffffff; /* White text for contrast */
-            box-shadow: 0 0 10px rgba(128, 0, 255, 0.5); /* Purple glow */
+            color: #E6EFEA; /* Gray Tint text for contrast */
+            box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Courier New', Courier, monospace; /* Retro font */
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -112,7 +112,7 @@ st.markdown("""
         }
         .predict-wrapper {
             display: flex;
-            justify-content: center; /* Center Predict button */
+            justify-content infarctions; /* Center Predict button */
             margin-bottom: 12px; /* Spacing */
         }
         .by-week-wrapper {
@@ -123,8 +123,8 @@ st.markdown("""
             gap: 12px; /* Spacing between selectors */
         }
         .stat-comparison-button:hover, .predict-button:hover, .by-week-selector:hover, .location-selector:hover {
-            background: radial-gradient(circle, #a100a1, #8000ff); /* Reverse purple radial gradient on hover */
-            box-shadow: 0 0 15px rgba(128, 0, 255, 0.7); /* Stronger purple glow on hover */
+            background: linear-gradient(to top, #00C0D1, #0082E0); /* Reverse vertical gradient on hover */
+            box-shadow: 0 0 15px rgba(0, 130, 224, 0.7); /* Stronger Fiji Blue glow on hover */
         }
     </style>
 
