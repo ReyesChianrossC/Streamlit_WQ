@@ -47,7 +47,7 @@ st.markdown("""
             font-size: 29px;
             font-weight: 900; /* Bolder for contrast */
             color: #AFD238; /* Atlantis Green for title */
-            text-shadow: 0 0 8px rgba(175, 210, 56, 0.8), 0 0 2px rgba(0, 0, 0, 0.5); /* Green glow with dark outline */
+            text-shadow: 0 0 8px rgba(175, 210, 56, 0.8), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Green glow with black border outline */
             font-family: 'Inter', sans-serif; /* Inter font */
         }
         .stat-comparison-container {
@@ -69,7 +69,7 @@ st.markdown("""
             font-weight: 700; /* Bold for contrast */
             cursor: pointer;
             color: #E6EFEA; /* Gray Tint for high contrast */
-            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Black border outline */
             display: flex;
             align-items: center;
             justify-content: center;
