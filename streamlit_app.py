@@ -88,10 +88,9 @@ st.markdown("""
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
             font-size: 19px;
-            font-weight: normal; /* Remove bold */
+            font-weight: normal;
             cursor: pointer;
             color: #000000;
-            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
             font-family: 'Inter', sans-serif;
         }
@@ -101,10 +100,9 @@ st.markdown("""
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
             font-size: 19px;
-            font-weight: normal; /* Remove bold */
+            font-weight: normal;
             cursor: pointer;
             color: #000000;
-            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
             font-family: 'Inter', sans-serif;
             -webkit-appearance: none;
