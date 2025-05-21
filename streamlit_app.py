@@ -197,6 +197,14 @@ st.markdown("""
         // Load Chart.js library
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = () => {
+            console.log("Chart.js loaded successfully");
+            // Initialize chart after script loads
+            displayPredictions();
+        };
+        script.onerror = () => {
+            console.error("Failed to load Chart.js");
+        };
         document.head.appendChild(script);
 
         // Load predictions data
@@ -244,68 +252,74 @@ st.markdown("""
         const ctx = document.getElementById('prediction-chart').getContext('2d');
 
         function updateChart(prediction) {
-            // Destroy existing chart if it exists
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+            console.log("Updating chart for:", prediction.site, prediction.time_frame);
+            try {
+                // Destroy existing chart if it exists
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
 
-            // Create new chart
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [
-                        'Surface Temp (°C)', 'Middle Temp (°C)', 'Bottom Temp (°C)', 'pH',
-                        'Ammonia (mg/L)', 'Nitrate (mg/L)', 'Phosphate (mg/L)', 'Dissolved Oxygen (mg/L)', 'WQI'
-                    ],
-                    datasets: [{
-                        label: 'Values',
-                        data: [
-                            prediction.surface_temperature,
-                            prediction.middle_temperature,
-                            prediction.bottom_temperature,
-                            prediction.ph,
-                            prediction.ammonia,
-                            prediction.nitrate,
-                            prediction.phosphate,
-                            prediction.dissolved_oxygen,
-                            prediction.wqi
+                // Create new chart
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            'Surface Temp (°C)', 'Middle Temp (°C)', 'Bottom Temp (°C)', 'pH',
+                            'Ammonia (mg/L)', 'Nitrate (mg/L)', 'Phosphate (mg/L)', 'Dissolved Oxygen (mg/L)', 'WQI'
                         ],
-                        backgroundColor: [
-                            '#FF6F61', '#6B5B95', '#88B04B', '#F7CAC9', '#92A8D1',
-                            '#955251', '#B565A7', '#009B77', '#DD4124'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Values'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Parameters'
-                            }
-                        }
+                        datasets: [{
+                            label: 'Values',
+                            data: [
+                                prediction.surface_temperature,
+                                prediction.middle_temperature,
+                                prediction.bottom_temperature,
+                                prediction.ph,
+                                prediction.ammonia,
+                                prediction.nitrate,
+                                prediction.phosphate,
+                                prediction.dissolved_oxygen,
+                                prediction.wqi
+                            ],
+                            backgroundColor: [
+                                '#FF6F61', '#6B5B95', '#88B04B', '#F7CAC9', '#92A8D1',
+                                '#955251', '#B565A7', '#009B77', '#DD4124'
+                            ],
+                            borderWidth: 1
+                        }]
                     },
-                    plugins: {
-                        legend: {
-                            display: false
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Values'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Parameters'
+                                }
+                            }
                         },
-                        title: {
-                            display: true,
-                            text: `Prediction for ${prediction.site} (Month)`
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: `Prediction for ${prediction.site} (Month)`
+                            }
                         }
                     }
-                }
-            });
+                });
+                console.log("Chart updated successfully");
+            } catch (error) {
+                console.error("Error updating chart:", error);
+            }
         }
 
         // Function to display predictions and update chart
@@ -314,9 +328,13 @@ st.markdown("""
             const location = document.getElementById('location-selector').value;
             const resultsDiv = document.getElementById('results');
 
+            console.log("Display predictions called. Time Frame:", timeFrame, "Location:", location);
+
             if (timeFrame === 'month') {
+                console.log("Looking for prediction. Site:", location, "Time Frame: Month");
                 const prediction = predictions.find(p => p.site === location && p.time_frame === 'Month');
                 if (prediction) {
+                    console.log("Prediction found:", prediction);
                     // Update the chart
                     updateChart(prediction);
 
@@ -335,6 +353,7 @@ st.markdown("""
                         <p>WQI: ${prediction.wqi.toFixed(2)} (${prediction.wqi_classification})</p>
                     `;
                 } else {
+                    console.log("No prediction found for", location, "Month");
                     resultsDiv.style.display = 'block';
                     resultsDiv.innerHTML = `<p>No data available for ${location} (Month)</p>`;
                     if (chartInstance) {
@@ -342,7 +361,9 @@ st.markdown("""
                     }
                 }
             } else {
-                resultsDiv.style.display = 'none';
+                console.log("Time frame is not 'month'. Hiding results and chart.");
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = `<p>Please select "Month" to view predictions.</p>`;
                 if (chartInstance) {
                     chartInstance.destroy();
                 }
@@ -350,8 +371,35 @@ st.markdown("""
         }
 
         // Add event listeners
-        document.getElementById('by-week-selector').addEventListener('change', displayPredictions);
-        document.getElementById('location-selector').addEventListener('change', displayPredictions);
-        document.getElementById('predict-button').addEventListener('click', displayPredictions);
+        const predictButton = document.getElementById('predict-button');
+        const byWeekSelector = document.getElementById('by-week-selector');
+        const locationSelector = document.getElementById('location-selector');
+
+        if (predictButton) {
+            predictButton.addEventListener('click', () => {
+                console.log("Predict button clicked");
+                displayPredictions();
+            });
+        } else {
+            console.error("Predict button not found");
+        }
+
+        if (byWeekSelector) {
+            byWeekSelector.addEventListener('change', () => {
+                console.log("Time frame changed to:", byWeekSelector.value);
+                displayPredictions();
+            });
+        } else {
+            console.error("By-week selector not found");
+        }
+
+        if (locationSelector) {
+            locationSelector.addEventListener('change', () => {
+                console.log("Location changed to:", locationSelector.value);
+                displayPredictions();
+            });
+        } else {
+            console.error("Location selector not found");
+        }
     </script>
 """, unsafe_allow_html=True)
