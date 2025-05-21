@@ -26,7 +26,7 @@ st.markdown("""
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://github.com/ReyesChianrossC/Streamlit_WQ/blob/main/taal.png'); /* Replace with actual GitHub raw URL */
+            background-image: url('https://raw.githubusercontent.com/ReyesChianrossC/Streamlit_WQ/main/taal.png'); /* Taal image from GitHub */
             background-size: cover;
             background-position: center;
             opacity: 0.1; /* Very low opacity */
