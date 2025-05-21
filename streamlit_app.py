@@ -143,6 +143,16 @@ st.markdown("""
             border-radius: 10px;
             display: none;
         }
+        .chart-container {
+            position: absolute;
+            top: 120px;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
     </style>
 
     <div class="vertical-box">
@@ -152,6 +162,9 @@ st.markdown("""
         </div>
         <div class="title-wrapper">
             <div class="title">CNN with LSTM Prediction</div>
+        </div>
+        <div class="chart-container">
+            <canvas id="prediction-chart"></canvas>
         </div>
         <div class="predict-wrapper">
             <button class="predict-button" id="predict-button">Predict</button>
@@ -181,7 +194,12 @@ st.markdown("""
     </div>
 
     <script>
-        // Load predictions data from parquet (assuming it's available as a JSON for simplicity)
+        // Load Chart.js library
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        document.head.appendChild(script);
+
+        // Load predictions data
         const predictions = [
             {"site": "TANAUAN", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
             {"site": "TANAUAN", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
@@ -221,7 +239,76 @@ st.markdown("""
             {"site": "SAN NICOLAS", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"}
         ];
 
-        // Function to display predictions
+        // Initialize Chart.js chart
+        let chartInstance = null;
+        const ctx = document.getElementById('prediction-chart').getContext('2d');
+
+        function updateChart(prediction) {
+            // Destroy existing chart if it exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            // Create new chart
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'Surface Temp (°C)', 'Middle Temp (°C)', 'Bottom Temp (°C)', 'pH',
+                        'Ammonia (mg/L)', 'Nitrate (mg/L)', 'Phosphate (mg/L)', 'Dissolved Oxygen (mg/L)', 'WQI'
+                    ],
+                    datasets: [{
+                        label: 'Values',
+                        data: [
+                            prediction.surface_temperature,
+                            prediction.middle_temperature,
+                            prediction.bottom_temperature,
+                            prediction.ph,
+                            prediction.ammonia,
+                            prediction.nitrate,
+                            prediction.phosphate,
+                            prediction.dissolved_oxygen,
+                            prediction.wqi
+                        ],
+                        backgroundColor: [
+                            '#FF6F61', '#6B5B95', '#88B04B', '#F7CAC9', '#92A8D1',
+                            '#955251', '#B565A7', '#009B77', '#DD4124'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Values'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Parameters'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: `Prediction for ${prediction.site} (Month)`
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to display predictions and update chart
         function displayPredictions() {
             const timeFrame = document.getElementById('by-week-selector').value;
             const location = document.getElementById('location-selector').value;
@@ -230,6 +317,10 @@ st.markdown("""
             if (timeFrame === 'month') {
                 const prediction = predictions.find(p => p.site === location && p.time_frame === 'Month');
                 if (prediction) {
+                    // Update the chart
+                    updateChart(prediction);
+
+                    // Update the results div
                     resultsDiv.style.display = 'block';
                     resultsDiv.innerHTML = `
                         <h4>Predictions for ${location} (Month)</h4>
@@ -246,9 +337,15 @@ st.markdown("""
                 } else {
                     resultsDiv.style.display = 'block';
                     resultsDiv.innerHTML = `<p>No data available for ${location} (Month)</p>`;
+                    if (chartInstance) {
+                        chartInstance.destroy();
+                    }
                 }
             } else {
                 resultsDiv.style.display = 'none';
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
             }
         }
 
