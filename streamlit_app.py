@@ -8,10 +8,10 @@ st.markdown("""
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
-            background-color: #ffffff;
-            border: 1.8px solid #d0d0d0;
+            background: linear-gradient(135deg, #00ff00, #39ff14, #00cc00); /* Neon green gradient */
+            border: 2px solid #00ff00; /* Neon green border */
             border-radius: 14px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.06);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); /* Neon glow effect */
             padding: 24px;
             display: flex;
             flex-direction: column;
@@ -19,59 +19,106 @@ st.markdown("""
             align-items: center;
             position: relative;
         }
-        .title {
+        .title-wrapper {
             position: absolute;
-            top: 24px;
+            top: 70px; /* Position below stat-comparison-container */
+            width: 100%;
+            display: flex;
+            justify-content: center; /* Center the title horizontally */
+        }
+        .title {
             text-align: center;
             font-size: 29px;
             font-weight: bold;
-            color: #000000;
+            color: #00ff00; /* Neon green for title */
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.7); /* Retro glow effect */
+            font-family: 'Courier New', Courier, monospace; /* Retro font */
+        }
+        .stat-comparison-container {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Align button to the right */
+        }
+        .stat-comparison-button {
+            width: 40px; /* 1x1 square */
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid #00cc00; /* Slightly darker neon green border */
+            background: linear-gradient(135deg, #39ff14, #00ff00); /* Gradient for button */
+            font-size: 16px;
+            cursor: pointer;
+            color: #000000; /* Black text for contrast */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Neon glow */
+            font-family: 'Courier New', Courier, monospace; /* Retro font */
         }
         .predict-wrapper, .by-week-wrapper {
-            width: 100%;  /* Ensure wrappers span full width of vertical-box */
+            width: 100%; /* Full width of vertical-box */
         }
-        .predict-button, .by-week-selector, .location-selector {
+        .predict-button {
             padding: 12px 24px;
             border-radius: 10px;
-            border: 1.2px solid #ccc;
-            background-color: #f9f9f9;
+            border: 2px solid #00cc00; /* Neon green border */
+            background: linear-gradient(135deg, #39ff14, #00ff00); /* Gradient for button */
             font-size: 19px;
             cursor: pointer;
-            color: #000000;
+            color: #000000; /* Black text for contrast */
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Neon glow */
+            font-family: 'Courier New', Courier, monospace; /* Retro font */
+        }
+        .by-week-selector, .location-selector {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 2px solid #00cc00; /* Neon green border */
+            background: linear-gradient(135deg, #39ff14, #00ff00); /* Gradient for selectors */
+            font-size: 19px;
+            cursor: pointer;
+            color: #000000; /* Black text for contrast */
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Neon glow */
+            font-family: 'Courier New', Courier, monospace; /* Retro font */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            text-align: left;
+        }
+        .by-week-selector {
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .location-selector {
+            flex: 1; /* Occupy remaining space */
         }
         .predict-wrapper {
             display: flex;
-            justify-content: center;  /* Explicitly center Predict button */
-            margin-bottom: 12px;  /* Add spacing between Predict and By Week/Location */
+            justify-content: center; /* Center Predict button */
+            margin-bottom: 12px; /* Spacing */
         }
         .by-week-wrapper {
             display: flex;
-            flex-direction: row;  /* Arrange By Week and Location selectors side by side */
-            align-items: center;  /* Vertically align selectors in the wrapper */
-            width: 100%;  /* Ensure wrapper spans full width for proper stretching */
-            gap: 12px;  /* Add spacing between By Week and Location selectors */
+            flex-direction: row; /* Side-by-side selectors */
+            align-items: center; /* Vertically align */
+            width: 100%;
+            gap: 12px; /* Spacing between selectors */
         }
-        .by-week-selector {
-            flex-shrink: 0;  /* Prevent By Week selector from shrinking */
-            -webkit-appearance: none;  /* Remove default browser styling */
-            -moz-appearance: none;
-            appearance: none;
-            text-align: left;  /* Align text to the left */
-        }
-        .location-selector {
-            flex: 1;  /* Make Location selector occupy remaining horizontal space */
-            -webkit-appearance: none;  /* Remove default browser styling */
-            -moz-appearance: none;
-            appearance: none;
-            text-align: left;  /* Align text to the left */
-        }
-        .predict-button:hover, .by-week-selector:hover, .location-selector:hover {
-            background-color: #e0e0e0;
+        .stat-comparison-button:hover, .predict-button:hover, .by-week-selector:hover, .location-selector:hover {
+            background: linear-gradient(135deg, #00cc00, #39ff14); /* Reverse gradient on hover */
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); /* Stronger glow on hover */
         }
     </style>
 
     <div class="vertical-box">
-        <div class="title">TaalWQ</div>
+        <div class="stat-comparison-container">
+            <button class="stat-comparison-button">SCI</button>
+        </div>
+        <div class="title-wrapper">
+            <div class="title">TaalWQ</div>
+        </div>
         <div class="predict-wrapper">
             <button class="predict-button">Predict</button>
         </div>
