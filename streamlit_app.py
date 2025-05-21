@@ -43,9 +43,9 @@ st.markdown("""
         .title {
             text-align: center;
             font-size: 29px;
-            font-weight: bold;
+            font-weight: 900; /* Bolder for contrast */
             color: #AFD238; /* Atlantis Green for title */
-            text-shadow: 0 0 8px rgba(175, 210, 56, 0.8); /* Atlantis Green glow */
+            text-shadow: 0 0 8px rgba(175, 210, 56, 0.8), 0 0 2px rgba(0, 0, 0, 0.5); /* Green glow with dark outline */
             font-family: 'Courier New', Courier, monospace; /* Retro font */
         }
         .stat-comparison-container {
@@ -64,8 +64,10 @@ st.markdown("""
             border: 2px solid #00C0D1; /* Sea Serpent border */
             background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 16px;
+            font-weight: 700; /* Bold for contrast */
             cursor: pointer;
-            color: #E6EFEA; /* Gray Tint text for contrast */
+            color: #E6EFEA; /* Gray Tint for high contrast */
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -84,8 +86,10 @@ st.markdown("""
             border: 2px solid #00C0D1; /* Sea Serpent border */
             background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 19px;
+            font-weight: 700; /* Bold for contrast */
             cursor: pointer;
-            color: #E6EFEA; /* Gray Tint text for contrast */
+            color: #E6EFEA; /* Gray Tint for high contrast */
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Courier New', Courier, monospace; /* Retro font */
         }
@@ -95,8 +99,10 @@ st.markdown("""
             border: 2px solid #00C0D1; /* Sea Serpent border */
             background: linear-gradient(to bottom, #0082E0, #00C0D1); /* Vertical linear gradient: Fiji Blue to Sea Serpent */
             font-size: 19px;
+            font-weight: 700; /* Bold for contrast */
             cursor: pointer;
-            color: #E6EFEA; /* Gray Tint text for contrast */
+            color: #E6EFEA; /* Gray Tint for high contrast */
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Courier New', Courier, monospace; /* Retro font */
             -webkit-appearance: none;
@@ -112,7 +118,7 @@ st.markdown("""
         }
         .predict-wrapper {
             display: flex;
-            justify-content infarctions; /* Center Predict button */
+            justify-content: center; /* Center Predict button */
             margin-bottom: 12px; /* Spacing */
         }
         .by-week-wrapper {
