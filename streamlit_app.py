@@ -1,26 +1,26 @@
 import streamlit as st
 
-# Page setup
-st.set_page_config(page_title="CNN-LSTM Prediction", layout="centered")
-
-# Inject custom CSS
+# Custom CSS styling
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
-        .vertical-box-background {
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
+        .vertical-box {
+            height: 480px;
             width: 100%;
             max-width: 480px;
-            height: 720px;
+            margin: 0 auto;
             background: linear-gradient(to bottom, #0082E0, #00C0D1, #8AE7D4);
             border: 2px solid #0082E0;
             border-radius: 14px;
             box-shadow: 0 0 15px rgba(0, 130, 224, 0.6);
-            z-index: -1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
         .background-image {
@@ -33,20 +33,31 @@ st.markdown("""
             background-size: cover;
             background-position: center;
             opacity: 0.1;
-            border-radius: 14px;
+            z-index: 1;
+        }
+
+        .title-wrapper {
+            position: absolute;
+            top: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 2;
         }
 
         .title {
+            text-align: center;
             font-size: 29px;
             font-weight: 900;
             color: #AFD238;
             text-shadow: 0 0 8px rgba(175, 210, 56, 0.8), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
             font-family: 'Inter', sans-serif;
-            text-align: center;
-            margin-bottom: 16px;
         }
 
         .stat-comparison-button {
+            position: absolute;
+            top: 24px;
+            right: 24px;
             width: 40px;
             height: 40px;
             border-radius: 10px;
@@ -55,36 +66,60 @@ st.markdown("""
             font-size: 16px;
             font-weight: 700;
             color: #E6EFEA;
-            text-shadow: 1px 1px 0 #000;
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-family: 'Inter', sans-serif;
-            float: right;
+            z-index: 2;
         }
+
+        .control-wrapper {
+            z-index: 2;
+            margin-top: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .select-wrapper {
+            display: flex;
+            gap: 12px;
+        }
+
     </style>
 """, unsafe_allow_html=True)
 
-# Draw the background box (purely visual layer)
-st.markdown("""
-    <div class="vertical-box-background">
-        <div class="background-image"></div>
-    </div>
-""", unsafe_allow_html=True)
+# Container
+st.markdown('<div class="vertical-box">', unsafe_allow_html=True)
+st.markdown('<div class="background-image"></div>', unsafe_allow_html=True)
+st.markdown('<div class="title-wrapper"><div class="title">CNN with LSTM Prediction</div></div>', unsafe_allow_html=True)
+st.markdown('<div class="stat-comparison-button">SCI</div>', unsafe_allow_html=True)
 
-# Now draw content (which floats visually in front of the box)
-st.markdown('<button class="stat-comparison-button">SCI</button>', unsafe_allow_html=True)
-st.markdown('<div class="title">CNN with LSTM Prediction</div>', unsafe_allow_html=True)
+# Streamlit widgets
+with st.container():
+    st.markdown('<div class="control-wrapper">', unsafe_allow_html=True)
 
-time_frame = st.selectbox("Select Time Frame", ["Week", "Month", "Year"])
-location = st.selectbox("Select Location", [
-    "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC", "BERINAYAN",
-    "BALAKILONG", "BUSO-BUSO", "BAÑAGA", "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
-])
+    col1, col2 = st.columns(2)
+    with col1:
+        time_frame = st.selectbox("Select Time Frame", ["week", "month", "year"], label_visibility="collapsed")
+    with col2:
+        location = st.selectbox("Select Location", [
+            "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC",
+            "BERINAYAN", "BALAKILONG", "BUSO-BUSO", "BAÑAGA",
+            "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
+        ], label_visibility="collapsed")
 
-predict_clicked = st.button("Predict")
+    show_chart = False
+    if st.button("Predict"):
+        if time_frame == "week" and location == "TANAUAN":
+            show_chart = True
 
-if predict_clicked:
-    if time_frame.lower() == "week" and location == "TANAUAN":
-        st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
-    else:
-        st.info(f"No prediction chart available for {location} - {time_frame}.")
+    if show_chart:
+        st.image("bar_chart_actual_values.png", use_column_width=True)
 
-st.write(f"Last updated: 01:10 PM PST, Wednesday, May 21, 2025")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Close container
+st.markdown('</div>', unsafe_allow_html=True)
