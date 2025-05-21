@@ -21,7 +21,7 @@ st.markdown("""
             flex-direction: column;
             align-items: center;
             position: relative;
-            min-height: 720px; /* Changed to min-height to allow growth */
+            min-height: 600px; /* Adjusted to fit content comfortably */
         }
         .background-image {
             position: absolute;
@@ -40,7 +40,7 @@ st.markdown("""
             display: flex;
             justify-content: center;
             z-index: 2;
-            padding: 16px 0; /* Adjusted to fit within padding */
+            margin-bottom: 16px; /* Space below title */
         }
         .title {
             text-align: center;
@@ -52,8 +52,8 @@ st.markdown("""
         }
         .stat-comparison-container {
             position: absolute;
-            top: 16px; /* Adjusted to fit within padding */
-            right: 16px; /* Adjusted to fit within padding */
+            top: 16px;
+            right: 16px;
             z-index: 2;
         }
         .stat-comparison-button {
@@ -72,15 +72,14 @@ st.markdown("""
             font-family: 'Inter', sans-serif;
         }
         .content-wrapper {
-            margin-top: 80px; /* Reduced to keep content within box */
-            z-index: 2;
             width: 100%;
-            padding: 0 16px; /* Added padding to align with box */
-            box-sizing: border-box; /* Ensures padding is included in width */
+            z-index: 2;
+            padding: 0 16px;
+            box-sizing: border-box;
         }
         .stSelectbox, .stButton {
             width: 100%;
-            max-width: 100%; /* Ensure widgets don't overflow */
+            max-width: 100%;
         }
     </style>
 """, unsafe_allow_html=True)
