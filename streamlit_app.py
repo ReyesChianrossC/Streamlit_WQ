@@ -9,7 +9,6 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
         .vertical-box {
-            height: 720px;
             width: 100%;
             max-width: 480px;
             margin: 0 auto;
@@ -22,7 +21,7 @@ st.markdown("""
             flex-direction: column;
             align-items: center;
             position: relative;
-            overflow: hidden;
+            min-height: 720px; /* Changed to min-height to allow growth */
         }
         .background-image {
             position: absolute;
@@ -37,12 +36,11 @@ st.markdown("""
             z-index: 1;
         }
         .title-wrapper {
-            position: absolute;
-            top: 30px;
             width: 100%;
             display: flex;
             justify-content: center;
             z-index: 2;
+            padding: 16px 0; /* Adjusted to fit within padding */
         }
         .title {
             text-align: center;
@@ -54,8 +52,8 @@ st.markdown("""
         }
         .stat-comparison-container {
             position: absolute;
-            top: 24px;
-            right: 24px;
+            top: 16px; /* Adjusted to fit within padding */
+            right: 16px; /* Adjusted to fit within padding */
             z-index: 2;
         }
         .stat-comparison-button {
@@ -74,12 +72,15 @@ st.markdown("""
             font-family: 'Inter', sans-serif;
         }
         .content-wrapper {
-            margin-top: 200px;
+            margin-top: 80px; /* Reduced to keep content within box */
             z-index: 2;
             width: 100%;
+            padding: 0 16px; /* Added padding to align with box */
+            box-sizing: border-box; /* Ensures padding is included in width */
         }
         .stSelectbox, .stButton {
             width: 100%;
+            max-width: 100%; /* Ensure widgets don't overflow */
         }
     </style>
 """, unsafe_allow_html=True)
