@@ -135,7 +135,7 @@ st.markdown("""
             box-shadow: 0 0 15px rgba(0, 130, 224, 0.7);
         }
         .clicked {
-            color: #FFD700 !important; /* Gold color on click */
+            color: #000000 !important; /* Black color on click */
         }
     </style>
 
@@ -168,7 +168,7 @@ st.markdown("""
         // Function to handle click color change
         function handleSelectorClick(selectorId) {
             const selector = document.getElementById(selectorId);
-            selector.classList.add('clicked'); // Change to gold on click
+            selector.classList.add('clicked'); // Change to black on click
             setTimeout(() => {
                 selector.style.color = '#FFFFFF'; // Revert to white after 300ms
             }, 300);
