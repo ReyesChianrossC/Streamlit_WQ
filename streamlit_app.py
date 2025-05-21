@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Basic CSS styling for widgets
+# Basic CSS styling for widgets and container card
 st.markdown("""
 <style>
     /* Apply custom font */
@@ -8,6 +8,16 @@ st.markdown("""
 
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
+    }
+
+    /* Card container styling */
+    .card-container {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        margin: 20px auto;
     }
 
     .stButton>button {
@@ -19,6 +29,8 @@ st.markdown("""
         padding: 0.6em 1.2em;
         box-shadow: 0 4px 10px rgba(0, 130, 224, 0.4);
         transition: 0.3s ease;
+        width: 100%;
+        margin-top: 12px;
     }
 
     .stButton>button:hover {
@@ -28,16 +40,19 @@ st.markdown("""
 
     .stSelectbox>div {
         background: linear-gradient(to bottom, #0082E0, #00C0D1);
-        color: black;
+        color: white;
         font-weight: bold;
         border-radius: 8px;
         padding: 0.4em;
+        margin-bottom: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Streamlit widgets
 st.title("CNN with LSTM Prediction")
+
+# Start container div
+st.markdown('<div class="card-container">', unsafe_allow_html=True)
 
 timeframe = st.selectbox("Select Time Frame", ["Week", "Month", "Year"])
 location = st.selectbox("Select Location", [
@@ -46,13 +61,13 @@ location = st.selectbox("Select Location", [
     "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
 ])
 
-# Predict button
 if st.button("Predict"):
-    # Example logic: show result or image
     if timeframe == "Week" and location == "TANAUAN":
         st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
     else:
         st.info(f"No chart available for {location} - {timeframe.lower()}.")
 
-# Optional footer
+# End container div
+st.markdown('</div>', unsafe_allow_html=True)
+
 st.caption("Last updated: May 21, 2025")
