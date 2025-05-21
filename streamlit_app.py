@@ -1,174 +1,173 @@
 import streamlit as st
-import os
 import pandas as pd
+import altair as alt
 
-# CSS for enhanced and vibrant design with horizontal belt
+# Streamlit config
+st.set_page_config(page_title="Water Quality Dashboard", layout="wide")
+
+# === Custom CSS for Dark Dashboard ===
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-        font-size: 16px;
-        background: linear-gradient(135deg, #e6f0fa, #b3d4fc);
-        height: 100%;
-        margin: 0;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-    .container {
-        background: rgba(255, 255, 255, 0.9);
-        padding: 20px 25px;
-        border-radius: 15px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        max-width: 400px;
-        margin: 40px auto;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .container:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+    background-color: #1e1e2f;
+    color: #f1f1f1;
+}
 
-    .belt {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
+h1, h2, h3 {
+    color: #f8f9fa;
+}
 
-    .stButton>button {
-        background: linear-gradient(90deg, #007bff, #00c4cc);
-        color: white;
-        font-weight: 600;
-        font-size: 1em;
-        border: none;
-        border-radius: 10px;
-        padding: 0.6em 1.2em;
-        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4);
-        transition: all 0.3s ease;
-        width: 100%; /* Full width within its own container */
-    }
-    .stButton>button:hover {
-        background: linear-gradient(90deg, #00c4cc, #007bff);
-        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.6);
-        transform: translateY(-2px);
-    }
-    .stButton>button:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
-    }
+.section {
+    background-color: #2c2c3e;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-bottom: 30px;
+}
 
-    .stSelectbox>div {
-        background: #ffffff;
-        color: #333;
-        font-weight: 600;
-        font-size: 0.9em;
-        border: 2px solid #007bff;
-        border-radius: 10px;
-        padding: 0.5em;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        width: 100%; /* Ensure selectbox takes full column width */
-    }
-    .stSelectbox>div:hover, .stSelectbox>div:focus {
-        border-color: #00c4cc;
-        box-shadow: 0 0 10px rgba(0, 196, 204, 0.3);
-    }
+.stat-block {
+    background-color: #2c2c3e;
+    color: #f1f1f1;
+    border-left: 4px solid #6f42c1;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
 
-    h1 {
-        font-size: 2.2em;
-        font-weight: 700;
-        color: #004085;
-        text-align: center;
-        margin-bottom: 25px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+.sidebar .css-1d391kg {
+    background-color: #29293f !important;
+}
 
-    .stCaption {
-        text-align: center;
-        color: #666;
-        font-size: 0.8em;
-        font-weight: 400;
-        margin-top: 15px;
-    }
+.metric-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: #f1f1f1;
+}
 
-    @media (max-width: 600px) {
-        .container {
-            max-width: 90%;
-            padding: 15px 20px;
-            margin: 20px auto;
-        }
-        h1 {
-            font-size: 1.8em;
-        }
-        .belt {
-            flex-direction: column;
-            gap: 5px;
-        }
-    }
+.metric-value {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #bcbcff;
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Prediction App", anchor=False)
+# === Sidebar ===
+st.sidebar.title("Navigation")
+location = st.sidebar.selectbox("Select Location", [
+    "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC",
+    "BERINAYAN", "BALAKILONG", "BUSO-BUSO", "BAÑAGA",
+    "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
+])
 
-# Load the predictions data
+timeframe = st.sidebar.selectbox("Select Time Frame", ["Week", "Month", "Year"])
+
+# === Load data ===
 try:
-    predictions_df = pd.read_parquet("predictions.parquet")
+    df = pd.read_parquet("predictions.parquet")
 except FileNotFoundError:
-    st.error("predictions.parquet file not found. Please ensure it is in the same directory as the app.")
+    st.error("Missing predictions.parquet file.")
     st.stop()
 
-with st.container():
-    # Horizontal belt layout using columns for selectboxes only
-    col1, col2 = st.columns([1, 1])  # Equal widths for two selectboxes
-    with col1:
-        timeframe = st.selectbox("Time Frame", ["Week", "Month", "Year"], key="timeframe")
-    with col2:
-        location = st.selectbox("Location", [
-            "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC",
-            "BERINAYAN", "BALAKILONG", "BUSO-BUSO", "BAÑAGA",
-            "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
-        ], key="location")
+# === Filter & Compute ===
+try:
+    selected_df = df[(df['site'] == location) & (df['time_frame'] == timeframe)]
+    if selected_df.empty:
+        st.error("No matching data found.")
+        st.stop()
+    selected = selected_df.iloc[0]
 
-    # Predict button below the belt
-    if st.button("Predict"):
-        with st.spinner("Analyzing data..."):
-            # Filter data for the selected site and timeframe
-            selected_data = predictions_df[(predictions_df['site'] == location) & (predictions_df['time_frame'] == timeframe)].iloc[0]
-            
-            # Use the "Week" value as baseline for comparison, or average if "Week" is selected
-            baseline_data = predictions_df[(predictions_df['site'] == location) & (predictions_df['time_frame'] == "Week")].iloc[0]
-            if timeframe == "Week":
-                # Select only numeric columns for mean calculation
-                numeric_columns = [
-                    'surface_temperature', 'middle_temperature', 'bottom_temperature',
-                    'ph', 'ammonia', 'nitrate', 'phosphate', 'dissolved_oxygen', 'wqi'
-                ]
-                baseline_data = predictions_df[predictions_df['site'] == location][numeric_columns].mean()
+    baseline_df = df[(df['site'] == location) & (df['time_frame'] == timeframe)]
+    baseline = baseline_df.mean(numeric_only=True)
+except Exception as e:
+    st.error(f"Data processing error: {e}")
+    st.stop()
 
-            # Parameters to compare
-            params = {
-                'Surface Temp': 'surface_temperature',
-                'Middle Temp': 'middle_temperature',
-                'Bottom Temp': 'bottom_temperature',
-                'pH': 'ph',
-                'Ammonia': 'ammonia',
-                'Nitrate': 'nitrate',
-                'Phosphate': 'phosphate',
-                'Diss. Oxygen': 'dissolved_oxygen',
-                'WQI': 'wqi'
-            }
+# === Header ===
+st.title("Water Quality Dashboard")
+st.subheader(f"{location} • {timeframe} View")
 
-            # Calculate and format original to changed values
-            changes = []
-            for display_name, param in params.items():
-                original = baseline_data[param]
-                changed = selected_data[param]
-                changes.append(f"- {display_name}: [{original:.6f}] → [{changed:.6f}]")
+# === Top Metrics ===
+metrics = {
+    "WQI": 'wqi',
+    "pH": 'ph',
+    "DO (mg/L)": 'dissolved_oxygen',
+    "Ammonia": 'ammonia'
+}
 
-            # Display the results in a compact list
-            st.write("### Water Quality Changes:")
-            st.write("\n".join(changes))
-            st.write(f"WQI Class: {selected_data['wqi_classification']}")
+cols = st.columns(len(metrics))
 
-st.caption("Updated: 02:22 PM PST, Wednesday, May 21, 2025")
+for i, (label, key) in enumerate(metrics.items()):
+    value = selected[key]
+    base = baseline[key]
+    delta = round(value - base, 2)
+    if delta > 0:
+        cols[i].metric(label, f"{value:.2f}", f"↑ {delta:.2f}", delta_color="normal")
+    elif delta < 0:
+        cols[i].metric(label, f"{value:.2f}", f"↓ {abs(delta):.2f}", delta_color="normal")
+    else:
+        cols[i].metric(label, f"{value:.2f}", f"{delta:.2f}", delta_color="off")
+
+# === Tabs ===
+tab1, tab2 = st.tabs(["Prediction Overview", "Parameter Comparison"])
+
+with tab1:
+    st.markdown("### Predicted Water Quality Changes")
+
+    param_map = {
+        'Surface Temp': 'surface_temperature',
+        'Middle Temp': 'middle_temperature',
+        'Bottom Temp': 'bottom_temperature',
+        'pH': 'ph',
+        'Ammonia': 'ammonia',
+        'Nitrate': 'nitrate',
+        'Phosphate': 'phosphate',
+        'Diss. Oxygen': 'dissolved_oxygen',
+        'WQI': 'wqi'
+    }
+
+    for name, key in param_map.items():
+        before = baseline[key]
+        after = selected[key]
+        st.markdown(f"""
+        <div class='stat-block'>
+            <div class='metric-title'>{name}</div>
+            <div class='metric-value'>[{before:.4f}] → [{after:.4f}]</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+        <div style='margin-top: 20px; font-size: 1.1rem;'>
+            <strong>WQI Classification:</strong> {selected['wqi_classification']}
+        </div>
+    """, unsafe_allow_html=True)
+
+with tab2:
+    st.markdown("### Parameter Comparison Chart")
+    chart_data = pd.DataFrame({
+        "Parameter": list(param_map.keys()),
+        "Baseline": [baseline[k] for k in param_map.values()],
+        "Predicted": [selected[k] for k in param_map.values()]
+    })
+
+    melted = chart_data.melt(id_vars="Parameter", var_name="Type", value_name="Value")
+
+    chart = alt.Chart(melted).mark_bar(opacity=0.85).encode(
+        x=alt.X('Parameter:N', title=None),
+        y=alt.Y('Value:Q'),
+        color=alt.Color('Type:N', scale=alt.Scale(range=['#a29bfe', '#6c5ce7'])),
+        tooltip=['Parameter', 'Type', 'Value']
+    ).properties(
+        width=700,
+        height=400
+    )
+
+    st.altair_chart(chart, use_container_width=True)
+
+# === Footer ===
+st.markdown("<hr>", unsafe_allow_html=True)
+st.caption("CPEN106 • Water Quality Monitoring • Updated: May 21, 2025")
