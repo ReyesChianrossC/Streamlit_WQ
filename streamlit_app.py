@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 
-# CSS for enhanced and vibrant design
+# CSS for enhanced and vibrant design with horizontal belt
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -27,6 +27,14 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
 
+    .belt {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
     .stButton>button {
         background: linear-gradient(90deg, #007bff, #00c4cc);
         color: white;
@@ -37,8 +45,8 @@ st.markdown("""
         padding: 0.6em 1.2em;
         box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4);
         transition: all 0.3s ease;
-        width: 100%;
-        margin-top: 15px;
+        width: auto; /* Adjusted to fit content */
+        margin: 0;
     }
     .stButton>button:hover {
         background: linear-gradient(90deg, #00c4cc, #007bff);
@@ -58,8 +66,8 @@ st.markdown("""
         border: 2px solid #007bff;
         border-radius: 10px;
         padding: 0.5em;
-        margin-bottom: 15px;
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        width: 100%; /* Ensure selectbox takes full column width */
     }
     .stSelectbox>div:hover, .stSelectbox>div:focus {
         border-color: #00c4cc;
@@ -93,6 +101,13 @@ st.markdown("""
         h1 {
             font-size: 1.8em;
         }
+        .belt {
+            flex-direction: column;
+            gap: 5px;
+        }
+        .stButton>button {
+            width: 100%;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -100,25 +115,27 @@ st.markdown("""
 st.title("Prediction App", anchor=False)
 
 with st.container():
-    timeframe = st.selectbox("Time Frame", ["Week", "Month", "Year"], key="timeframe")
-    location = st.selectbox("Location", [
-        "Tanauan", "Talisay", "Aya", "Tumaway", "Sampaloc",
-        "Berinayan", "Balakilong", "Buso-Buso", "Bañaga",
-        "Bilibinwang", "Subic-Ilaya", "San Nicolas"
-    ], key="location")
-
-    if st.button("Predict"):
-        with st.spinner("Generating prediction..."):
-            # Try to load the dynamic image path
-            image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
-            if os.path.exists(image_path):
-                st.image(image_path, caption=f"{location} {timeframe} Prediction", use_column_width=True)
-            else:
-                # Fallback to bar_chart_actual_values.png if the dynamic image is not found
-                fallback_image = "bar_chart_actual_values.png"
-                if os.path.exists(fallback_image):
-                    st.image(fallback_image, caption=f"Showing actual values for {location} - {timeframe} (Prediction image not found)", use_column_width=True)
+    # Horizontal belt layout using columns
+    col1, col2, col3 = st.columns([1, 1, 0.8])  # Adjust column ratios as needed
+    with col1:
+        timeframe = st.selectbox("Time Frame", ["Week", "Month", "Year"], key="timeframe")
+    with col2:
+        location = st.selectbox("Location", [
+            "Tanauan", "Talisay", "Aya", "Tumaway", "Sampaloc",
+            "Berinayan", "Balakilong", "Buso-Buso", "Bañaga",
+            "Bilibinwang", "Subic-Ilaya", "San Nicolas"
+        ], key="location")
+    with col3:
+        if st.button("Predict"):
+            with st.spinner("Generating prediction..."):
+                image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
+                if os.path.exists(image_path):
+                    st.image(image_path, caption=f"{location} {timeframe} Prediction", use_column_width=True)
                 else:
-                    st.error(f"No prediction image found for {location} - {timeframe}, and fallback image 'bar_chart_actual_values.png' is missing.")
+                    fallback_image = "bar_chart_actual_values.png"
+                    if os.path.exists(fallback_image):
+                        st.image(fallback_image, caption=f"Showing actual values for {location} - {timeframe} (Prediction image not found)", use_column_width=True)
+                    else:
+                        st.error(f"No prediction image found for {location} - {timeframe}, and fallback image 'bar_chart_actual_values.png' is missing.")
 
 st.caption("Updated: May 21, 2025")
