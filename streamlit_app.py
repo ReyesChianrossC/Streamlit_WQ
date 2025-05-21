@@ -3,6 +3,8 @@ import streamlit as st
 # Custom HTML & CSS
 st.markdown("""
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
         .vertical-box {
             height: 480px;
             width: 100%;
@@ -46,7 +48,7 @@ st.markdown("""
             font-weight: 900; /* Bolder for contrast */
             color: #AFD238; /* Atlantis Green for title */
             text-shadow: 0 0 8px rgba(175, 210, 56, 0.8), 0 0 2px rgba(0, 0, 0, 0.5); /* Green glow with dark outline */
-            font-family: 'Courier New', Courier, monospace; /* Retro font */
+            font-family: 'Inter', sans-serif; /* Inter font */
         }
         .stat-comparison-container {
             position: absolute;
@@ -74,7 +76,7 @@ st.markdown("""
             text-align: center;
             padding: 0;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
-            font-family: 'Courier New', Courier, monospace; /* Retro font */
+            font-family: 'Inter', sans-serif; /* Inter font */
         }
         .predict-wrapper, .by-week-wrapper {
             width: 100%; /* Full width of vertical-box */
@@ -91,7 +93,7 @@ st.markdown("""
             color: #E6EFEA; /* Gray Tint for high contrast */
             text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
-            font-family: 'Courier New', Courier, monospace; /* Retro font */
+            font-family: 'Inter', sans-serif; /* Inter font */
         }
         .by-week-selector, .location-selector {
             padding: 12px 24px;
@@ -104,7 +106,7 @@ st.markdown("""
             color: #E6EFEA; /* Gray Tint for high contrast */
             text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
-            font-family: 'Courier New', Courier, monospace; /* Retro font */
+            font-family: 'Inter', sans-serif; /* Inter font */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
