@@ -3,14 +3,12 @@ import streamlit as st
 # CSS for container card style
 st.markdown("""
 <style>
-    /* Apply font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=inter:wght@400;700&display=swap');
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+        font-family: 'inter', sans-serif;
     }
 
-    /* Style the Streamlit container */
-    div[data-testid="stVerticalBlock"] > div:first-child {
+    div[data-testid="stverticalblock"] > div:first-child {
         background: white;
         padding: 20px 30px;
         border-radius: 16px;
@@ -19,9 +17,8 @@ st.markdown("""
         margin: 20px auto;
     }
 
-    /* Buttons styling */
-    .stButton>button {
-        background: linear-gradient(to bottom, #0082E0, #00C0D1);
+    .stbutton>button {
+        background: linear-gradient(to bottom, #0082e0, #00c0d1);
         color: white;
         font-weight: bold;
         border: none;
@@ -32,14 +29,13 @@ st.markdown("""
         width: 100%;
         margin-top: 12px;
     }
-    .stButton>button:hover {
-        background: linear-gradient(to top, #00C0D1, #0082E0);
+    .stbutton>button:hover {
+        background: linear-gradient(to top, #00c0d1, #0082e0);
         box-shadow: 0 0 12px rgba(0, 130, 224, 0.7);
     }
 
-    /* Selectbox style */
-    .stSelectbox>div {
-        background: linear-gradient(to bottom, #0082E0, #00C0D1);
+    .stselectbox>div {
+        background: linear-gradient(to bottom, #0082e0, #00c0d1);
         color: white;
         font-weight: bold;
         border-radius: 8px;
@@ -52,15 +48,23 @@ st.markdown("""
 st.title("CNN with LSTM Prediction")
 
 with st.container():
-    timeframe = st.selectbox("Select Time Frame", ["Week", "Month", "Year"])
+    timeframe = st.selectbox("Select Time Frame", ["week", "month", "year"])
     location = st.selectbox("Select Location", [
-        "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC",
-        "BERINAYAN", "BALAKILONG", "BUSO-BUSO", "BAÑAGA",
-        "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
+        "tanauan", "talisay", "aya", "tumaway", "sampaloc",
+        "berinayan", "balakilong", "buso-buso", "bañaga",
+        "bilibinwang", "subic-ilaya", "san nicolas"
     ])
+
     if st.button("Predict"):
-        if timeframe == "Week" and location == "TANAUAN":
-            st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
+        # Debugging outputs
+        st.write("Timeframe selected:", timeframe)
+        st.write("Location selected:", location)
+
+        if timeframe == "week" and location == "tanauan":
+            try:
+                st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
+            except FileNotFoundError:
+                st.error("Image file not found.")
         else:
             st.info(f"No chart available for {location} - {timeframe.lower()}.")
 
