@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import pandas as pd
 
 # CSS for enhanced and vibrant design with horizontal belt
 st.markdown("""
@@ -110,6 +111,13 @@ st.markdown("""
 
 st.title("Prediction App", anchor=False)
 
+# Load the predictions data
+try:
+    predictions_df = pd.read_parquet("predictions.parquet")
+except FileNotFoundError:
+    st.error("predictions.parquet file not found. Please ensure it is in the same directory as the app.")
+    st.stop()
+
 with st.container():
     # Horizontal belt layout using columns for selectboxes only
     col1, col2 = st.columns([1, 1])  # Equal widths for two selectboxes
@@ -117,22 +125,50 @@ with st.container():
         timeframe = st.selectbox("Time Frame", ["Week", "Month", "Year"], key="timeframe")
     with col2:
         location = st.selectbox("Location", [
-            "Tanauan", "Talisay", "Aya", "Tumaway", "Sampaloc",
-            "Berinayan", "Balakilong", "Buso-Buso", "Bañaga",
-            "Bilibinwang", "Subic-Ilaya", "San Nicolas"
+            "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC",
+            "BERINAYAN", "BALAKILONG", "BUSO-BUSO", "BAÑAGA",
+            "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
         ], key="location")
 
     # Predict button below the belt
     if st.button("Predict"):
-        with st.spinner("Generating prediction..."):
-            image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
-            if os.path.exists(image_path):
-                st.image(image_path, caption=f"{location} {timeframe} Prediction", use_container_width=True)
-            else:
-                fallback_image = "bar_chart_actual_values.png"
-                if os.path.exists(fallback_image):
-                    st.image(fallback_image, caption=f"Showing actual values for {location} - {timeframe} (Prediction image not found)", use_container_width=True)
-                else:
-                    st.error(f"No prediction image found for {location} - {timeframe}, and fallback image 'bar_chart_actual_values.png' is missing.")
+        with st.spinner("Analyzing data..."):
+            # Filter data for the selected site and timeframe
+            selected_data = predictions_df[(predictions_df['site'] == location) & (predictions_df['time_frame'] == timeframe)].iloc[0]
+            
+            # Use the "Week" value as baseline for comparison, or average if "Week" is selected
+            baseline_data = predictions_df[(predictions_df['site'] == location) & (predictions_df['time_frame'] == "Week")].iloc[0]
+            if timeframe == "Week":
+                baseline_data = predictions_df[predictions_df['site'] == location].mean()
 
-st.caption("Updated: 02:03 PM PST, Wednesday, May 21, 2025")
+            # Parameters to compare
+            params = {
+                'Surface Temperature': 'surface_temperature',
+                'Middle Temperature': 'middle_temperature',
+                'Bottom Temperature': 'bottom_temperature',
+                'pH': 'ph',
+                'Ammonia': 'ammonia',
+                'Nitrate': 'nitrate',
+                'Phosphate': 'phosphate',
+                'Dissolved Oxygen': 'dissolved_oxygen',
+                'WQI': 'wqi'
+            }
+
+            # Calculate and display changes
+            changes = []
+            for display_name, param in params.items():
+                change = selected_data[param] - baseline_data[param]
+                if change > 0:
+                    changes.append(f"{display_name}: Increased by {change:.6f}")
+                elif change < 0:
+                    changes.append(f"{display_name}: Decreased by {change:.6f}")
+                else:
+                    changes.append(f"{display_name}: No change")
+
+            # Display the results
+            st.write("### Changes in Water Quality Parameters:")
+            for change in changes:
+                st.write(change)
+            st.write(f"WQI Classification: {selected_data['wqi_classification']}")
+
+st.caption("Updated: 02:11 PM PST, Wednesday, May 21, 2025")
