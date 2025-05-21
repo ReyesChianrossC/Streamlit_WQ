@@ -93,6 +93,7 @@ st.markdown("""
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
             font-family: 'Inter', sans-serif;
+            width: 150px; /* Adjusted width */
         }
         .by-week-selector, .location-selector {
             padding: 12px 24px;
@@ -111,10 +112,10 @@ st.markdown("""
             text-align: left;
         }
         .by-week-selector {
-            flex-shrink: 0;
+            width: 100px; /* Adjusted width */
         }
         .location-selector {
-            flex: 1;
+            width: 200px; /* Adjusted width */
         }
         .predict-wrapper {
             display: flex;
