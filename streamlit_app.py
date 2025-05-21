@@ -1,5 +1,9 @@
 import streamlit as st
 
+# Page config (optional)
+st.set_page_config(page_title="CNN with LSTM Prediction", layout="centered")
+
+# Custom CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -71,47 +75,37 @@ st.markdown("""
         z-index: 2;
     }
 
-    .form-controls {
+    .widget-area {
         z-index: 2;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 280px;
-        gap: 10px;
+        margin-top: 300px;
+        width: 100%;
     }
 
-    select, .fake-button {
-        padding: 12px 24px;
-        border-radius: 10px;
-        border: none;
-        background: linear-gradient(to bottom, #0082E0, #00C0D1);
-        font-size: 16px;
-        font-weight: 700;
-        color: #000;
-        box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
+    .stButton>button, .stSelectbox>div {
         font-family: 'Inter', sans-serif;
-        cursor: default;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
+        border: none !important;
+        background: linear-gradient(to bottom, #0082E0, #00C0D1) !important;
+        color: #000000 !important;
+        box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
+        padding: 12px 24px !important;
     }
 
-    .checkbox-toggle {
-        display: none;
-    }
-
-    .fake-button {
-        text-align: center;
-    }
-
-    .chart-container {
-        display: none;
-        margin-top: 16px;
-    }
-
-    .checkbox-toggle:checked + .fake-button + .chart-container {
-        display: block;
+    .chart-image {
+        z-index: 2;
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 10px;
+        padding: 10px;
     }
 
 </style>
+""", unsafe_allow_html=True)
 
+# HTML layout container
+st.markdown("""
 <div class="vertical-box">
     <div class="background-image"></div>
 
@@ -120,29 +114,27 @@ st.markdown("""
     <div class="title-wrapper">
         <div class="title">CNN with LSTM Prediction</div>
     </div>
-
-    <div class="form-controls">
-        <select>
-            <option>Week</option>
-            <option>Month</option>
-            <option>Year</option>
-        </select>
-        <select>
-            <option>TANAUAN</option>
-            <option>TALISAY</option>
-            <option>AYA</option>
-            <option>TUMAWAY</option>
-            <option>SAMPALOC</option>
-        </select>
-
-        <!-- Simulate interaction -->
-        <label>
-            <input class="checkbox-toggle" type="checkbox" />
-            <div class="fake-button">Predict</div>
-            <div class="chart-container">
-                <img src="bar_chart_actual_values.png" width="100%" />
-            </div>
-        </label>
-    </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Streamlit widgets below the styled box
+st.markdown('<div class="widget-area">', unsafe_allow_html=True)
+
+# Selectors
+time_option = st.selectbox("Select Timeframe", ["Week", "Month", "Year"])
+location_option = st.selectbox("Select Location", [
+    "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC",
+    "BERINAYAN", "BALAKILONG", "BUSO-BUSO", "BAÑAGA",
+    "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
+])
+
+# Button
+if st.button("Predict"):
+    if time_option == "Week" and location_option == "TANAUAN":
+        st.markdown('<div class="chart-image">', unsafe_allow_html=True)
+        st.image("bar_chart_actual_values.png", use_column_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.info("Prediction chart only available for 'Week' and 'TANAUAN'.")
+
+st.markdown('</div>', unsafe_allow_html=True)
