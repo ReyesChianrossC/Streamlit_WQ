@@ -148,32 +148,31 @@ with st.container():
 
             # Parameters to compare
             params = {
-                'Surface Temperature': 'surface_temperature',
-                'Middle Temperature': 'middle_temperature',
-                'Bottom Temperature': 'bottom_temperature',
+                'Surface Temp': 'surface_temperature',
+                'Middle Temp': 'middle_temperature',
+                'Bottom Temp': 'bottom_temperature',
                 'pH': 'ph',
                 'Ammonia': 'ammonia',
                 'Nitrate': 'nitrate',
                 'Phosphate': 'phosphate',
-                'Dissolved Oxygen': 'dissolved_oxygen',
+                'Diss. Oxygen': 'dissolved_oxygen',
                 'WQI': 'wqi'
             }
 
-            # Calculate and display changes
+            # Calculate and format changes in a compact way
             changes = []
             for display_name, param in params.items():
                 change = selected_data[param] - baseline_data[param]
                 if change > 0:
-                    changes.append(f"{display_name}: Increased by {change:.6f}")
+                    changes.append(f"- {display_name}: +{change:.6f}")
                 elif change < 0:
-                    changes.append(f"{display_name}: Decreased by {change:.6f}")
+                    changes.append(f"- {display_name}: {change:.6f}")
                 else:
-                    changes.append(f"{display_name}: No change")
+                    changes.append(f"- {display_name}: 0.000000")
 
-            # Display the results
-            st.write("### Changes in Water Quality Parameters:")
-            for change in changes:
-                st.write(change)
-            st.write(f"WQI Classification: {selected_data['wqi_classification']}")
+            # Display the results in a compact list
+            st.write("### Water Quality Changes:")
+            st.write("\n".join(changes))
+            st.write(f"WQI Class: {selected_data['wqi_classification']}")
 
-st.caption("Updated: 02:12 PM PST, Wednesday, May 21, 2025")
+st.caption("Updated: 02:13 PM PST, Wednesday, May 21, 2025")
