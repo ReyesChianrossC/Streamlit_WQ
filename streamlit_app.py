@@ -91,7 +91,7 @@ st.markdown("""
             font-weight: 700; /* Bold for contrast */
             cursor: pointer;
             color: #E6EFEA; /* Gray Tint for high contrast */
-            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Black border outline */
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Inter', sans-serif; /* Inter font */
         }
@@ -104,7 +104,7 @@ st.markdown("""
             font-weight: 700; /* Bold for contrast */
             cursor: pointer;
             color: #E6EFEA; /* Gray Tint for high contrast */
-            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Dark outline for readability */
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Black border outline */
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Inter', sans-serif; /* Inter font */
             -webkit-appearance: none;
