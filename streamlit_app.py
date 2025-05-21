@@ -124,4 +124,15 @@ with st.container():
 
     # Predict button below the belt
     if st.button("Predict"):
-        with st.spinner("Generating prediction...
+        with st.spinner("Generating prediction..."):
+            image_path = f"{location.lower()}_{timeframe.lower()}_prediction.png"
+            if os.path.exists(image_path):
+                st.image(image_path, caption=f"{location} {timeframe} Prediction", use_container_width=True)
+            else:
+                fallback_image = "bar_chart_actual_values.png"
+                if os.path.exists(fallback_image):
+                    st.image(fallback_image, caption=f"Showing actual values for {location} - {timeframe} (Prediction image not found)", use_container_width=True)
+                else:
+                    st.error(f"No prediction image found for {location} - {timeframe}, and fallback image 'bar_chart_actual_values.png' is missing.")
+
+st.caption("Updated: 02:03 PM PST, Wednesday, May 21, 2025")
