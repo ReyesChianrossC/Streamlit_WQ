@@ -1,75 +1,58 @@
 import streamlit as st
 
-# Hidden input to capture JS event (like button click)
-event_trigger = st.text_input("js_event", value="", label_visibility="collapsed")
-
-# Custom HTML, CSS, and JS
+# Basic CSS styling for widgets
 st.markdown("""
 <style>
-    /* your entire CSS from earlier remains unchanged */
+    /* Apply custom font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .stButton>button {
+        background: linear-gradient(to bottom, #0082E0, #00C0D1);
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6em 1.2em;
+        box-shadow: 0 4px 10px rgba(0, 130, 224, 0.4);
+        transition: 0.3s ease;
+    }
+
+    .stButton>button:hover {
+        background: linear-gradient(to top, #00C0D1, #0082E0);
+        box-shadow: 0 0 12px rgba(0, 130, 224, 0.7);
+    }
+
+    .stSelectbox>div {
+        background: linear-gradient(to bottom, #0082E0, #00C0D1);
+        color: black;
+        font-weight: bold;
+        border-radius: 8px;
+        padding: 0.4em;
+    }
 </style>
-
-<div class="vertical-box">
-    <div class="background-image"></div>
-    <div class="stat-comparison-container">
-        <button class="stat-comparison-button">SCI</button>
-    </div>
-    <div class="title-wrapper">
-        <div class="title">CNN with LSTM Prediction</div>
-    </div>
-    <div class="chart-container">
-        <img id="prediction-chart" class="chart-image" src="bar_chart_actual_values.png" alt="Predicted Parameters Chart">
-    </div>
-    <div class="predict-wrapper">
-        <button class="predict-button" id="predict-button">Predict</button>
-    </div>
-    <div class="by-week-wrapper">
-        <select class="by-week-selector" id="by-week-selector">
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
-        </select>
-        <select class="location-selector" id="location-selector">
-            <option value="TANAUAN">TANAUAN</option>
-            <option value="TALISAY">TALISAY</option>
-            <option value="AYA">AYA</option>
-            <option value="TUMAWAY">TUMAWAY</option>
-            <option value="SAMPALOC">SAMPALOC</option>
-            <option value="BERINAYAN">BERINAYAN</option>
-            <option value="BALAKILONG">BALAKILONG</option>
-            <option value="BUSO-BUSO">BUSO-BUSO</option>
-            <option value="BAÑAGA">BAÑAGA</option>
-            <option value="BILIBINWANG">BILIBINWANG</option>
-            <option value="SUBIC-ILAYA">SUBIC-ILAYA</option>
-            <option value="SAN NICOLAS">SAN NICOLAS</option>
-        </select>
-    </div>
-    <div id="results"></div>
-</div>
-
-<script>
-    document.getElementById('predict-button').addEventListener('click', function() {
-        const timeFrame = document.getElementById('by-week-selector').value;
-        const location = document.getElementById('location-selector').value;
-        const chartImage = document.getElementById('prediction-chart');
-
-        if (timeFrame === 'week' && location === 'TANAUAN') {
-            chartImage.style.display = 'block';
-        } else {
-            chartImage.style.display = 'none';
-        }
-
-        // Update Streamlit hidden input to trigger rerun
-        const streamlitInput = window.parent.document.querySelector('input[data-testid="stTextInput"][aria-label="js_event"]');
-        if (streamlitInput) {
-            streamlitInput.value = `${timeFrame}-${location}`;
-            streamlitInput.dispatchEvent(new Event("input", { bubbles: true }));
-        }
-    });
-</script>
 """, unsafe_allow_html=True)
 
-# Use the result in Python logic
-if event_trigger:
-    timeframe, location = event_trigger.split("-")
-    st.success(f"Prediction triggered for: {timeframe.upper()} in {location.upper()}")
+# Streamlit widgets
+st.title("CNN with LSTM Prediction")
+
+timeframe = st.selectbox("Select Time Frame", ["Week", "Month", "Year"])
+location = st.selectbox("Select Location", [
+    "TANAUAN", "TALISAY", "AYA", "TUMAWAY", "SAMPALOC",
+    "BERINAYAN", "BALAKILONG", "BUSO-BUSO", "BAÑAGA",
+    "BILIBINWANG", "SUBIC-ILAYA", "SAN NICOLAS"
+])
+
+# Predict button
+if st.button("Predict"):
+    # Example logic: show result or image
+    if timeframe == "Week" and location == "TANAUAN":
+        st.image("bar_chart_actual_values.png", caption="Predicted Parameters Chart")
+    else:
+        st.info(f"No chart available for {location} - {timeframe.lower()}.")
+
+# Optional footer
+st.caption("Last updated: May 21, 2025")
