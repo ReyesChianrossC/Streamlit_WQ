@@ -103,7 +103,7 @@ st.markdown("""
             font-size: 19px;
             font-weight: 700; /* Bold for contrast */
             cursor: pointer;
-            color: #E6EFEA; /* Gray Tint for high contrast */
+            color: #333333; /* Dark gray for better contrast */
             text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; /* Black border outline */
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5); /* Fiji Blue glow */
             font-family: 'Inter', sans-serif; /* Inter font */
