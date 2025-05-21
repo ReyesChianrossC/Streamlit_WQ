@@ -142,7 +142,7 @@ st.markdown("""
             <button class="stat-comparison-button">SCI</button>
         </div>
         <div class="title-wrapper">
-            <div class="title">TaalWQ</div>
+            <div class="title">CNN with LSTM Prediction</div>
         </div>
         <div class="predict-wrapper">
             <button class="predict-button">Predict</button>
