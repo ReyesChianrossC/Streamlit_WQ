@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Custom HTML & CSS with JavaScript
+# Custom HTML & CSS
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -90,7 +90,7 @@ st.markdown("""
             font-size: 19px;
             font-weight: 700;
             cursor: pointer;
-            color: #E6EFEA;
+            color: #000000; /* Black text */
             text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
             font-family: 'Inter', sans-serif;
@@ -103,7 +103,7 @@ st.markdown("""
             font-size: 19px;
             font-weight: 700;
             cursor: pointer;
-            color: #E6EFEA;
+            color: #000000; /* Black text */
             text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
             font-family: 'Inter', sans-serif;
@@ -134,9 +134,6 @@ st.markdown("""
             background: linear-gradient(to top, #00C0D1, #0082E0);
             box-shadow: 0 0 15px rgba(0, 130, 224, 0.7);
         }
-        .clicked {
-            color: #000000 !important; /* Black color on click */
-        }
     </style>
 
     <div class="vertical-box">
@@ -151,31 +148,16 @@ st.markdown("""
             <button class="predict-button">Predict</button>
         </div>
         <div class="by-week-wrapper">
-            <select class="by-week-selector" id="by-week-selector">
+            <select class="by-week-selector">
                 <option value="week">Week</option>
                 <option value="month">Month</option>
                 <option value="year">Year</option>
             </select>
-            <select class="location-selector" id="location-selector">
+            <select class="location-selector">
                 <option value="location1">Location 1</option>
                 <option value="location2">Location 2</option>
                 <option value="location3">Location 3</option>
             </select>
         </div>
     </div>
-
-    <script>
-        // Function to handle click color change
-        function handleSelectorClick(selectorId) {
-            const selector = document.getElementById(selectorId);
-            selector.classList.add('clicked'); // Change to black on click
-            setTimeout(() => {
-                selector.style.color = '#FFFFFF'; // Revert to white after 300ms
-            }, 300);
-        }
-
-        // Add event listeners to both selectors
-        document.getElementById('by-week-selector').addEventListener('mousedown', () => handleSelectorClick('by-week-selector'));
-        document.getElementById('location-selector').addEventListener('mousedown', () => handleSelectorClick('location-selector'));
-    </script>
 """, unsafe_allow_html=True)
