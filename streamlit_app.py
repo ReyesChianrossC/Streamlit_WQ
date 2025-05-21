@@ -1,89 +1,96 @@
 import streamlit as st
 
-# CSS for enhanced ultra-compact card style
+# CSS for enhanced and vibrant design
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
         font-size: 16px;
+        background: linear-gradient(135deg, #e6f0fa, #b3d4fc);
+        height: 100%;
+        margin: 0;
     }
 
     .container {
-        background: white;
-        padding: 16px 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-        max-width: 360px;
-        margin: 20px auto;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px 25px;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        margin: 40px auto;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .container:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
 
     .stButton>button {
-        background: linear-gradient(135deg, #0077cc, #00b7d4);
+        background: linear-gradient(90deg, #007bff, #00c4cc);
         color: white;
         font-weight: 600;
-        font-size: 0.9em;
+        font-size: 1em;
         border: none;
-        border-radius: 8px;
-        padding: 0.5em 1em;
-        box-shadow: 0 2px 8px rgba(0, 119, 204, 0.3);
+        border-radius: 10px;
+        padding: 0.6em 1.2em;
+        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4);
         transition: all 0.3s ease;
         width: 100%;
-        margin-top: 12px;
+        margin-top: 15px;
     }
     .stButton>button:hover {
-        background: linear-gradient(135deg, #00b7d4, #0077cc);
-        box-shadow: 0 4px 12px rgba(0, 119, 204, 0.5);
-        transform: translateY(-1px);
+        background: linear-gradient(90deg, #00c4cc, #007bff);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.6);
+        transform: translateY(-2px);
     }
     .stButton>button:active {
         transform: translateY(0);
-        box-shadow: 0 2px 6px rgba(0, 119, 204, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
     }
 
     .stSelectbox>div {
-        background: #f8f9fd;
+        background: #ffffff;
         color: #333;
         font-weight: 600;
-        font-size: 0.85em;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 0.4em;
-        margin-bottom: 12px;
-        transition: border-color 0.2s ease;
+        font-size: 0.9em;
+        border: 2px solid #007bff;
+        border-radius: 10px;
+        padding: 0.5em;
+        margin-bottom: 15px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .stSelectbox>div:hover, .stSelectbox>div:focus {
-        border-color: #0077cc;
+        border-color: #00c4cc;
+        box-shadow: 0 0 10px rgba(0, 196, 204, 0.3);
+    }
+
+    h1 {
+        font-size: 2.2em;
+        font-weight: 700;
+        color: #004085;
+        text-align: center;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
     .stCaption {
         text-align: center;
-        color: #888;
-        font-size: 0.75em;
+        color: #666;
+        font-size: 0.8em;
         font-weight: 400;
-        margin-top: 10px;
-    }
-
-    h1 {
-        font-size: 1.8em;
-        font-weight: 700;
-        color: #222;
-        text-align: center;
-        margin-bottom: 20px;
+        margin-top: 15px;
     }
 
     @media (max-width: 600px) {
         .container {
             max-width: 90%;
-            padding: 12px 16px;
+            padding: 15px 20px;
+            margin: 20px auto;
         }
         h1 {
-            font-size: 1.5em;
+            font-size: 1.8em;
         }
     }
 </style>
