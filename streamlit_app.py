@@ -1,3 +1,5 @@
+import streamlit as st
+
 # Custom HTML & CSS with JavaScript
 st.markdown("""
     <style>
