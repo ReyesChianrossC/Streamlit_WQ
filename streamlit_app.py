@@ -87,20 +87,19 @@ st.markdown("""
             border-radius: 10px;
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
-            font-size: 19px;
+            font-size: 16px; /* Reduced font size */
             font-weight: normal;
             cursor: pointer;
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
             font-family: 'Inter', sans-serif;
-            width: 150px; /* Adjusted width */
         }
         .by-week-selector, .location-selector {
             padding: 12px 24px;
             border-radius: 10px;
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
-            font-size: 19px;
+            font-size: 16px; /* Reduced font size */
             font-weight: normal;
             cursor: pointer;
             color: #000000;
@@ -112,10 +111,10 @@ st.markdown("""
             text-align: left;
         }
         .by-week-selector {
-            width: 100px; /* Adjusted width */
+            flex-shrink: 0;
         }
         .location-selector {
-            width: 200px; /* Adjusted width */
+            flex: 1;
         }
         .predict-wrapper {
             display: flex;
