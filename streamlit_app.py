@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Custom HTML & CSS
+# Custom HTML & CSS with JavaScript
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -88,7 +88,7 @@ st.markdown("""
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
             font-size: 16px;
-            font-weight: 700; /* Increased font weight */
+            font-weight: 700;
             cursor: pointer;
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
@@ -100,7 +100,7 @@ st.markdown("""
             border: none;
             background: linear-gradient(to bottom, #0082E0, #00C0D1);
             font-size: 16px;
-            font-weight: 700; /* Increased font weight */
+            font-weight: 700;
             cursor: pointer;
             color: #000000;
             box-shadow: 0 0 10px rgba(0, 130, 224, 0.5);
@@ -132,6 +132,17 @@ st.markdown("""
             background: linear-gradient(to top, #00C0D1, #0082E0);
             box-shadow: 0 0 15px rgba(0, 130, 224, 0.7);
         }
+        #results {
+            margin-top: 20px;
+            color: #000000;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            display: none;
+        }
     </style>
 
     <div class="vertical-box">
@@ -143,19 +154,107 @@ st.markdown("""
             <div class="title">CNN with LSTM Prediction</div>
         </div>
         <div class="predict-wrapper">
-            <button class="predict-button">Predict</button>
+            <button class="predict-button" id="predict-button">Predict</button>
         </div>
         <div class="by-week-wrapper">
-            <select class="by-week-selector">
+            <select class="by-week-selector" id="by-week-selector">
                 <option value="week">Week</option>
                 <option value="month">Month</option>
                 <option value="year">Year</option>
             </select>
-            <select class="location-selector">
-                <option value="location1">Location 1</option>
-                <option value="location2">Location 2</option>
-                <option value="location3">Location 3</option>
+            <select class="location-selector" id="location-selector">
+                <option value="TANAUAN">TANAUAN</option>
+                <option value="TALISAY">TALISAY</option>
+                <option value="AYA">AYA</option>
+                <option value="TUMAWAY">TUMAWAY</option>
+                <option value="SAMPALOC">SAMPALOC</option>
+                <option value="BERINAYAN">BERINAYAN</option>
+                <option value="BALAKILONG">BALAKILONG</option>
+                <option value="BUSO-BUSO">BUSO-BUSO</option>
+                <option value="BAÑAGA">BAÑAGA</option>
+                <option value="BILIBINWANG">BILIBINWANG</option>
+                <option value="SUBIC-ILAYA">SUBIC-ILAYA</option>
+                <option value="SAN NICOLAS">SAN NICOLAS</option>
             </select>
         </div>
+        <div id="results"></div>
     </div>
+
+    <script>
+        // Load predictions data from parquet (assuming it's available as a JSON for simplicity)
+        const predictions = [
+            {"site": "TANAUAN", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "TANAUAN", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "TANAUAN", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "TALISAY", "time_frame": "Week", "surface_temperature": 26.198494, "middle_temperature": 26.212751, "bottom_temperature": 26.355118, "ph": 8.665811, "ammonia": 0.120792, "nitrate": 0.110559, "phosphate": 2.344637, "dissolved_oxygen": 5.638792, "wqi": 353.236206, "wqi_classification": "Good"},
+            {"site": "TALISAY", "time_frame": "Month", "surface_temperature": 26.198494, "middle_temperature": 26.212751, "bottom_temperature": 26.355118, "ph": 8.665811, "ammonia": 0.120792, "nitrate": 0.110559, "phosphate": 2.344637, "dissolved_oxygen": 5.638792, "wqi": 353.236206, "wqi_classification": "Good"},
+            {"site": "TALISAY", "time_frame": "Year", "surface_temperature": 26.198494, "middle_temperature": 26.212751, "bottom_temperature": 26.355118, "ph": 8.665811, "ammonia": 0.120792, "nitrate": 0.110559, "phosphate": 2.344637, "dissolved_oxygen": 5.638792, "wqi": 353.236206, "wqi_classification": "Good"},
+            {"site": "AYA", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "AYA", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "AYA", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "TUMAWAY", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "TUMAWAY", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "TUMAWAY", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SAMPALOC", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SAMPALOC", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SAMPALOC", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BERINAYAN", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BERINAYAN", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BERINAYAN", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BALAKILONG", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BALAKILONG", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BALAKILONG", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BUSO-BUSO", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BUSO-BUSO", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BUSO-BUSO", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BAÑAGA", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BAÑAGA", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BAÑAGA", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BILIBINWANG", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BILIBINWANG", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "BILIBINWANG", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SUBIC-ILAYA", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SUBIC-ILAYA", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SUBIC-ILAYA", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SAN NICOLAS", "time_frame": "Week", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178986, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SAN NICOLAS", "time_frame": "Month", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780165, "ph": 8.233041, "ammonia": 0.224652, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178985, "wqi": 238.272095, "wqi_classification": "Good"},
+            {"site": "SAN NICOLAS", "time_frame": "Year", "surface_temperature": 26.945187, "middle_temperature": 26.868622, "bottom_temperature": 26.780167, "ph": 8.233041, "ammonia": 0.224654, "nitrate": 0.135936, "phosphate": 2.348414, "dissolved_oxygen": 2.178987, "wqi": 238.272095, "wqi_classification": "Good"}
+        ];
+
+        // Function to display predictions
+        function displayPredictions() {
+            const timeFrame = document.getElementById('by-week-selector').value;
+            const location = document.getElementById('location-selector').value;
+            const resultsDiv = document.getElementById('results');
+
+            if (timeFrame === 'month') {
+                const prediction = predictions.find(p => p.site === location && p.time_frame === 'Month');
+                if (prediction) {
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML = `
+                        <h4>Predictions for ${location} (Month)</h4>
+                        <p>Surface Temp: ${prediction.surface_temperature.toFixed(2)}°C</p>
+                        <p>Middle Temp: ${prediction.middle_temperature.toFixed(2)}°C</p>
+                        <p>Bottom Temp: ${prediction.bottom_temperature.toFixed(2)}°C</p>
+                        <p>pH: ${prediction.ph.toFixed(2)}</p>
+                        <p>Ammonia: ${prediction.ammonia.toFixed(2)} mg/L</p>
+                        <p>Nitrate: ${prediction.nitrate.toFixed(2)} mg/L</p>
+                        <p>Phosphate: ${prediction.phosphate.toFixed(2)} mg/L</p>
+                        <p>Dissolved Oxygen: ${prediction.dissolved_oxygen.toFixed(2)} mg/L</p>
+                        <p>WQI: ${prediction.wqi.toFixed(2)} (${prediction.wqi_classification})</p>
+                    `;
+                } else {
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.innerHTML = `<p>No data available for ${location} (Month)</p>`;
+                }
+            } else {
+                resultsDiv.style.display = 'none';
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('by-week-selector').addEventListener('change', displayPredictions);
+        document.getElementById('location-selector').addEventListener('change', displayPredictions);
+        document.getElementById('predict-button').addEventListener('click', displayPredictions);
+    </script>
 """, unsafe_allow_html=True)
