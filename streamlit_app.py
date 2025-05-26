@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -86,7 +87,9 @@ h1, h2, h3 {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     z-index: 2000;
-    width: 300px;
+    width: 900px; /* Adjusted for three facets */
+    max-height: 500px; /* Reduced height for compactness */
+    overflow-y: auto; /* Allow scrolling */
     text-align: center;
 }
 </style>
@@ -95,7 +98,7 @@ h1, h2, h3 {
 # === Floating Button ===
 st.markdown("""
 <div class='floating-button' onclick='st.session_state.show_popup=True'>
-    <span style='color: #f1f1f1; font-size: 1.2rem; font-weight: bold;'>Open</span>
+    <span style='color: #f1f1f1; font-size: 1.2rem; font-weight: bold;'>Model Comparison</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -104,12 +107,62 @@ if st.session_state.show_popup:
     with st.container():
         st.markdown("""
         <div class='popup-container'>
-            <h3>Placeholder Popup</h3>
-            <p>This is a placeholder popup content.</p>
+            <h3>Model Performance Comparison</h3>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Close Popup", key="close_popup"):
-            st.session_state.show_popup = False
+        
+        try:
+            # Load model comparison data
+            comparison_df = pd.read_parquet("model_comparison.parquet")
+            
+            # Validate data
+            if comparison_df.empty:
+                st.markdown("""
+                <div class='popup-container'>
+                    <p>No data found in model_comparison.parquet.</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                # Create Altair bar chart
+                chart = alt.Chart(comparison_df).mark_bar().encode(
+                    x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
+                    y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(domain=[0, comparison_df['mae'].max() * 1.2])),
+                    color=alt.condition(
+                        alt.datum.best_model,
+                        alt.value('#6f42c1'),  # Highlight best model
+                        alt.value('#a29bfe')
+                    ),
+                    column=alt.Column('prediction_gap:N', title='Prediction Gap'),
+                    tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
+                ).properties(
+                    width=250,  # Slightly wider facets
+                    height=300
+                ).configure_axis(
+                    labelFontSize=12,
+                    titleFontSize=14
+                )
+                
+                # Display chart in popup
+                with st.container():
+                    st.altair_chart(chart, use_container_width=True)
+                
+        except FileNotFoundError:
+            st.markdown("""
+            <div class='popup-container'>
+                <p>model_comparison.parquet not found.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        except Exception as e:
+            st.markdown(f"""
+            <div class='popup-container'>
+                <p>Error loading chart: {e}</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Close button
+        with st.container():
+            if st.button("Close Popup", key="close_popup"):
+                st.session_state.show_popup = False
 
 # === Sidebar ===
 st.sidebar.title("Navigation")
