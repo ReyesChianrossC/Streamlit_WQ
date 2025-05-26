@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -60,7 +61,7 @@ h1, h2, h3 {
 
 /* Floating Button */
 .floating-button {
-    position: fixed;
+    position: fixed !important;
     top: 10px;
     right: 10px;
     width: 128px;
@@ -73,6 +74,13 @@ h1, h2, h3 {
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     z-index: 1000;
+    border: none;
+    color: #f1f1f1;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.5;
+    padding: 10px;
 }
 
 /* Popup Styling */
@@ -86,19 +94,46 @@ h1, h2, h3 {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     z-index: 2000;
-    width: 900px; /* Adjusted for three facets */
-    max-height: 500px; /* Reduced height for compactness */
-    overflow-y: auto; /* Allow scrolling */
+    width: 900px;
+    max-height: 500px;
+    overflow-y: auto;
     text-align: center;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # === Floating Button ===
+if st.button("Model Comparison", key="floating_button", 
+             help="Open model comparison chart", 
+             use_container_width=False):
+    st.session_state.show_popup = True
+
+# Apply CSS to the button using markdown
 st.markdown("""
-<div class='floating-button' onclick='st.session_state.show_popup=True'>
-    <span style='color: #f1f1f1; font-size: 1.2rem; font-weight: bold;'>Model Comparison</span>
-</div>
+<style>
+div[data-testid="stButton"] > button[key="floating_button"] {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 128px;
+    height: 128px;
+    background-color: #6f42c1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    border: none;
+    color: #f1f1f1;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.5;
+    padding: 10px;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # === Popup Logic ===
@@ -134,7 +169,7 @@ if st.session_state.show_popup:
                     column=alt.Column('prediction_gap:N', title='Prediction Gap'),
                     tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
                 ).properties(
-                    width=250,  # Slightly wider facets
+                    width=250,
                     height=300
                 ).configure_axis(
                     labelFontSize=12,
@@ -277,4 +312,4 @@ with tab2:
 
 # === Footer ===
 st.markdown("<hr>", unsafe_allow_html=True)
-st.caption("CPEN106 • Water Quality Monitoring • Updated: May 21, 2025")
+st.caption("CPEN106 • Water Quality Monitoring • Updated: May 26, 2025")
