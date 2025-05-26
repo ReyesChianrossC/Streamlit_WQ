@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -97,9 +98,7 @@ h1, h2, h3 {
     max-height: 500px;
     overflow-y: auto;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    background: #2c2c3e; /* Explicitly set background to match theme */
 }
 
 /* Close Button Styling */
@@ -112,6 +111,11 @@ h1, h2, h3 {
     margin-top: 10px;
     cursor: pointer;
     font-weight: 600;
+}
+
+/* Ensure no overlay from chart or containers */
+.altair-chart {
+    background: transparent !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -163,12 +167,11 @@ div[data-testid="stButton"] > button[key="close_popup"] {
 # === Popup Logic ===
 if st.session_state.show_popup:
     with st.container():
-        with st.container():
-            st.markdown("""
-            <div class='popup-container'>
-                <h3>Model Performance Comparison</h3>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown("""
+        <div class='popup-container'>
+            <h3>Model Performance Comparison</h3>
+        </div>
+        """, unsafe_allow_html=True)
         
         try:
             # Load model comparison data
@@ -199,6 +202,8 @@ if st.session_state.show_popup:
                 ).configure_axis(
                     labelFontSize=12,
                     titleFontSize=14
+                ).configure_view(
+                    background='transparent'  # Ensure chart background is transparent
                 )
                 
                 # Display chart in popup
