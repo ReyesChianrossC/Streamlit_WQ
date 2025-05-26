@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -5,11 +6,7 @@ import altair as alt
 # Streamlit config
 st.set_page_config(page_title="Water Quality Dashboard", layout="wide")
 
-# Initialize session state for popup
-if 'show_popup' not in st.session_state:
-    st.session_state.show_popup = False
-
-# === Custom CSS for Dark Dashboard and Button ===
+# === Custom CSS for Dark Dashboard ===
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -58,174 +55,12 @@ h1, h2, h3 {
     color: #bcbcff;
 }
 
-/* Floating Button */
-.floating-button {
-    position: fixed !important;
-    top: 10px;
-    right: 10px;
-    width: 128px;
-    height: 128px;
-    background-color: #6f42c1;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    border: none;
-    color: #f1f1f1;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    line-height: 1.5;
-    padding: 10px;
-}
-
-/* Popup Styling */
-.popup-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #2c2c3e;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    z-index: 2000;
-    width: 900px;
-    max-height: 500px;
-    overflow-y: auto;
-    text-align: center;
-    background: #2c2c3e; /* Explicitly set background to match theme */
-}
-
-/* Close Button Styling */
-.close-button {
-    background-color: #6f42c1;
-    color: #f1f1f1;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    margin-top: 10px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-/* Ensure no overlay from chart or containers */
+/* Ensure chart background is transparent */
 .altair-chart {
     background: transparent !important;
 }
 </style>
 """, unsafe_allow_html=True)
-
-# === Floating Button ===
-if st.button("Model Comparison", key="floating_button", 
-             help="Open model comparison chart", 
-             use_container_width=False):
-    st.session_state.show_popup = True
-
-# Apply CSS to the button using markdown
-st.markdown("""
-<style>
-div[data-testid="stButton"] > button[key="floating_button"] {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    width: 128px;
-    height: 128px;
-    background-color: #6f42c1;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    border: none;
-    color: #f1f1f1;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    line-height: 1.5;
-    padding: 10px;
-}
-div[data-testid="stButton"] > button[key="close_popup"] {
-    background-color: #6f42c1;
-    color: #f1f1f1;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    margin-top: 10px;
-    cursor: pointer;
-    font-weight: 600;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# === Popup Logic ===
-if st.session_state.show_popup:
-    with st.container():
-        st.markdown("""
-        <div class='popup-container'>
-            <h3>Model Performance Comparison</h3>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        try:
-            # Load model comparison data
-            comparison_df = pd.read_parquet("model_comparison.parquet")
-            
-            # Validate data
-            if comparison_df.empty:
-                st.markdown("""
-                <div class='popup-container'>
-                    <p>No data found in model_comparison.parquet.</p>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                # Create Altair bar chart
-                chart = alt.Chart(comparison_df).mark_bar().encode(
-                    x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
-                    y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(domain=[0, comparison_df['mae'].max() * 1.2])),
-                    color=alt.condition(
-                        alt.datum.best_model,
-                        alt.value('#6f42c1'),  # Highlight best model
-                        alt.value('#a29bfe')
-                    ),
-                    column=alt.Column('prediction_gap:N', title='Prediction Gap'),
-                    tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
-                ).properties(
-                    width=250,
-                    height=300
-                ).configure_axis(
-                    labelFontSize=12,
-                    titleFontSize=14
-                ).configure_view(
-                    background='transparent'  # Ensure chart background is transparent
-                )
-                
-                # Display chart in popup
-                with st.container():
-                    st.altair_chart(chart, use_container_width=True)
-                
-        except FileNotFoundError:
-            st.markdown("""
-            <div class='popup-container'>
-                <p>model_comparison.parquet not found.</p>
-            </div>
-            """, unsafe_allow_html=True)
-        except Exception as e:
-            st.markdown(f"""
-            <div class='popup-container'>
-                <p>Error loading chart: {e}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Close button
-        with st.container():
-            if st.button("Close Popup", key="close_popup"):
-                st.session_state.show_popup = False
 
 # === Sidebar ===
 st.sidebar.title("Navigation")
@@ -338,6 +173,46 @@ with tab2:
     )
 
     st.altair_chart(chart, use_container_width=True)
+
+# === Model Comparison Chart Section ===
+st.markdown("### Model Performance Comparison")
+
+try:
+    # Load model comparison data
+    comparison_df = pd.read_parquet("model_comparison.parquet")
+    
+    # Validate data
+    if comparison_df.empty:
+        st.markdown("<p>No data found in model_comparison.parquet.</p>", unsafe_allow_html=True)
+    else:
+        # Create Altair bar chart
+        chart = alt.Chart(comparison_df).mark_bar().encode(
+            x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
+            y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(domain=[0, comparison_df['mae'].max() * 1.2])),
+            color=alt.condition(
+                alt.datum.best_model,
+                alt.value('#6f42c1'),  # Highlight best model
+                alt.value('#a29bfe')
+            ),
+            column=alt.Column('prediction_gap:N', title='Prediction Gap'),
+            tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
+        ).properties(
+            width=250,
+            height=300
+        ).configure_axis(
+            labelFontSize=12,
+            titleFontSize=14
+        ).configure_view(
+            background='transparent'  # Ensure chart background is transparent
+        )
+        
+        # Display chart
+        st.altair_chart(chart, use_container_width=True)
+        
+except FileNotFoundError:
+    st.markdown("<p>model_comparison.parquet not found.</p>", unsafe_allow_html=True)
+except Exception as e:
+    st.markdown(f"<p>Error loading chart: {e}</p>", unsafe_allow_html=True)
 
 # === Footer ===
 st.markdown("<hr>", unsafe_allow_html=True)
