@@ -184,7 +184,7 @@ try:
     if comparison_df.empty:
         st.markdown("<p>No data found in model_comparison.parquet.</p>", unsafe_allow_html=True)
     else:
-        # Create Altair bar chart
+        # Create Altair bar chart using the provided data structure
         chart = alt.Chart(comparison_df).mark_bar().encode(
             x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
             y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(domain=[0, comparison_df['mae'].max() * 1.2])),
@@ -201,8 +201,6 @@ try:
         ).configure_axis(
             labelFontSize=12,
             titleFontSize=14
-        ).configure_view(
-            background='transparent'  # Ensure chart background is transparent
         )
         
         # Display chart
