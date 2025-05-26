@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -97,6 +98,9 @@ h1, h2, h3 {
     max-height: 500px;
     overflow-y: auto;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* Close Button Styling */
@@ -160,11 +164,12 @@ div[data-testid="stButton"] > button[key="close_popup"] {
 # === Popup Logic ===
 if st.session_state.show_popup:
     with st.container():
-        st.markdown("""
-        <div class='popup-container'>
-            <h3>Model Performance Comparison</h3>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container():
+            st.markdown("""
+            <div class='popup-container'>
+                <h3>Model Performance Comparison</h3>
+            </div>
+            """, unsafe_allow_html=True)
         
         try:
             # Load model comparison data
