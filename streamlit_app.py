@@ -98,6 +98,18 @@ h1, h2, h3 {
     overflow-y: auto;
     text-align: center;
 }
+
+/* Close Button Styling */
+.close-button {
+    background-color: #6f42c1;
+    color: #f1f1f1;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -131,6 +143,16 @@ div[data-testid="stButton"] > button[key="floating_button"] {
     text-align: center;
     line-height: 1.5;
     padding: 10px;
+}
+div[data-testid="stButton"] > button[key="close_popup"] {
+    background-color: #6f42c1;
+    color: #f1f1f1;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-weight: 600;
 }
 </style>
 """, unsafe_allow_html=True)
