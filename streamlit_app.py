@@ -177,21 +177,18 @@ with tab2:
 st.markdown("### Model Performance Comparison")
 
 try:
-    # Load model comparison data
     comparison_df = pd.read_parquet("model_comparison.parquet")
     
-    # Validate data
     if comparison_df.empty:
         st.markdown("<p>No data found in model_comparison.parquet.</p>", unsafe_allow_html=True)
     else:
-        # Create Altair bar chart using the provided data structure
         chart = alt.Chart(comparison_df).mark_bar().encode(
             x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
-            y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(domain=[0, comparison_df['mae'].max() * 1.2])),
+            y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(type='sqrt')),
             color=alt.condition(
                 alt.datum.best_model,
-                alt.value('#6f42c1'),  # Highlight best model
-                alt.value('#a29bfe')
+                alt.value('#6f42c1'),  # Best model color
+                alt.value('#a29bfe')   # Other models
             ),
             column=alt.Column('prediction_gap:N', title='Prediction Gap'),
             tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
@@ -203,7 +200,6 @@ try:
             titleFontSize=14
         )
         
-        # Display chart
         st.altair_chart(chart, use_container_width=True)
         
 except FileNotFoundError:
