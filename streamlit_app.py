@@ -5,7 +5,11 @@ import altair as alt
 # Streamlit config
 st.set_page_config(page_title="Water Quality Dashboard", layout="wide")
 
-# === Custom CSS for Dark Dashboard ===
+# Initialize session state for popup
+if 'show_popup' not in st.session_state:
+    st.session_state.show_popup = False
+
+# === Custom CSS for Dark Dashboard and Button ===
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -53,8 +57,59 @@ h1, h2, h3 {
     font-size: 0.9rem;
     color: #bcbcff;
 }
+
+/* Floating Button */
+.floating-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 128px;
+    height: 128px;
+    background-color: #6f42c1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+/* Popup Styling */
+.popup-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2c2c3e;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    width: 300px;
+    text-align: center;
+}
 </style>
 """, unsafe_allow_html=True)
+
+# === Floating Button ===
+st.markdown("""
+<div class='floating-button' onclick='st.session_state.show_popup=True'>
+    <span style='color: #f1f1f1; font-size: 1.2rem; font-weight: bold;'>Open</span>
+</div>
+""", unsafe_allow_html=True)
+
+# === Popup Logic ===
+if st.session_state.show_popup:
+    with st.container():
+        st.markdown("""
+        <div class='popup-container'>
+            <h3>Placeholder Popup</h3>
+            <p>This is a placeholder popup content.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Close Popup", key="close_popup"):
+            st.session_state.show_popup = False
 
 # === Sidebar ===
 st.sidebar.title("Navigation")
