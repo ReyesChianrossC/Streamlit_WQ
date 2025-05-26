@@ -118,8 +118,9 @@ for i, (label, key) in enumerate(metrics.items()):
         cols[i].metric(label, f"{value:.2f}", f"{delta:.2f}", delta_color="off")
 
 # === Tabs ===
-tab1, tab2 = st.tabs(["Prediction Overview", "Parameter Comparison"])
+tab1, tab2, tab3 = st.tabs(["Prediction Overview", "Parameter Comparison", "Model Comparison"])
 
+# === Tab 1: Prediction Overview ===
 with tab1:
     st.markdown("### Predicted Water Quality Changes")
 
@@ -151,6 +152,7 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
 
+# === Tab 2: Parameter Comparison ===
 with tab2:
     st.markdown("### Parameter Comparison Chart")
     chart_data = pd.DataFrame({
@@ -173,39 +175,44 @@ with tab2:
 
     st.altair_chart(chart, use_container_width=True)
 
-# === Model Comparison Chart Section ===
-st.markdown("### Model Performance Comparison")
+# === Tab 3: Model Comparison ===
+with tab3:
+    st.markdown("### Model Performance Comparison")
 
-try:
-    comparison_df = pd.read_parquet("model_comparison.parquet")
-    
-    if comparison_df.empty:
-        st.markdown("<p>No data found in model_comparison.parquet.</p>", unsafe_allow_html=True)
-    else:
-        chart = alt.Chart(comparison_df).mark_bar().encode(
-            x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
-            y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(type='sqrt')),
-            color=alt.condition(
-                alt.datum.best_model,
-                alt.value('#6f42c1'),  # Best model color
-                alt.value('#a29bfe')   # Other models
-            ),
-            column=alt.Column('prediction_gap:N', title='Prediction Gap'),
-            tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
-        ).properties(
-            width=250,
-            height=300
-        ).configure_axis(
-            labelFontSize=12,
-            titleFontSize=14
-        )
+    try:
+        comparison_df = pd.read_parquet("model_comparison.parquet")
         
-        st.altair_chart(chart, use_container_width=True)
+        if comparison_df.empty:
+            st.warning("No data found in model_comparison.parquet.")
+        else:
+            chart = alt.Chart(comparison_df).mark_bar().encode(
+                x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
+                y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(type='sqrt')),
+                color=alt.condition(
+                    alt.datum.best_model,
+                    alt.value('#6f42c1'),  # Best model color
+                    alt.value('#a29bfe')   # Other models
+                ),
+                column=alt.Column('prediction_gap:N', title='Prediction Gap'),
+                tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
+            ).properties(
+                width=250,
+                height=300
+            ).configure_axis(
+                labelFontSize=12,
+                titleFontSize=14
+            )
+            
+            st.altair_chart(chart, use_container_width=True)
+
+            # Also show as table
+            st.markdown("#### Raw Comparison Table")
+            st.dataframe(comparison_df, use_container_width=True)
         
-except FileNotFoundError:
-    st.markdown("<p>model_comparison.parquet not found.</p>", unsafe_allow_html=True)
-except Exception as e:
-    st.markdown(f"<p>Error loading chart: {e}</p>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error("File model_comparison.parquet not found.")
+    except Exception as e:
+        st.error(f"Error loading model comparison data: {e}")
 
 # === Footer ===
 st.markdown("<hr>", unsafe_allow_html=True)
