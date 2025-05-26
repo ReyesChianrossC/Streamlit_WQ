@@ -54,7 +54,6 @@ h1, h2, h3 {
     color: #bcbcff;
 }
 
-/* Ensure chart background is transparent */
 .altair-chart {
     background: transparent !important;
 }
@@ -71,21 +70,20 @@ location = st.sidebar.selectbox("Select Location", [
 
 timeframe = st.sidebar.selectbox("Select Time Frame", ["Week", "Month", "Year"])
 
-# === Load data ===
+# === Load Data ===
 try:
     df = pd.read_parquet("predictions.parquet")
 except FileNotFoundError:
     st.error("Missing predictions.parquet file.")
     st.stop()
 
-# === Filter & Compute ===
+# === Filter Data ===
 try:
     selected_df = df[(df['site'] == location) & (df['time_frame'] == timeframe)]
     if selected_df.empty:
         st.error("No matching data found.")
         st.stop()
     selected = selected_df.iloc[0]
-
     baseline_df = df[(df['site'] == location) & (df['time_frame'] == timeframe)]
     baseline = baseline_df.mean(numeric_only=True)
 except Exception as e:
@@ -103,9 +101,7 @@ metrics = {
     "DO (mg/L)": 'dissolved_oxygen',
     "Ammonia": 'ammonia'
 }
-
 cols = st.columns(len(metrics))
-
 for i, (label, key) in enumerate(metrics.items()):
     value = selected[key]
     base = baseline[key]
@@ -123,7 +119,6 @@ tab1, tab2, tab3 = st.tabs(["Prediction Overview", "Parameter Comparison", "Mode
 # === Tab 1: Prediction Overview ===
 with tab1:
     st.markdown("### Predicted Water Quality Changes")
-
     param_map = {
         'Surface Temp': 'surface_temperature',
         'Middle Temp': 'middle_temperature',
@@ -135,7 +130,6 @@ with tab1:
         'Diss. Oxygen': 'dissolved_oxygen',
         'WQI': 'wqi'
     }
-
     for name, key in param_map.items():
         before = baseline[key]
         after = selected[key]
@@ -145,14 +139,13 @@ with tab1:
             <div class='metric-value'>[{before:.4f}] → [{after:.4f}]</div>
         </div>
         """, unsafe_allow_html=True)
-
     st.markdown(f"""
         <div style='margin-top: 20px; font-size: 1.1rem;'>
             <strong>WQI Classification:</strong> {selected['wqi_classification']}
         </div>
     """, unsafe_allow_html=True)
 
-# === Tab 2: Parameter Comparison ===
+# === Tab 2: Parameter Comparison Chart ===
 with tab2:
     st.markdown("### Parameter Comparison Chart")
     chart_data = pd.DataFrame({
@@ -160,9 +153,7 @@ with tab2:
         "Baseline": [baseline[k] for k in param_map.values()],
         "Predicted": [selected[k] for k in param_map.values()]
     })
-
     melted = chart_data.melt(id_vars="Parameter", var_name="Type", value_name="Value")
-
     chart = alt.Chart(melted).mark_bar(opacity=0.85).encode(
         x=alt.X('Parameter:N', title=None),
         y=alt.Y('Value:Q'),
@@ -172,43 +163,42 @@ with tab2:
         width=700,
         height=400
     )
-
     st.altair_chart(chart, use_container_width=True)
 
-# === Tab 3: Model Comparison ===
+# === Tab 3: Model Comparison (Compact Grouped View) ===
 with tab3:
     st.markdown("### Model Performance Comparison")
 
     try:
         comparison_df = pd.read_parquet("model_comparison.parquet")
-        
+
         if comparison_df.empty:
             st.warning("No data found in model_comparison.parquet.")
         else:
-            chart = alt.Chart(comparison_df).mark_bar().encode(
-                x=alt.X('model:N', title='Model', axis=alt.Axis(labelAngle=0)),
-                y=alt.Y('mae:Q', title='Mean Absolute Error', scale=alt.Scale(type='sqrt')),
+            gap_option = st.radio("Select Prediction Gap", options=["Week", "Month", "Year"], horizontal=True)
+            filtered = comparison_df[comparison_df['prediction_gap'] == gap_option]
+            filtered = filtered.sort_values("mae")
+
+            chart = alt.Chart(filtered).mark_bar(size=30).encode(
+                x=alt.X('model:N', title=None, sort='-y'),
+                y=alt.Y('mae:Q', title='MAE', scale=alt.Scale(type='linear')),
                 color=alt.condition(
                     alt.datum.best_model,
-                    alt.value('#6f42c1'),  # Best model color
-                    alt.value('#a29bfe')   # Other models
+                    alt.value('#6f42c1'),
+                    alt.value('#a29bfe')
                 ),
-                column=alt.Column('prediction_gap:N', title='Prediction Gap'),
-                tooltip=['model', 'prediction_gap', alt.Tooltip('mae', format='.6f')]
+                tooltip=[alt.Tooltip('model:N'), alt.Tooltip('mae:Q', format='.6f')]
             ).properties(
-                width=250,
-                height=300
-            ).configure_axis(
-                labelFontSize=12,
-                titleFontSize=14
+                width=500,
+                height=300,
+                title=f"{gap_option} Models"
             )
-            
+
             st.altair_chart(chart, use_container_width=True)
 
-            # Also show as table
-            st.markdown("#### Raw Comparison Table")
-            st.dataframe(comparison_df, use_container_width=True)
-        
+            with st.expander("Show Model Table"):
+                st.dataframe(filtered, use_container_width=True)
+
     except FileNotFoundError:
         st.error("File model_comparison.parquet not found.")
     except Exception as e:
